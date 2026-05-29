@@ -1,4 +1,4 @@
-package it.diem.unisa.musicplaylistmanager_sad;
+package it.diem.unisa.musicmanager;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
