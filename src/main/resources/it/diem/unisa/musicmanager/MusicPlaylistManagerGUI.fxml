@@ -52,6 +52,9 @@
       </StackPane>
    </center>
 
-
+   <bottom>
+      <fx:include fx:id="player"
+                  source="components/player_bar.fxml"/>
+   </bottom>
 
 </BorderPane>
