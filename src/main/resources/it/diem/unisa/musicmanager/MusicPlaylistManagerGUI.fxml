@@ -54,7 +54,7 @@
 
    <bottom>
       <fx:include fx:id="player"
-                  source="components/player_bar.fxml"/>
+                  source="components/playerBar.fxml"/>
    </bottom>
 
 </BorderPane>
