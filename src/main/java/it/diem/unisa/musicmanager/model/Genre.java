@@ -15,6 +15,7 @@ public enum Genre {
     INDIE,
     COUNTRY,
     RAP,
-    PUNK
+    PUNK,
+    UNKNOWN
 
 }

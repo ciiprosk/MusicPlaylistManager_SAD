@@ -4,22 +4,47 @@ import java.util.UUID;
 
 public class Track {
 
-    private static final UUID  id = UUID.randomUUID();
+    private UUID  id;
 
-    private String title;   //max 100 caratteri
+    private String title;   //max 100 caratteri, OBBLIGATORIA
 
-    private String author;   //max 100 caratteri
+    private String author;   //max 100 caratteri. Opzionale
 
-    private Genre genre; //enum
+    private Genre genre; //enum, di default è 'KNOWN'
 
-    private final int songLength; //durata in secondi della canzone
+    private final int songLength; //durata in secondi della canzone >0
 
     private final String songPath;
 
-    private String year;
+    private String year;    //4 cifre, non nel futuro. di default è 'UNKNOWN'
 
 
     public Track(String title, String author, Genre genre, String songPath, int songLength, String year) {
+
+        this.id = UUID.randomUUID();
+
+        String trimTitle = title.trim();
+
+        String trimAuthor = author.trim();
+
+        this.title = trimTitle;
+
+        this.author = trimAuthor;
+
+        this.genre = genre;
+
+        this.songPath = songPath;
+
+        this.songLength = songLength;
+
+        this.year = year;
+
+    }
+
+    //costruttore per recuperare le info già esistenti (persistenza)
+    public Track(UUID id, String title, String author, Genre genre, String songPath, int songLength, String year) {
+
+        this.id = UUID.randomUUID();
 
         String trimTitle = title.trim();
 
@@ -86,14 +111,37 @@ public class Track {
     public boolean isDuplicate(Track track) {
         //tracce duplicate se hanno stesso nome e stesso autore
 
-        return this.author.equals(track.getAuthor()) && this.title.equals(track.getTitle());
+        String trimAuthor = track.getAuthor().trim();
+
+        String trimTitle = track.getTitle().trim();
+
+        return this.author.equals(trimAuthor) && this.title.equals(trimTitle);
 
     }
 
-    public boolean isValid(Track track) {
+    /* forse va nel controller?
+    public boolean checkValidFields(String title, String author, Genre genre, int songLength, String year) {
 
-        return true;
+        if (!title.isEmpty() && title.length() <= 100) {
+            return false;
+        }
+
+        if (author.length() <= 100) {
+            return false;
+        }
+
+        if (genre.name().length() > 50) {
+            return false;
+        }
+
+        if (songLength > 0) {
+            return false;
+        }
+
+        if (year != "UNKNOWN" || year.matches(""))
 
     }
+
+    */
 
 }
