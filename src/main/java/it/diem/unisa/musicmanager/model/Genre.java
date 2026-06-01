@@ -13,6 +13,8 @@ public enum Genre {
     METAL,
     FUNK,
     INDIE,
-    COUNTRY
+    COUNTRY,
+    RAP,
+    PUNK
 
 }

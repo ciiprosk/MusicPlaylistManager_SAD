@@ -6,24 +6,28 @@ public class Track {
 
     private static final UUID  id = UUID.randomUUID();
 
-    private String title;
+    private String title;   //max 100 caratteri
 
-    private String author;
+    private String author;   //max 100 caratteri
 
-    private Genre genre; //creare enum Genre
+    private Genre genre; //enum
 
-    private final int songLength;
+    private final int songLength; //durata in secondi della canzone
 
     private final String songPath;
 
-    private int year;
+    private String year;
 
 
-    public Track(String title, String author, Genre genre, String songPath, int songLength, int year) {
+    public Track(String title, String author, Genre genre, String songPath, int songLength, String year) {
 
-        this.title = title.trim();
+        String trimTitle = title.trim();
 
-        this.author = author.trim();
+        String trimAuthor = author.trim();
+
+        this.title = trimTitle;
+
+        this.author = trimAuthor;
 
         this.genre = genre;
 
@@ -34,8 +38,6 @@ public class Track {
         this.year = year;
 
     }
-
-    //FARE COSTRUTTORE CON LA DURATA
 
     public UUID getId() {
         return id;
@@ -51,6 +53,10 @@ public class Track {
 
     public Genre getGenre() {
         return genre;
+    }
+
+    public String getYear() {
+        return year;
     }
 
     public String getAuthor() {
@@ -73,14 +79,20 @@ public class Track {
         this.genre = genre;
     }
 
-    public void setYear(int year) {
-        
+    public void setYear(String year) {
+        this.year = year;
     }
 
     public boolean isDuplicate(Track track) {
         //tracce duplicate se hanno stesso nome e stesso autore
 
         return this.author.equals(track.getAuthor()) && this.title.equals(track.getTitle());
+
+    }
+
+    public boolean isValid(Track track) {
+
+        
 
     }
 
