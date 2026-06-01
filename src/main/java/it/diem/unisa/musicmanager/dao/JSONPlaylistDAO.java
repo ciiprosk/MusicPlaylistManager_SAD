@@ -22,7 +22,7 @@ public class JSONPlaylistDAO  extends JSONAbstractDAO implements DAO<Playlist> {
 
         this.folderPath = folderPath;
         this.filePath = folderPath + File.separator + fileName;
-        createFile();
+        super.createFileJSON(filePath, folderPath);
     }
 
 
@@ -73,10 +73,4 @@ public class JSONPlaylistDAO  extends JSONAbstractDAO implements DAO<Playlist> {
         return false;
     }
 
-    /**
-     * Metodo che crea il file json e la cartella se non esistono.
-     *
-     */
-    private void createFile() {
-    }
 }
