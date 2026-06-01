@@ -1,6 +1,5 @@
 package it.diem.unisa.musicmanager.model;
 
-import it.diem.unisa.musicmanager.PlaylistException;
 import it.diem.unisa.musicmanager.exception.PlaylistInfoException;
 
 import java.util.ArrayList;
