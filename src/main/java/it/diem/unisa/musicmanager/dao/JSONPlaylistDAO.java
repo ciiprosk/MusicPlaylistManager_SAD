@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public class PlaylistDAO implements DAO<Playlist>{
+public class JSONPlaylistDAO implements DAO<Playlist>{
     private final String filePath;
     private final String folderPath;
 
@@ -18,7 +18,7 @@ public class PlaylistDAO implements DAO<Playlist>{
      * @return
      */
 
-    public PlaylistDAO( String folderPath, String fileName) {
+    public JSONPlaylistDAO(String folderPath, String fileName) {
 
         this.folderPath = folderPath;
         this.filePath = folderPath + File.separator + fileName;
@@ -64,6 +64,10 @@ public class PlaylistDAO implements DAO<Playlist>{
         return Optional.empty();
     }
 
+    /**
+     * Metodo che crea il file json e la cartella se non esistono.
+     *
+     */
     private void createFile(){
        File folder = new File(folderPath);
        File file = new File(filePath);
@@ -77,7 +81,7 @@ public class PlaylistDAO implements DAO<Playlist>{
            if(!file.exists()){
                file.createNewFile();
                Files.write(Paths.get(filePath), "[]".getBytes()); // si usa files perché è una lobreria nuova e rende più semplici questi metodi
-                //getbytes si usa peer converire
+                //getbytes si usa peer converire la stringa in byte altrimenti non nsi possono scrivere nel file
            }
        } catch (Exception e) {
            throw new FilePathException("Error: File Path not created!");
