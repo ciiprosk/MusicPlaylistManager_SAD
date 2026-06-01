@@ -12,8 +12,10 @@ public interface DAO<T> {
 
     void update(T t);
 
-    void delete(T t);
+    void delete(UUID id);
 
     Optional<T> searchById(UUID id);
+
+    boolean isDuplicated(T t);
 
 }
