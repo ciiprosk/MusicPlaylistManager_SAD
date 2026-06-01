@@ -9,68 +9,52 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<!-- Root cambiato in StackPane: cosi' l'overlay puo' stare SOPRA tutto lo shell -->
-<StackPane prefHeight="720.0" prefWidth="1080.0" stylesheets="@../css/style.css" styleClass="sfondo-principale" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.diem.unisa.musicmanager.controller.MainController">
-   <children>
+<BorderPane prefHeight="720.0" prefWidth="1080.0" stylesheets="@../css/style.css" styleClass="sfondo-principale" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.diem.unisa.musicmanager.controller.MainController">
 
-      <BorderPane>
-
-         <top>
-            <HBox alignment="CENTER_LEFT" prefHeight="60.0" styleClass="header-bar" BorderPane.alignment="CENTER">
-               <padding>
-                  <Insets bottom="10.0" left="20.0" right="20.0" top="10.0" />
-               </padding>
-               <children>
-                  <Label styleClass="logo-text" text="MusicPlaylistManager" />
-                  <Region HBox.hgrow="ALWAYS" />
-                  <Button mnemonicParsing="false" styleClass="btn-icon" text="↩" />
-               </children>
-            </HBox>
-         </top>
-
-         <left>
-            <VBox minWidth="200.0" maxWidth="250.0" prefWidth="200.0" spacing="15.0" styleClass="sidebar" BorderPane.alignment="CENTER">
-               <padding>
-                  <Insets bottom="20.0" left="15.0" right="15.0" top="20.0" />
-               </padding>
-               <children>
-                  <Label styleClass="menu-title" text="Menu" textFill="#a0a0a0">
-                     <padding>
-                        <Insets bottom="10.0" />
-                     </padding>
-                  </Label>
-                  <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#openHome" styleClass="btn-menu" text="🏠 Home" alignment="BASELINE_LEFT" />
-                  <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#openTracks" styleClass="btn-menu" text="🎵 Tracks" alignment="BASELINE_LEFT" />
-                  <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#openPlaylists" styleClass="btn-menu" text="🎶 Playlists" alignment="BASELINE_LEFT" />
-               </children>
-            </VBox>
-         </left>
-
-         <center>
-            <StackPane fx:id="viewStack" styleClass="content-area" BorderPane.alignment="CENTER">
-               <children>
-                  <fx:include fx:id="playlistsPage" source="pages/playlist.fxml" />
-                  <fx:include fx:id="tracksPage" source="pages/tracks.fxml" />
-                  <fx:include fx:id="homePage" source="pages/home.fxml" />
-               </children>
-            </StackPane>
-         </center>
-
-         <bottom>
-            <fx:include fx:id="player"
-                        source="components/playerBar.fxml"/>
-         </bottom>
-
-      </BorderPane>
-
-      <!-- ===== OVERLAY MODALE (nascosto di default) ===== -->
-      <!-- lo scrim ha uno sfondo (in .modal-scrim) => oscura e intercetta i click dietro.
-           onMouseClicked="#onScrimClicked" = chiudi cliccando fuori dalla card (facoltativo). -->
-      <StackPane fx:id="modalOverlay" styleClass="modal-scrim" managed="false" visible="false">
+   <top>
+      <HBox alignment="CENTER_LEFT" prefHeight="60.0" styleClass="header-bar" BorderPane.alignment="CENTER">
+         <padding>
+            <Insets bottom="10.0" left="20.0" right="20.0" top="10.0" />
+         </padding>
          <children>
-            <fx:include fx:id="addSongPopup" source="pages/addSong.fxml" StackPane.alignment="CENTER" />
+            <Label styleClass="logo-text" text="MusicPlaylistManager" />
+            <Region HBox.hgrow="ALWAYS" />
+            <Button mnemonicParsing="false" styleClass="btn-icon" text="↩" />
+         </children>
+      </HBox>
+   </top>
+
+   <left>
+      <VBox minWidth="200.0" maxWidth="250.0" prefWidth="200.0" spacing="15.0" styleClass="sidebar" BorderPane.alignment="CENTER">
+         <padding>
+            <Insets bottom="20.0" left="15.0" right="15.0" top="20.0" />
+         </padding>
+         <children>
+            <Label styleClass="menu-title" text="Menu" textFill="#a0a0a0">
+               <padding>
+                  <Insets bottom="10.0" />
+               </padding>
+            </Label>
+            <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#openHome" styleClass="btn-menu" text="🏠 Home" alignment="BASELINE_LEFT" />
+            <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#openTracks" styleClass="btn-menu" text="🎵 Tracks" alignment="BASELINE_LEFT" />
+            <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#openPlaylists" styleClass="btn-menu" text="🎶 Playlists" alignment="BASELINE_LEFT" />
+         </children>
+      </VBox>
+   </left>
+
+   <center>
+      <StackPane fx:id="viewStack" styleClass="content-area" BorderPane.alignment="CENTER">
+         <children>
+            <fx:include fx:id="playlistsPage" source="pages/playlist.fxml" />
+            <fx:include fx:id="tracksPage" source="pages/tracks.fxml" />
+            <fx:include fx:id="homePage" source="pages/home.fxml" />
          </children>
       </StackPane>
+   </center>
 
-   </children>
-</StackPane>
+   <bottom>
+      <fx:include fx:id="player"
+                  source="components/playerBar.fxml"/>
+   </bottom>
+
+</BorderPane>
