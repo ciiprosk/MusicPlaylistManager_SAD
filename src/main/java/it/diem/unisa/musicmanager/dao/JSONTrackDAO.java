@@ -2,12 +2,14 @@ package it.diem.unisa.musicmanager.dao;
 
 import com.google.gson.Gson;
 import it.diem.unisa.musicmanager.exception.FilePathException;
+import it.diem.unisa.musicmanager.exception.JSONFileException;
 import it.diem.unisa.musicmanager.model.Playlist;
 import it.diem.unisa.musicmanager.model.Track;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -92,6 +94,7 @@ public class JSONTrackDAO extends JSONAbstractDAO implements DAO<Track> {
      */
     @Override
     public void update(Track track) {
+        updateFile(track, false);
     }
 
     /**
@@ -100,6 +103,10 @@ public class JSONTrackDAO extends JSONAbstractDAO implements DAO<Track> {
     @Override
     public void delete(UUID id) {
 
+        Track tempTrack = new Track(id); //costruttore realizzato appositamente
+        //per la delete, ci serve per eliminare la traccia dal Json tramite id
+
+        updateFile(tempTrack,true);
     }
 
     /**
@@ -131,5 +138,48 @@ public class JSONTrackDAO extends JSONAbstractDAO implements DAO<Track> {
 
     private boolean fileExists() {
         return Files.exists(Paths.get(filePath));
+    }
+
+    private boolean updateFile(Track track, boolean delete){
+        if (!fileExists()){
+            return false;
+        }
+
+        File tempFile = new File(filePath + ".temp"); //qui c'è il file vecchio
+
+        try(BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), "UTF-8"));
+            BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(tempFile), "UTF-8"));){
+
+            String line;
+            while((line = bufferedReader.readLine())!=null){
+                if(line.trim().isEmpty()){ continue;}
+
+                Track oldTrack = json.fromJson(line, Track.class);
+
+                // è stata trovata la traccia
+                if(oldTrack.getId().equals(track.getId())){
+                    if(!delete){
+                        String trackString = json.toJson(track, Track.class);
+                        bufferedWriter.write(trackString + "\n");
+                    }
+                }else{
+                    bufferedWriter.write(line + "\n");
+                }
+            }
+
+
+        } catch (FileNotFoundException e) {
+            throw new JSONFileException("File not found: " + filePath );
+        } catch (UnsupportedEncodingException e) {
+            throw new JSONFileException("Unsupported encoding: " + filePath );
+        } catch (IOException e) {
+            throw new JSONFileException("Error reading or writing file: " + filePath );
+        }
+        try{
+            Files.move(tempFile.toPath(), Paths.get(filePath), StandardCopyOption.REPLACE_EXISTING);
+        }catch (IOException e){
+            throw new FilePathException("Error: File Path not created!");
+        }
+        return true;
     }
 }
