@@ -1,6 +1,8 @@
 package it.diem.unisa.musicmanager.dao;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 public interface DAO<T> {
 
@@ -11,5 +13,7 @@ public interface DAO<T> {
     void update(T t);
 
     void delete(T t);
+
+    Optional<T> searchById(UUID id);
 
 }
