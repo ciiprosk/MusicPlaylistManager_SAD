@@ -16,7 +16,7 @@ public abstract class JSONAbstractDAO {
             try{
                 //controllo che la directory esista
                 if(!folder.exists()){
-                    folder.mkdir(); //crea la directory
+                    folder.mkdirs(); //crea la directory
 
                 }
                 if(!file.exists()){
