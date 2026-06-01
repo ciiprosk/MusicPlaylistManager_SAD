@@ -32,6 +32,7 @@ class Playlist{
     - trackIDs : List<UUID>
 
     + Playlist()
+    + setName(newName): void
     + addTrack(idTrack): void
     + removeTrack(idTtack): void
     - containsTrack(idTrack): boolean
