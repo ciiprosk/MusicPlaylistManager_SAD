@@ -120,6 +120,7 @@ public class JSONPlaylistDAO  extends JSONAbstractDAO implements DAO<Playlist> {
      * @param id è l'identificatore univoco della playlist da cercare.
      * @return un Optional che contiene la playlist se trovata, altrimenti Optional.empty().
      */
+
     @Override
     public Optional<Playlist> searchById(UUID id) {
         Optional<Playlist> playlist = Optional.empty();

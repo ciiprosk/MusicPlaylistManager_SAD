@@ -44,7 +44,7 @@ public class Track {
     //costruttore per recuperare le info già esistenti (persistenza)
     public Track(UUID id, String title, String author, Genre genre, String songPath, int songLength, String year) {
 
-        this.id = UUID.randomUUID();
+        this.id = id;
 
         String trimTitle = title.trim();
 
@@ -62,6 +62,17 @@ public class Track {
 
         this.year = year;
 
+    }
+
+    //costruttore con solo id, ci serve per la delete nel DAO
+    public Track(UUID id) {
+        this.id = id;
+        this.title = "Unknkwon";
+        this.author = "Unknown";
+        this.genre = null;
+        this.songPath = ""; // Obbligatorio inizializzarlo perché è final
+        this.songLength = 1; // Obbligatorio inizializzarlo perché è final, e deve essere >0
+        this.year = "UNKNOWN";
     }
 
     public UUID getId() {
