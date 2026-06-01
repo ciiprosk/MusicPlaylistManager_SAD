@@ -25,5 +25,19 @@ public class Playlist {
         this.name = name;
     }
 
+    public void addTrack(UUID trackID){
+        tracks.add(trackID);
+    }
+
+    public void removeTrack(UUID trackID){
+        tracks.remove(trackID);
+    }
+
+    public List<UUID> getTracks() {
+        return tracks;
+    }
+     public boolean containsTrack(UUID trackID){
+        return tracks.contains(trackID);
+     }
 
 }
