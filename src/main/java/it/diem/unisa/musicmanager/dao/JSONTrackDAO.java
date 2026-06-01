@@ -140,9 +140,9 @@ public class JSONTrackDAO extends JSONAbstractDAO implements DAO<Track> {
         return Files.exists(Paths.get(filePath));
     }
 
-    private boolean updateFile(Track track, boolean delete){
+    private void updateFile(Track track, boolean delete){
         if (!fileExists()){
-            return false;
+            return;
         }
 
         File tempFile = new File(filePath + ".temp"); //qui c'è il file vecchio
@@ -180,6 +180,6 @@ public class JSONTrackDAO extends JSONAbstractDAO implements DAO<Track> {
         }catch (IOException e){
             throw new FilePathException("Error: File Path not created!");
         }
-        return true;
+        return;
     }
 }
