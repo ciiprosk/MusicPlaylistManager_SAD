@@ -48,10 +48,10 @@ public class JSONPlaylistDAO  extends JSONAbstractDAO implements DAO<Playlist> {
     }
 
     /**
-     * @param playlist
+     * @param id
      */
     @Override
-    public void delete(Playlist playlist) {
+    public void delete(UUID id) {
 
     }
 
@@ -62,6 +62,15 @@ public class JSONPlaylistDAO  extends JSONAbstractDAO implements DAO<Playlist> {
     @Override
     public Optional<Playlist> searchById(UUID id) {
         return Optional.empty();
+    }
+
+    /**
+     * @param playlist
+     * @return
+     */
+    @Override
+    public boolean isDuplicated(Playlist playlist) {
+        return false;
     }
 
     /**
