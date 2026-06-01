@@ -10,7 +10,9 @@ public class Playlist {
     private List<UUID> tracks;
 
     public Playlist(String name) {
-        this.name = name;
+        if(name.trim().isEmpty()){
+
+        }
         this.tracks = new ArrayList<>();
     }
 
