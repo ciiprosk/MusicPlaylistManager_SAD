@@ -18,7 +18,7 @@
         <HBox alignment="CENTER_LEFT">
             <Label styleClass="titolo-pagina" text="Tracks" textFill="WHITE" />
             <Region HBox.hgrow="ALWAYS" />
-            <Button minWidth="120.0" maxWidth="150.0" mnemonicParsing="false" styleClass="btn-primario" text="Add Track" />
+            <Button minWidth="120.0" maxWidth="150.0" mnemonicParsing="false" styleClass="btn-primario" text="Add Track" onAction="#openAddTrackModal" />
         </HBox>
 
         <TextField fx:id="searchBar" minWidth="250.0" maxWidth="600.0" prefWidth="400.0" promptText="Search" styleClass="search-bar" />
