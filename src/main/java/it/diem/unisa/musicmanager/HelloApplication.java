@@ -32,7 +32,7 @@ public class App extends Application {
 
         // creati UNA VOLTA SOLA — ma non sono Singleton statici
         TrackDAO    trackDAO    = new JsonTrackDAO();
-        PlaylistDAO playlistDAO = new JsonPlaylistDAO();
+        DAO playlistDAO = new JsonPlaylistDAO();
         AppState    appState    = new AppState();
 
         TrackService    trackService    = new TrackService(trackDAO, appState);
