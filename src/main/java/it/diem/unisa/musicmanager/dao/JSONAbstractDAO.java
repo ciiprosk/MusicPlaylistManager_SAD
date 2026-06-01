@@ -3,9 +3,10 @@ package it.diem.unisa.musicmanager.dao;
 import it.diem.unisa.musicmanager.exception.FilePathException;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.OutputStreamWriter;
+
 
 public abstract class JSONAbstractDAO {
 
@@ -21,8 +22,10 @@ public abstract class JSONAbstractDAO {
                 }
                 if(!file.exists()){
                     file.createNewFile();
-                    Files.write(Paths.get(filePath), "[]".getBytes()); // si usa files perché è una lobreria nuova e rende più semplici questi metodi
-                    //getbytes si usa peer converire la stringa in byte altrimenti non nsi possono scrivere nel file
+                    //dobbiamo scrivere nel file appena creato un array vuoto
+                    try(OutputStreamWriter outputStreamWriter = new OutputStreamWriter(new FileOutputStream(file), "UTF-8");){
+                        outputStreamWriter.write("[]");
+                    }
                 }
             } catch (Exception e) {
                 throw new FilePathException("Error: File Path not created!");
