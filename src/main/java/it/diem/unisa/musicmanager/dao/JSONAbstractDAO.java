@@ -15,7 +15,8 @@ public abstract class JSONAbstractDAO {
                 try {
                     file.createNewFile();
                     // Scrive l'array vuoto per Gson
-                    Files.write(Paths.get(filePath), "[]".getBytes());
+                    Files.write(Paths.get(filePath), "[]".getBytes()); //si usa files perché è una lobreria nuova e rende più semplici questi metodi
+                    //getbytes si usa peer converire la stringa in byte altrimenti non nsi possono scrivere nel file
 
                 } catch (IOException e) {
                     throw new FilePathException("Error: File Path not created!");
