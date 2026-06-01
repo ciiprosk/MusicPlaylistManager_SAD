@@ -1,5 +1,8 @@
 package it.diem.unisa.musicmanager.model;
 
+import it.diem.unisa.musicmanager.PlaylistException;
+import it.diem.unisa.musicmanager.exception.PlaylistInfoException;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -10,9 +13,7 @@ public class Playlist {
     private List<UUID> tracks;
 
     public Playlist(String name) {
-        if(name.trim().isEmpty()){
-
-        }
+        if (checkRulesName(name.trim()))  this.name = name.trim();
         this.tracks = new ArrayList<>();
     }
 
@@ -41,5 +42,13 @@ public class Playlist {
      public boolean containsTrack(UUID trackID){
         return tracks.contains(trackID);
      }
+
+     // metodo per la verifica delle business rules
+    private boolean checkRulesName(String name) throws PlaylistInfoException {
+        if(name.isEmpty()) throw new PlaylistInfoException("The name cannot be empty");
+        if(name.length() > 50) throw new PlaylistInfoException("The name cannot be longer than 50 characters");
+
+        return true;
+    }
 
 }
