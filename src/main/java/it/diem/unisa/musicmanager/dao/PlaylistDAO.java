@@ -13,16 +13,15 @@ import java.util.UUID;
 public class PlaylistDAO implements DAO<Playlist>{
     private final String filePath;
     private final String folderPath;
-    private final String nameFile;
+
     /**
      * @return
      */
 
-    public PlaylistDAO( String folderPath, String nameFile) {
+    public PlaylistDAO( String folderPath, String fileName) {
 
         this.folderPath = folderPath;
-        this.nameFile = nameFile;
-        this.filePath = folderPath + File.separator + nameFile;
+        this.filePath = folderPath + File.separator + fileName;
         createFile();
     }
 
@@ -78,7 +77,7 @@ public class PlaylistDAO implements DAO<Playlist>{
            if(!file.exists()){
                file.createNewFile();
                Files.write(Paths.get(filePath), "[]".getBytes()); // si usa files perché è una lobreria nuova e rende più semplici questi metodi
-
+                //getbytes si usa peer converire
            }
        } catch (Exception e) {
            throw new FilePathException("Error: File Path not created!");
