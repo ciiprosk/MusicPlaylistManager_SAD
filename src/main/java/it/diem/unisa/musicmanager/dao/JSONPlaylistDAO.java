@@ -1,5 +1,6 @@
 package it.diem.unisa.musicmanager.dao;
 
+import com.google.gson.Gson;
 import it.diem.unisa.musicmanager.exception.FilePathException;
 import it.diem.unisa.musicmanager.model.Playlist;
 
@@ -13,21 +14,31 @@ import java.util.UUID;
 public class JSONPlaylistDAO  extends JSONAbstractDAO implements DAO<Playlist> {
     private final String filePath;
     private final String folderPath;
+    private Gson json;
 
     /**
-     * @return
+     * Costruttore della classe JSONPlaylistDAO.
+     * @return un oggetto JSONPlaylistDAO
      */
 
     public JSONPlaylistDAO(String folderPath, String fileName) {
 
         this.folderPath = folderPath;
         this.filePath = folderPath + File.separator + fileName;
+        json = new Gson();
         super.createFileJSON(filePath, folderPath);
     }
 
+    /**
+     * Metodo che restituisce tutte le playlist presenti nel file JSON.
+     * @return La lista di playlist.
+     */
 
     @Override
     public List<Playlist> selectAll() {
+        if (Files.exists(Paths.get(filePath))) {
+
+        }
         return List.of();
     }
 
