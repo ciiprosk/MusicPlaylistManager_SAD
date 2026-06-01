@@ -11,13 +11,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public class TrackDAO implements DAO<Track> {
+public class JSONTrackDAO implements DAO<Track> {
 
     private final String filePath;
 
     private final String folderPath;
 
-    public TrackDAO(String filePath, String folderPath, String fileName) {
+    public JSONTrackDAO(String filePath, String folderPath, String fileName) {
 
         this.folderPath = folderPath;
         this.filePath = folderPath + File.separator + fileName;
