@@ -4,6 +4,7 @@ import it.diem.unisa.musicmanager.PlaylistException;
 import it.diem.unisa.musicmanager.exception.PlaylistInfoException;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -20,7 +21,7 @@ public class Playlist {
      * Una raccolta di tracce identificate dai UUID.
      */
     private String name;
-    private final UUID id = UUID.randomUUID();
+    private UUID id;
     private List<UUID> tracks;
 
     /**
@@ -30,9 +31,21 @@ public class Playlist {
      */
     public Playlist(String name) {
         if (checkRulesName(name.trim()))  this.name = name.trim();
+        this.id= UUID.randomUUID();
         this.tracks = new ArrayList<>();
     }
 
+    /**
+     * Costruttore della playlist utilizzato per il recupero di una playlist dal file JSON.
+     * @param id: l'identificatore univoco della playlist.
+     * @param name: il nome della playlist.
+     * @param tracks: una lista di tracce identificate dai UUID.
+     */
+    public Playlist(UUID id, String name, List<UUID> tracks) {
+        this.id = id;
+        this.name = name;
+        this.tracks = tracks;
+    }
     /**
      * Getter per il nome della playlist.
      * @return il nome della playlist.
@@ -75,11 +88,11 @@ public class Playlist {
     }
 
     /**
-     * Metodo che ritorna le tracce presenti nella playlist.
+     * Metodo che ritorna una copia della lista delle tracce presenti nella playlist.
      * @return una lista di tracce presenti nella playlist.
      */
     public List<UUID> getTracks() {
-        return tracks;
+        return Collections.unmodifiableList(tracks);
     }
      public boolean containsTrack(UUID trackID){
         return tracks.contains(trackID);
