@@ -92,7 +92,7 @@ public class Track {
 
     public boolean isValid(Track track) {
 
-        
+        return true;
 
     }
 
