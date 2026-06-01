@@ -12,21 +12,26 @@ public class Track {
 
     private Genre genre; //creare enum Genre
 
-    private int songLength = 0;   //0 di default
+    private final int songLength;
 
     private final String songPath;
 
-    public Track(String title, String author, Genre genre, String songPath) {
+    private int year;
 
-        this.title = title;
 
-        this.author = author;
+    public Track(String title, String author, Genre genre, String songPath, int songLength, int year) {
+
+        this.title = title.trim();
+
+        this.author = author.trim();
 
         this.genre = genre;
 
         this.songPath = songPath;
 
-        //fare costruttore con songPath
+        this.songLength = songLength;
+
+        this.year = year;
 
     }
 
@@ -66,6 +71,10 @@ public class Track {
 
     public void setGenre(Genre genre) {
         this.genre = genre;
+    }
+
+    public void setYear(int year) {
+        
     }
 
     public boolean isDuplicate(Track track) {
