@@ -1,17 +1,12 @@
 package it.diem.unisa.musicmanager.dao;
 
-import it.diem.unisa.musicmanager.exception.FilePathException;
 import it.diem.unisa.musicmanager.model.Track;
-
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public class JSONTrackDAO implements DAO<Track> {
+public class JSONTrackDAO extends JSONAbstractDAO implements DAO<Track> {
 
     private final String filePath;
 
@@ -21,26 +16,6 @@ public class JSONTrackDAO implements DAO<Track> {
 
         this.folderPath = folderPath;
         this.filePath = folderPath + File.separator + fileName;
-        createFilePath();
-
-    }
-
-    private void createFilePath() {
-
-        File file = new File(filePath);
-
-        if (!file.exists()) { //se il file non esiste ancora, lo creo
-
-            try {
-                file.createNewFile();   //provo a creare il file
-
-                Files.write(Paths.get(filePath), "[]".getBytes()); //crea un array JSON vuoto
-
-            } catch (IOException e) {
-                throw new FilePathException("Error: File Path not created!");
-            }
-
-        }
 
     }
 
