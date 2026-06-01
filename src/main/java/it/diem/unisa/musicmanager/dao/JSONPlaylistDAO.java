@@ -108,6 +108,7 @@ public class JSONPlaylistDAO  extends JSONAbstractDAO implements DAO<Playlist> {
     @Override
     public Optional<Playlist> searchById(UUID id) {
         return Optional.empty();
+
     }
 
     /**
