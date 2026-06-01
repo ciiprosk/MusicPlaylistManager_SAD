@@ -1,20 +1,28 @@
 package it.diem.unisa.musicmanager.dao;
 
+import it.diem.unisa.musicmanager.exception.FilePathException;
 import it.diem.unisa.musicmanager.model.Playlist;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 public class PlaylistDAO implements DAO<Playlist>{
     private final String filePath;
+    private final String folderPath;
+    private final String nameFile;
     /**
      * @return
      */
 
-    public PlaylistDAO(String filePath) {
-        this.filePath = filePath;
+    public PlaylistDAO( String folderPath, String nameFile) {
+
+        this.folderPath = folderPath;
+        this.nameFile = nameFile;
+        this.filePath = folderPath + File.separator + nameFile;
         createFile();
     }
 
@@ -58,7 +66,23 @@ public class PlaylistDAO implements DAO<Playlist>{
     }
 
     private void createFile(){
+       File folder = new File(folderPath);
        File file = new File(filePath);
-       if(!file.exists()) file.mkdir();
+
+       try{
+           //controllo che la directory esista
+           if(!folder.exists()){
+               folder.mkdir(); //crea la directory
+
+           }
+           if(!file.exists()){
+               file.createNewFile();
+               Files.write(Paths.get(filePath), "[]".getBytes()); // si usa files perché è una lobreria nuova e rende più semplici questi metodi
+
+           }
+       } catch (Exception e) {
+           throw new FilePathException("Error: File Path not created!");
+       }
+
     }
 }
