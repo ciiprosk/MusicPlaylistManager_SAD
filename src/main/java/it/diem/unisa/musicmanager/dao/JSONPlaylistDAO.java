@@ -2,6 +2,7 @@ package it.diem.unisa.musicmanager.dao;
 
 import com.google.gson.Gson;
 import it.diem.unisa.musicmanager.exception.FilePathException;
+import it.diem.unisa.musicmanager.exception.JSONFileException;
 import it.diem.unisa.musicmanager.model.Playlist;
 
 import java.io.*;
@@ -83,7 +84,7 @@ public class JSONPlaylistDAO  extends JSONAbstractDAO implements DAO<Playlist> {
             outputStreamWriter.write(playlistString + "\n");
         }
         catch (IOException e) {
-            //ancora non so cosa lancaire
+            throw new JSONFileException("Error: File Path not created!");
         }
     }
 
@@ -135,9 +136,9 @@ public class JSONPlaylistDAO  extends JSONAbstractDAO implements DAO<Playlist> {
                 }
             }
         } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
+            throw new JSONFileException("File not found: " + filePath );
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new JSONFileException("Error reading or writing file: " + filePath );
         }
 
         return playlist;
@@ -162,9 +163,9 @@ public class JSONPlaylistDAO  extends JSONAbstractDAO implements DAO<Playlist> {
                 }
             }
         } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
+            throw new JSONFileException("File not found: " + filePath);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new JSONFileException("Error reading or writing file: " + filePath);
         }
         return false;
     }
@@ -202,15 +203,17 @@ public class JSONPlaylistDAO  extends JSONAbstractDAO implements DAO<Playlist> {
 
 
         } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
+            throw new JSONFileException("File not found: " + filePath );
         } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
+            throw new JSONFileException("Unsupported encoding: " + filePath );
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new JSONFileException("Error reading or writing file: " + filePath );
         }
         try{
             Files.move(tempFile.toPath(), Paths.get(filePath), StandardCopyOption.REPLACE_EXISTING);
-        }catch (IOException e){}
+        }catch (IOException e){
+            throw new FilePathException("Error: File Path not created!");
+        }
         return true;
     }
 
@@ -219,7 +222,8 @@ public class JSONPlaylistDAO  extends JSONAbstractDAO implements DAO<Playlist> {
      * @return true se esiste, false altrimenti
      */
     private boolean exists() {
-        File file = new File(filePath);
-        return file.exists();
+//        File file = new File(filePath); //il file non viene creato da zero, ma viene associato un puntatore al filepath
+//        return file.exists();
+        return Files.exists(Paths.get(filePath)); //gestisce meglio tutto
     }
 }

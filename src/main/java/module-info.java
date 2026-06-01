@@ -7,4 +7,5 @@ module it.diem.unisa.musicplaylistmanager_sad {
     exports it.diem.unisa.musicmanager;
 
     opens it.diem.unisa.musicmanager.controller to javafx.fxml;
+    opens it.diem.unisa.musicmanager.model to com.google.gson;
 }

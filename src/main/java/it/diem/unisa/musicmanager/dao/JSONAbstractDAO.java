@@ -22,10 +22,7 @@ public abstract class JSONAbstractDAO {
                 }
                 if(!file.exists()){
                     file.createNewFile();
-                    //dobbiamo scrivere nel file appena creato un array vuoto
-                    try(OutputStreamWriter outputStreamWriter = new OutputStreamWriter(new FileOutputStream(file), "UTF-8");){
-                        outputStreamWriter.write("[]");
-                    }
+
                 }
             } catch (Exception e) {
                 throw new FilePathException("Error: File Path not created!");
