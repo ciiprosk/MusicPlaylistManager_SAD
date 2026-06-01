@@ -5,16 +5,20 @@
 
 
 package "Model" {
+
     class Track{
     - id:UUID
     - title: String
     - author: String
     - genre: GENRE
     - songLength: int
+    - songPath: String
+    -year: String
 
-    + Track()
-    + Track(title, author, GENRE)
-    + getId():UIID
+    + Track(id)
+    + Track(title, author, genre)
+    + Track(id, title, author, genre, songLength, songPath, year)
+    + getId():UUID
     + getTitle(): String
     + getAuthor(): String
     + getGenre(): GENRE
@@ -22,8 +26,8 @@ package "Model" {
     + setTitle(newTitle): void
     + setAuthor(newAuthor): void
     + setGenre(newGenre): void
-
-    - isDuplicate(Track): boolean
+    + setYear(newYear): void
+    + isDuplicate(Track): boolean
 }
 
 class Playlist{
@@ -38,17 +42,40 @@ class Playlist{
     - containsTrack(idTrack): boolean
 
 }
+
+enum Genre{
+    POP
+    ROCK
+    HIPHOP
+    EDM
+    JAZZ
+    CLASSICAL
+    REGGAE
+    DISCO
+    METAL
+    FUNK
+    INDIE
+    COUNTRY
+    RAP
+    PUNK
+    UNKNOWN
+}
 }
 
 package "DAO" {
 
 
-interface TrackDAO{
-    + save(Track): void
-    + update(Track): void
-    + delete(idTrack): void
-    + existsDuplicate(Track): boolean
-    + getAllTracks(): List<Tracks>
+interface DAO<T>{
+    + insert(T): void
+    + update(T): void
+    + delete(T): void
+    + isDuplicated(T): boolean
+    + selectAll(): List<T>
+    + searchById(UUID): Optional<T>
+}
+
+abstract class JSONAbstractDAO {
+    protected createFileJSON(filePath, pathFolder): void
 }
 
 interface PlaylistDAO{
@@ -59,18 +86,35 @@ interface PlaylistDAO{
 }
 
 class JSONTrackDAO{
+    - filePath: String
+    - folderPath: String
+    - json: Gson
+
     + save(Track): void
     + update(Track): void
     + delete(idTrack): void
-    + existsDuplicate(Track): boolean
-    + getAllTracks(): List<Tracks>
+    + isDuplicated(Track): boolean
+    + selectAll(): List<Track>
+    + searchById(idTrack): Optional<Track>
+
+    - fileExists(): boolean
+    - updateFile(track, delete): void
 }
 
 class JSONPlaylistDAO{
+    - filePath: String
+    - folderPath: String
+    - json: Gson
+
     + save(Playlist): void
     + update(Playlist): void
-    + delete(UUID): void
-    + existsByName(String): boolean
+    + delete(idPlaylist): void
+    + isDuplicated(Playlist): boolean
+    + selectAll(): List<Playlist>
+    + searchById(idPlaylist): Optional<Playlist>
+
+    - exists(): boolean
+    - updateFile(playlist, delete): boolean
 }
 }
 
@@ -203,11 +247,13 @@ class SharedState{
 
 
 
-JSONTrackDAO ..|> TrackDAO
-JSONPlaylistDAO ..|> PlaylistDAO
+JSONAbstractDAO <|-- JSONTrackDAO
+JSONAbstractDAO <|-- JSONPlaylistDAO
 
-TrackService --> TrackDAO
-PlaylistService --> PlaylistDAO
+DAO <|.. JSONTrackDAO
+DAO <|.. JSONPlaylistDAO
+PlaylistDAO <|.. JSONPlaylistDAO
+
 PersistanceService --> TrackDAO
 PersistanceService --> PlaylistDAO
 
@@ -246,6 +292,7 @@ SharedState o-- "0..*" Playlist
 
 Playlist ..> Track : trackID
 Playlist "0..*" --> Track
+Track --> Genre
 
 
 
