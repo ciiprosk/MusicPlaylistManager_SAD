@@ -13,7 +13,6 @@ package "ENTRY POINT" {
 
         'SharedState appState = new SharedState()
         'TrackDAO trackDAO = new JsonTrackDAO()
-        'PlaylistDAO playlistDAO = new JsonPlaylistDAO()
         'TrackService trackService = new TrackService(trackDAO, appState)
         'PlaylistService playlistService = new PlaylistService(playlistDAO, appState)
         'PlayerService playerService = new PlayerService(appState)
