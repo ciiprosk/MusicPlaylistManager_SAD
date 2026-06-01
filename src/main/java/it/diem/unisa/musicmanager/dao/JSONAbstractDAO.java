@@ -8,19 +8,24 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 public abstract class JSONAbstractDAO {
-        protected void createFileJSON(String filePath) {
+
+        protected void createFileJSON(String filePath, String pathFolder) {
             File file = new File(filePath);
+            File folder = new File(pathFolder);
 
-            if (!file.exists()) {
-                try {
-                    file.createNewFile();
-                    // Scrive l'array vuoto per Gson
-                    Files.write(Paths.get(filePath), "[]".getBytes()); //si usa files perché è una lobreria nuova e rende più semplici questi metodi
-                    //getbytes si usa peer converire la stringa in byte altrimenti non nsi possono scrivere nel file
+            try{
+                //controllo che la directory esista
+                if(!folder.exists()){
+                    folder.mkdir(); //crea la directory
 
-                } catch (IOException e) {
-                    throw new FilePathException("Error: File Path not created!");
                 }
+                if(!file.exists()){
+                    file.createNewFile();
+                    Files.write(Paths.get(filePath), "[]".getBytes()); // si usa files perché è una lobreria nuova e rende più semplici questi metodi
+                    //getbytes si usa peer converire la stringa in byte altrimenti non nsi possono scrivere nel file
+                }
+            } catch (Exception e) {
+                throw new FilePathException("Error: File Path not created!");
             }
         }
 }
