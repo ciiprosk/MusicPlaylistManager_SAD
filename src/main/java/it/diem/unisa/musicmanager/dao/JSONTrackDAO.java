@@ -1,5 +1,6 @@
 package it.diem.unisa.musicmanager.dao;
 
+import com.google.gson.Gson;
 import it.diem.unisa.musicmanager.model.Track;
 import java.io.File;
 import java.util.List;
@@ -12,11 +13,14 @@ public class JSONTrackDAO extends JSONAbstractDAO implements DAO<Track> {
 
     private final String folderPath;
 
+    private Gson json;
+
     public JSONTrackDAO(String filePath, String folderPath, String fileName) {
 
         this.folderPath = folderPath;
         this.filePath = folderPath + File.separator + fileName;
-
+        json = new Gson();
+        super.createFileJSON(filePath, folderPath);
     }
 
     /**
