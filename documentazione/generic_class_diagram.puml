@@ -1,0 +1,403 @@
+@startuml class_diagram_sprint1
+    !theme plain
+    skinparam linetype ortho
+
+package "ENTRY POINT" {
+    class App {
+        - primaryStage: Stage
+
+        + start(Stage): void
+        --
+        'Crea tutte le istanze UNA VOLTA SOLA
+        'e le inietta nei Service e Controller
+
+        'SharedState appState = new SharedState()
+        'TrackDAO trackDAO = new JsonTrackDAO()
+        'PlaylistDAO playlistDAO = new JsonPlaylistDAO()
+        'TrackService trackService = new TrackService(trackDAO, appState)
+        'PlaylistService playlistService = new PlaylistService(playlistDAO, appState)
+        'PlayerService playerService = new PlayerService(appState)
+        'PersistenceService persistenceService = new PersistenceService(trackDAO, playlistDAO, appState)
+
+        'persistenceService.load() → carica JSON in AppState
+        'fxmlLoader.setControllerFactory(controllerClass -> ...)
+    }
+}
+
+package "MODEL — Entità pure, zero dipendenze" {
+    class Track {
+        - id: UUID
+        - titolo: String
+        - autore: String
+        - genere: String
+        - anno: int
+        - durata: int (secondi)
+        - filePath: String
+
+        + Track(id, titolo, autore, genere, anno, durata, filePath)
+        + getId(): UUID
+        + getTitolo(): String
+        + getArtista(): String
+        + getGenere(): String
+        + getAnno(): int
+        + getDurata(): int
+        + getDurataFormattata(): String
+        + isDuplicatoDi(Track): boolean
+    }
+
+    class Playlist {
+        - id: UUID
+        - nome: String
+        - trackIds: List<UUID>
+
+        + Playlist(id, nome)
+        + getId(): UUID
+        + getNome(): String
+        + getTrackIds(): List<UUID>
+        + addTrack(trackId: UUID): void
+        + removeTrack(trackId: UUID): void
+        + containsTrack(trackId: UUID): boolean
+    }
+}
+
+package "DAO LAYER — Persistenza JSON (Pattern DAO)" {
+    interface TrackDAO {
+        + findAll(): List<Track>
+        + findById(UUID): Optional<Track>
+        + save(Track): void
+        + update(Track): void
+        + delete(UUID): void
+        + existsDuplicate(Track): boolean
+    }
+
+    interface PlaylistDAO {
+        + findAll(): List<Playlist>
+        + findById(UUID): Optional<Playlist>
+        + save(Playlist): void
+        + update(Playlist): void
+        + delete(UUID): void
+        + existsByNome(String): boolean
+    }
+
+    class JsonTrackDAO {
+        - filePath: String = "data/tracks.json"
+        - gson: Gson
+
+        + findAll(): List<Track>
+        + findById(UUID): Optional<Track>
+        + save(Track): void
+        + update(Track): void
+        + delete(UUID): void
+        + existsDuplicate(Track): boolean
+    }
+
+    class JsonPlaylistDAO {
+        - filePath: String = "data/playlists.json"
+        - gson: Gson
+
+        + findAll(): List<Playlist>
+        + findById(UUID): Optional<Playlist>
+        + save(Playlist): void
+        + update(Playlist): void
+        + delete(UUID): void
+        + existsByNome(String): boolean
+    }
+
+    JsonTrackDAO ..|> TrackDAO
+    JsonPlaylistDAO ..|> PlaylistDAO
+}
+
+package "STATE — Memoria condivisa (creata in App.java, iniettata)" {
+    class SharedState {
+        - archivio: ObservableList<Track>
+        - playlists: ObservableList<Playlist>
+        - trackCorrente: ObjectProperty<Track>
+        - inRiproduzione: BooleanProperty
+        - progresso: DoubleProperty
+
+        + getArchivio(): ObservableList<Track>
+        + getPlaylists(): ObservableList<Playlist>
+        + trackCorrenteProperty(): ObjectProperty<Track>
+        + inRiproduzioneProperty(): BooleanProperty
+        + progressoProperty(): DoubleProperty
+    }
+}
+
+package "SERVICE LAYER — Logica di dominio (ricevono dipendenze via costruttore)" {
+    class PersistenceService {
+        - trackDAO: TrackDAO
+        - playlistDAO: PlaylistDAO
+        - appState: SharedState
+
+        + PersistenceService(TrackDAO, PlaylistDAO, SharedState)
+        + carica(): void
+        + salva(): void
+    }
+
+    class TrackService {
+        - trackDAO: TrackDAO
+        - appState: SharedState
+
+        + TrackService(TrackDAO, SharedState)
+        + aggiungi(Track): Optional<String>
+        + modifica(Track): Optional<String>
+        + elimina(UUID): void
+        + getAll(): ObservableList<Track>
+        + getById(UUID): Optional<Track>
+        + valida(Track): boolean
+    }
+
+    class PlaylistService {
+        - playlistDAO: PlaylistDAO
+        - appState: SharedState
+
+        + PlaylistService(PlaylistDAO, SharedState)
+        + crea(nome): Playlist
+        + elimina(UUID): void
+        + rinomina(UUID, String): void
+        + aggiungiTraccia(playlistId: UUID, trackId: UUID): void
+        + rimuoviTraccia(playlistId: UUID, trackId: UUID): void
+        + getAll(): ObservableList<Playlist>
+        + getById(UUID): Optional<Playlist>
+    }
+
+    class PlayerService {
+        - mediaPlayer: MediaPlayer
+        - appState: SharedState
+
+        + PlayerService(SharedState)
+        + play(Track): void
+        + pause(): void
+        + resume(): void
+        + stop(): void
+        --
+        'Sprint 2: next(), previous(), setModalita()
+    }
+
+    TrackService --> TrackDAO
+    PlaylistService --> PlaylistDAO
+    PersistenceService --> TrackDAO
+    PersistenceService --> PlaylistDAO
+
+    TrackService --> SharedState
+    PlaylistService --> SharedState
+    PlayerService --> SharedState
+    PersistenceService --> SharedState
+}
+
+package "CONTROLLER LAYER — UI orchestration (ricevono Service via costruttore)" {
+    class MainController {
+        - trackService: TrackService
+        - playlistService: PlaylistService
+        - playerService: PlayerService
+
+        + MainController(TrackService, PlaylistService, PlayerService)
+        + initialize(): void
+        + showHome(): void
+        + showBrani(): void
+        + showPlaylists(): void
+    }
+
+    class HomeController {
+        - trackService: TrackService
+        - playerService: PlayerService
+
+        + HomeController(TrackService, PlayerService)
+        + initialize(): void
+        + loadTopBrani(): void
+        + loadTopPlaylist(): void
+    }
+
+    class BraniController {
+        - trackService: TrackService
+        - playerService: PlayerService
+
+        + BraniController(TrackService, PlayerService)
+        + initialize(): void
+        + handleAggiungi(): void
+        + popolaLista(List<Track>, VBox): void
+    }
+
+    class PlaylistController {
+        - playlistService: PlaylistService
+        - trackService: TrackService
+
+        + PlaylistController(PlaylistService, TrackService)
+        + initialize(): void
+        + handleNuova(): void
+        + loadTopPlaylist(): void
+    }
+
+    class PlayerController {
+        - playerService: PlayerService
+        - appState: SharedState
+
+        + PlayerController(PlayerService, SharedState)
+        + initialize(): void
+        + handlePlayPause(): void
+        --
+        'US16, US17, US23
+        'Binding diretto a appState.trackCorrenteProperty()
+        'e appState.progressoProperty()
+    }
+
+    class BranoRowController {
+        - track: Track
+        - playerService: PlayerService
+        - trackService: TrackService
+
+        + setTrack(Track): void
+        + setPlayerService(PlayerService): void
+        + setTrackService(TrackService): void
+        + handlePlay(): void
+        + handleMenu(): void
+        --
+        'Component dinamico caricato da:
+        '• HomeController (top 5 brani)
+        '• BraniController (tutti i brani)
+        '• DettaglioPlaylistController (tracce playlist)
+    }
+
+    class PlaylistCardController {
+        - playlist: Playlist
+        - playlistService: PlaylistService
+
+        + setPlaylist(Playlist): void
+        + setPlaylistService(PlaylistService): void
+        + handlePlay(): void
+        + handleMenu(): void
+        --
+        'Component dinamico caricato da:
+        '• PlaylistController (tutte le playlist)
+        '• HomeController (top 5 playlist)
+    }
+
+    class DettaglioPlaylistController {
+        - playlist: Playlist
+        - playlistService: PlaylistService
+        - trackService: TrackService
+        - playerService: PlayerService
+
+        + DettaglioPlaylistController(...)
+        + setPlaylist(Playlist): void
+        + initialize(): void
+        + handleAggiungiCoda(): void
+        + handleModificaPlaylist(): void
+        + handleAggiungiBrano(): void
+        + handleEliminaPlaylist(): void
+        --
+        'Modale Stage — US7, US8, US9, US10
+        'Carica dinamicamente BranoRowController per ogni traccia
+    }
+
+    class AggiungiBranoController {
+        - trackService: TrackService
+
+        + setTrackService(TrackService): void
+        + handleCaricaAudio(): void
+        + handleValidazione(): void
+        + handleCrea(): void
+        + handleAnnulla(): void
+        --
+        'Modale Stage — US1
+        'Valida e salva Track via TrackService
+    }
+
+    class ModificaBranoController {
+        - trackService: TrackService
+
+        + setTrackService(TrackService): void
+        + setTrack(Track): void
+        + handleValidazione(): void
+        + handleModifica(): void
+        + handleAnnulla(): void
+        --
+        'Modale Stage — US2
+        'Solo Titolo, Autore, Genere modificabili
+        'Anno e Durata read-only
+    }
+
+    class CreaPlaylistController {
+        - playlistService: PlaylistService
+
+        + setPlaylistService(PlaylistService): void
+        + handleValidazione(): void
+        + handleCrea(): void
+        + handleAnnulla(): void
+        --
+        'Modale Stage — US6
+        'Crea playlist con nome univoco
+    }
+
+    MainController --> TrackService
+    MainController --> PlaylistService
+    MainController --> PlayerService
+
+    HomeController --> TrackService
+    HomeController --> PlayerService
+
+    BraniController --> TrackService
+    BraniController --> PlayerService
+
+    PlaylistController --> PlaylistService
+    PlaylistController --> TrackService
+
+    PlayerController --> PlayerService
+    PlayerController --> SharedState
+
+    BranoRowController --> PlayerService
+    BranoRowController --> TrackService
+
+    PlaylistCardController --> PlaylistService
+
+    DettaglioPlaylistController --> PlaylistService
+    DettaglioPlaylistController --> TrackService
+    DettaglioPlaylistController --> PlayerService
+
+    AggiungiBranoController --> TrackService
+    ModificaBranoController --> TrackService
+    CreaPlaylistController --> PlaylistService
+}
+
+package "RELAZIONI DINAMICHE" {
+    note right of BranoRowController
+        BranoRowController è caricato dinamicamente
+        da 3 controller diversi:
+
+        HomeController → top 5 brani
+        BraniController → tutti i brani
+        DettaglioPlaylistController → tracce della playlist
+
+        Stesso component, contesti diversi
+    end note
+
+    note right of PlaylistCardController
+        PlaylistCardController è caricato dinamicamente
+        da 2 controller diversi:
+
+        PlaylistController → tutte le playlist
+        HomeController → top 5 playlist
+
+        Stesso component, contesti diversi
+    end note
+}
+
+note left of App
+    App.java è l'unico punto di creazione.
+    Crea una sola volta:
+    • SharedState (memoria)
+    • TrackDAO, PlaylistDAO (file JSON)
+    • TrackService, PlaylistService, PlayerService
+    • PersistenceService (carica JSON all'avvio)
+
+    Poi inietta nei controller via setControllerFactory
+end note
+
+note left of SharedState
+    SharedState è creato UNA VOLTA in App.java
+    e passato a TUTTI i Service.
+    Non è un Singleton statico — è una istanza
+    gestita esplicitamente.
+end note
+
+@enduml

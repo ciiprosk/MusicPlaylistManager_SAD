@@ -1,0 +1,252 @@
+@startuml class Diagram
+    top to bottom direction
+    skinparam linetype ortho
+
+
+
+package "Model" {
+    class Track{
+    - id:UUID
+    - title: String
+    - author: String
+    - genre: GENRE
+    - songLength: int
+
+    + Track()
+    + Track(title, author, GENRE)
+    + getId():UIID
+    + getTitle(): String
+    + getAuthor(): String
+    + getGenre(): GENRE
+    + getSongLength(): int
+    + setTitle(newTitle): void
+    + setAuthor(newAuthor): void
+    + setGenre(newGenre): void
+
+    - isDuplicate(Track): boolean
+}
+
+class Playlist{
+    - id:UUID
+    - name: String
+    - trackIDs : List<UUID>
+
+    + Playlist()
+    + setName(newName): void
+    + addTrack(idTrack): void
+    + removeTrack(idTtack): void
+    - containsTrack(idTrack): boolean
+
+}
+}
+
+package "DAO" {
+
+
+interface TrackDAO{
+    + save(Track): void
+    + update(Track): void
+    + delete(idTrack): void
+    + existsDuplicate(Track): boolean
+    + getAllTracks(): List<Tracks>
+}
+
+interface PlaylistDAO{
+    + save(Playlist): void
+    + update(Playlist): void
+    + delete(UUID): void
+    + existsByName(String): boolean
+}
+
+class JSONTrackDAO{
+    + save(Track): void
+    + update(Track): void
+    + delete(idTrack): void
+    + existsDuplicate(Track): boolean
+    + getAllTracks(): List<Tracks>
+}
+
+class JSONPlaylistDAO{
+    + save(Playlist): void
+    + update(Playlist): void
+    + delete(UUID): void
+    + existsByName(String): boolean
+}
+}
+
+package "Services" {
+
+class PersistanceService{
+    - trackDAO: TrackDAO
+    - playlistDAO: PlaylistDAO
+    - SharedState: SharedState
+
+    + load(): void
+    + save(): void
+
+}
+
+class TrackService{
+    - trackDAO: TrackDAO
+    - SharedState: SharedState
+
+    + addTrack(Track): void
+    + modifyTrack(Track): void
+    + deleteTrack(UUID): void
+    + getAllTracks(): ObservableList
+    + verifyTrack(Track): boolean
+
+}
+
+class PlaylistService{
+    - playlistDAO: PlaylistDAO
+    - SharedState: SharedState
+
+    + createPlaylist(name): Playlist
+    + modifyNamePlaylist(UUID, name): void
+    + addTrack(UUID, UUID): void
+    + removeTrack(UUID, UUID): void
+
+}
+
+class PlayerService{
+    - mediaPlayer: MediaPlayer
+    - sharedState: SharedState
+
+    + play(Track): void
+    + pause(): void
+    + resume(): void
+
+    -next() : DA FARE DOPO
+
+}
+}
+
+package "Controller" {
+    class MainController{
+    - trackService
+    - playlistService
+    - playerService
+    + showHome()
+    + showTracks()
+    + showPlaylists()
+}
+
+class HomeController{
+    - trackService: TrackService
+    - playerService: PlayerService
+    + initialize()
+    + handleAdd()
+}
+
+class PlayerController{
+    - playerService: PlayerService
+    - sharedState: SharedState
+    + initialize()
+    + handlePlayPause()
+}
+
+class TracksController{
+   - trackService: TrackService
+   - playerService: PlayerService
+   + initialize()
+   + handleAggiungi()
+}
+
+class PlaylistController{
+    - trackService: TrackService
+    - playerService: PlayerService
+    + initialize()
+    + handleAdd()
+}
+
+class DetailedPlaylistController{
+    - trackService: TrackService
+    - playlistController: PlaylistController
+    + initialize()
+    + setPlaylist(Playlist)
+    + handleAdd()
+    + handleRemove()
+    + handleRename()
+}
+
+class RowTrackController{
+    - track: Track
+    - trackService: TrackService
+    - playerService: PlayerService
+    + initialize()
+    + setTrack(Track)
+    + handlePlay()
+    + handleModify()
+    + handleDelete()
+}
+
+class PlaylistCardController{
+    - playlist: Playlist
+    - playlistService: PlaylistService
+    + initialize()
+    + setPlaylist(Playlist)
+    + handleOpenDetails()
+}
+
+}
+class SharedState{
+    - allTracks: ObservableList<Track>
+    - allPlaylists: ObservableList<Playlist>
+    - currentTrack : ObjectProperty<Track>
+    - isPlaying: BooleanProperty
+    - progress: DoubleProperty
+
+    + getAllTracks(): ObservableList
+    + getAllPlaylists(): ObservableList
+}
+
+
+
+JSONTrackDAO ..|> TrackDAO
+JSONPlaylistDAO ..|> PlaylistDAO
+
+TrackService --> TrackDAO
+PlaylistService --> PlaylistDAO
+PersistanceService --> TrackDAO
+PersistanceService --> PlaylistDAO
+
+TrackService --> SharedState
+PlaylistService --> SharedState
+PlayerService --> SharedState
+PersistanceService --> SharedState
+
+MainController --> TrackService
+MainController --> PlaylistService
+MainController --> PlayerService
+
+HomeController --> TrackService
+HomeController --> PlayerService
+
+TracksController --> TrackService
+TracksController --> PlayerService
+
+PlaylistController --> PlaylistService
+PlaylistController --> TrackService
+
+DetailedPlaylistController --> PlaylistService
+DetailedPlaylistController --> TrackService
+
+RowTrackController --> TrackService
+RowTrackController --> PlayerService
+
+PlaylistCardController --> PlaylistService
+
+PlayerController --> PlayerService
+PlayerController --> SharedState
+
+SharedState o-- "0..*" Track
+SharedState o-- "0..*" Playlist
+
+
+Playlist ..> Track : trackID
+Playlist "0..*" --> Track
+
+
+
+@enduml
