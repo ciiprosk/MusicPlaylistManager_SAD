@@ -39,9 +39,23 @@ public class JSONPlaylistDAO  extends JSONAbstractDAO implements DAO<Playlist> {
     @Override
     public List<Playlist> selectAll() {
         List<Playlist> playlists= new ArrayList<>();
-        if (Files.exists(Paths.get(filePath))) {
+        if (!exists()) {return playlists;}
+
+        try(BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), "UTF-8"))){
+            String line;
+            while((line = bufferedReader.readLine())!=null){
+                if(line.trim().isEmpty()){ continue;}
+                Playlist p = json.fromJson(line, Playlist.class);
+                playlists.add(p);
+            }
+
+        } catch (
+                FileNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-        return List.of();
+        return playlists;
     }
 
     /**
@@ -101,22 +115,57 @@ public class JSONPlaylistDAO  extends JSONAbstractDAO implements DAO<Playlist> {
     }
 
     /**
-     * @param id
-     * @return
+     * Metodo che cerca una playlist nel file JSON.
+     * @param id è l'identificatore univoco della playlist da cercare.
+     * @return un Optional che contiene la playlist se trovata, altrimenti Optional.empty().
      */
 
     @Override
     public Optional<Playlist> searchById(UUID id) {
-        return Optional.empty();
+        Optional<Playlist> playlist = Optional.empty();
+        if (!exists()) {return playlist;}
+        try(BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), "UTF-8"))){
+            String line;
+            while((line = bufferedReader.readLine())!=null){
+                if(line.trim().isEmpty()){ continue;}
+                Playlist p = json.fromJson(line, Playlist.class);
+                if(p.getId().equals(id)){
+                    playlist = Optional.of(p);
+                    break;
+                }
+            }
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return playlist;
 
     }
 
     /**
-     * @param playlist
-     * @return
+     * Il metodo controlla se il nome di una playlst è già presente nel file JSON.
+     * @param playlist è la playlist da controllare, di cui si controlla il nome.
+     * @return true se il nome è giè presente, false altrimenti.
      */
     @Override
     public boolean isDuplicated(Playlist playlist) {
+        if (!exists()) {return false;}
+        try(BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), "UTF-8"))){
+            String line;
+            while((line = bufferedReader.readLine())!=null){
+                if(line.trim().isEmpty()){ continue;}
+                Playlist p = json.fromJson(line, Playlist.class); // p è la playlist corrente del file da veificare che sia uguale al nome della playlist da verificare
+                if(p.getName().equals(playlist.getName())){
+                    return true;
+                }
+            }
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         return false;
     }
 
@@ -150,9 +199,7 @@ public class JSONPlaylistDAO  extends JSONAbstractDAO implements DAO<Playlist> {
                     bufferedWriter.write(line + "\n");
                 }
             }
-            try{
-                Files.move(tempFile.toPath(), Paths.get(filePath), StandardCopyOption.REPLACE_EXISTING);
-            }catch (IOException e){}
+
 
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
@@ -161,6 +208,9 @@ public class JSONPlaylistDAO  extends JSONAbstractDAO implements DAO<Playlist> {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        try{
+            Files.move(tempFile.toPath(), Paths.get(filePath), StandardCopyOption.REPLACE_EXISTING);
+        }catch (IOException e){}
         return true;
     }
 
