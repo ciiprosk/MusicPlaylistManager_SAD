@@ -92,7 +92,6 @@ public class JSONTrackDAO extends JSONAbstractDAO implements DAO<Track> {
      */
     @Override
     public void update(Track track) {
-
     }
 
     /**
@@ -109,7 +108,13 @@ public class JSONTrackDAO extends JSONAbstractDAO implements DAO<Track> {
      */
     @Override
     public Optional<Track> searchById(UUID id) {
-        return Optional.empty();
+
+        // Cerca la prima traccia con l'ID corrispondente e la restituisce
+        //Sfruttiamo la selectAll già creata e la possibilità di fare filtro con lo stream
+        //sull'id. Ritorniamo la prima occorrenza, dovrebbe essercene comunque sempre solo una
+        return selectAll().stream()
+                .filter(t -> t.getId().equals(id))
+                .findFirst();
     }
 
     /**
@@ -118,7 +123,10 @@ public class JSONTrackDAO extends JSONAbstractDAO implements DAO<Track> {
      */
     @Override
     public boolean isDuplicated(Track track) {
-        return false;
+        // Cerca se esiste già una traccia con lo stesso titolo e autore
+        return selectAll().stream()
+                .anyMatch(t -> t.getTitle().equals(track.getTitle())
+                        && t.getAuthor().equals(track.getAuthor()));
     }
 
     private boolean fileExists() {
