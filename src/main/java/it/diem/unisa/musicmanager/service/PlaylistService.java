@@ -43,7 +43,7 @@ public class PlaylistService {
      * @return
      */
     public Optional<String> createPlaylist(String name) {
-        try{
+
             Playlist playlist = new Playlist(name);
 
             if(playlistDAO.isDuplicated(playlist))
@@ -54,9 +54,6 @@ public class PlaylistService {
             sharedState.getALlPlaylists().add(playlist);
             return Optional.empty();
 
-        } catch (PlaylistInfoException e){
-            return Optional.of("Playlist name already exists");
-        }
     }
 
     /**
@@ -86,7 +83,7 @@ public class PlaylistService {
         // se siamo qui la playlist è stata trovata e posso eseguire l'update
        Playlist playlist = optionalPlaylist.get(); //mi dewrappo l aplaylist ritornata dal dao
        try {
-           newPlaylist = new Playlist(newName);
+           newPlaylist = new Playlist(playlistID, newName); //non vedo se il nome è vuoto
         }catch (PlaylistInfoException e){
            return Optional.of("Playlist name already exists");
        }
@@ -143,7 +140,7 @@ public class PlaylistService {
         //ho ricevuuto tute le playlists ma le devo modificare con i nuovi aggiornameni rispetto alla playlist ricevuto come parametr
         //1. devo cercare playlist nella lista
         IntStream.range(0, playlists.size())
-                .filter(index -> playlists.get(index).equals(playlist.getId()))
+                .filter(index -> playlists.get(index).getId().equals(playlist.getId()))
                 .findFirst().ifPresent(index -> playlists.set(index, playlist));
 
     }

@@ -41,10 +41,17 @@ public class Playlist {
      * @param tracks: una lista di tracce identificate dai UUID.
      */
     public Playlist(UUID id, String name, List<UUID> tracks) {
+        if (checkRulesName(name.trim()))  this.name = name.trim();
         this.id = id;
-        this.name = name;
         this.tracks = tracks;
     }
+
+    public Playlist(UUID playlistID, String name) {
+        if (checkRulesName(name.trim()))  this.name = name.trim();
+        this.id = playlistID;
+        this.tracks = new ArrayList<>();
+    }
+
     /**
      * Getter per il nome della playlist.
      * @return il nome della playlist.

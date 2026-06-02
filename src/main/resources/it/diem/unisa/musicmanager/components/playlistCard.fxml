@@ -8,58 +8,29 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.Rectangle?>
 
-<VBox alignment="TOP_CENTER"
-      spacing="10.0"
-      styleClass="playlist-card"
-      xmlns="http://javafx.com/javafx/21"
-      xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="it.diem.unisa.musicmanager.controller.PlaylistCardController">
+<VBox alignment="TOP_CENTER" spacing="10.0" styleClass="playlist-card" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.diem.unisa.musicmanager.controller.PlaylistCardController">
 
     <padding>
-        <Insets bottom="0.0" left="0.0" right="0.0" top="0.0"/>
+        <Insets bottom="0.0" left="0.0" right="0.0" top="0.0" />
     </padding>
 
     <!-- Cover area -->
     <StackPane prefHeight="140.0" prefWidth="140.0">
-        <Rectangle arcHeight="8.0"
-                   arcWidth="8.0"
-                   fill="#333333"
-                   height="140.0"
-                   width="140.0"/>
-        <Label fx:id="lblPlaylistIcon"
-               text="🎵"
-               styleClass="playlist-icon"/>
+        <Rectangle arcHeight="8.0" arcWidth="8.0" fill="#333333" height="140.0" width="140.0" />
+        <Label fx:id="lblPlaylistIcon" styleClass="playlist-icon" text="🎵" />
     </StackPane>
 
     <!-- Nome playlist -->
-    <Label fx:id="labelName"
-           text="Nome Playlist"
-           styleClass="playlist-nome"
-           wrapText="true"
-           textAlignment="CENTER"/>
+    <Label fx:id="labelName" styleClass="playlist-nome" text="Name" textAlignment="CENTER" wrapText="true" />
 
     <!-- Numero tracce -->
-    <Label fx:id="labelTracks"
-           text="0 tracce"
-           styleClass="playlist-tracce"/>
+    <Label fx:id="labelTracks" styleClass="playlist-tracce" text="0 tracks" />
 
     <!-- Bottoni azioni -->
-    <HBox alignment="CENTER"
-          spacing="8.0"
-          styleClass="playlist-actions">
-        <Button fx:id="btnPlay"
-                text="▶"
-                onAction="#handlePlay"
-                styleClass="btn-playlist-play"/>
-        <Button fx:id="btnModify"
-                text="✎"
-                onAction="#handleModify"
-                styleClass="btn-playlist-menu"/>
-        <Button fx:id="btnMenu"
-                text="···"
-                onAction="#handleMenu"
-                styleClass="btn-playlist-menu"/>
+    <HBox alignment="CENTER" spacing="8.0" styleClass="playlist-actions">
+        <Button fx:id="btnPlay" onAction="#handlePlay" styleClass="btn-playlist-play" text="▶" />
+        <Button fx:id="btnModify" onAction="#handleModify" styleClass="btn-playlist-menu" text="✎" />
+        <Button fx:id="btnMenu" onAction="#handleMenu" styleClass="btn-playlist-menu" text="···" />
     </HBox>
 
 </VBox>
-

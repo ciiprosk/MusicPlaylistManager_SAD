@@ -20,7 +20,7 @@
 
         <!-- ===== TITOLO ===== -->
         <HBox alignment="CENTER_LEFT" spacing="12.0">
-            <Label styleClass="menu-title" text="Crea Playlist" textFill="#a0a0a0" />
+            <Label styleClass="menu-title" text="Create Playlist" textFill="#a0a0a0" />
         </HBox>
 
         <!-- ===== NOME (unico campo) ===== -->

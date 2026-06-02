@@ -4,6 +4,8 @@ import it.diem.unisa.musicmanager.model.Playlist;
 import it.diem.unisa.musicmanager.model.Track;
 //import it.diem.unisa.musicmanager.service.PlaylistService;
 //import it.diem.unisa.musicmanager.service.TrackService;
+import it.diem.unisa.musicmanager.service.PlaylistService;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -27,7 +29,7 @@ import javafx.stage.Stage;
 public class DetailedPlaylistController {
 
     // --- Campi dell'interfaccia, collegati agli fx:id in detailedPlaylist.fxml ---
-    @FXML private Label lblPlaylistName;
+    @FXML private Label labelName;
     @FXML private Label lblTrackCount;
     @FXML private ListView<Track> tracksList;
 
@@ -36,7 +38,7 @@ public class DetailedPlaylistController {
 
     // Service (da collegare quando disponibili).
     // private TrackService trackService;
-    // private PlaylistService playlistService;
+    private PlaylistService playlistService;
 
     /**
      * Chiamato automaticamente da JavaFX appena la schermata e' pronta.
@@ -44,7 +46,7 @@ public class DetailedPlaylistController {
      */
     @FXML
     private void initialize() {
-        tracksList.setCellFactory(lv -> createTrackCell());
+      //  tracksList.setCellFactory(lv -> createTrackCell());
     }
 
     /**
@@ -54,9 +56,9 @@ public class DetailedPlaylistController {
      */
     public void setPlaylist(Playlist playlist) {
         this.playlist = playlist;
-        lblPlaylistName.setText(playlist.getName());
+        labelName.setText(playlist.getName());
         int n = playlist.getTracks().size();
-        lblTrackCount.setText(n + (n == 1 ? " traccia" : " tracce"));
+        lblTrackCount.setText(n + (n == 1 ? " track" : " tracks"));
 
         // Quando il TrackService sara' disponibile, qui risolveremo gli UUID
         // della playlist nei rispettivi Track e riempiremo la lista:
@@ -68,6 +70,9 @@ public class DetailedPlaylistController {
         // tracksList.getItems().setAll(tracce);
     }
 
+    public void setPlaylistService(PlaylistService playlistService){
+        this.playlistService = playlistService;
+    }
     /**
      * Crea una cella che mostra "Titolo - Autore" a sinistra e la durata a destra.
      *
@@ -117,20 +122,16 @@ public class DetailedPlaylistController {
         return String.format("%d:%02d", minutes, seconds);
     }
 
-    /**
-     * Click su "Rinomina": apre la finestra di modifica del nome della playlist.
-     */
-    @FXML
-    private void handleRename() {
+    public void onModify(ActionEvent actionEvent) {
         try {
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource("/it/diem/unisa/musicmanager/pages/editPlaylist.fxml"));
             Parent root = loader.load();
 
             EditPlaylistController controller = loader.getController();
-            //controller.setPlaylist(playlist);
+            controller.setPlaylist(playlist);
             // Quando il PlaylistService sara' attivo:
-            // controller.setPlaylistService(playlistService);
+            controller.setPlaylistService(playlistService);
 
             Stage stage = new Stage();
             stage.setTitle("Modifica Playlist");
@@ -140,11 +141,18 @@ public class DetailedPlaylistController {
 
             // Dopo la chiusura, aggiorniamo il nome mostrato (potrebbe essere cambiato).
             if (playlist != null) {
-                lblPlaylistName.setText(playlist.getName());
+                labelName.setText(playlist.getName());
             }
 
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
+    public void onAddTrack(ActionEvent actionEvent) {
+    }
+
+    public void onDelete(ActionEvent actionEvent) {
+    }
+
 }
