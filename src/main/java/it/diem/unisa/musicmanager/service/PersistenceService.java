@@ -27,7 +27,7 @@ public class PersistenceService {
     /**
      * Metodo che carica tutti i dati dal file JSON. Sia le tracce che le playlist.
       */
-    public void lod(){
+    public void load(){
         sharedState.getALlTracks().setAll(trackDAO.selectAll()); // aggiunge tutte le tracce al set di tutte le tracce
         sharedState.getALlPlaylists().setAll(playlistDAO.selectAll()); // aggiunge tutte le playlist al set di tutte le playlist
     }

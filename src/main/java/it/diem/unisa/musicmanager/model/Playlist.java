@@ -97,6 +97,9 @@ public class Playlist {
         return tracks.contains(trackID);
      }
 
+     public int numberOfTrakcs(){
+        return tracks.size();
+     }
     /**
      * Valida le business rules per il nome della playlist.
      * Si assicura che il nome non sia vuoto e che non superi i 50 caratteri.

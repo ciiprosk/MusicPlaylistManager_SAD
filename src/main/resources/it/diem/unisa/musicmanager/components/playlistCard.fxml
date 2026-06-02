@@ -35,14 +35,14 @@
     </StackPane>
 
     <!-- Nome playlist -->
-    <Label fx:id="lblNome"
+    <Label fx:id="labelName"
            text="Nome Playlist"
            styleClass="playlist-nome"
            wrapText="true"
            textAlignment="CENTER"/>
 
     <!-- Numero tracce -->
-    <Label fx:id="lblTracce"
+    <Label fx:id="labelTracks"
            text="0 tracce"
            styleClass="playlist-tracce"/>
 
