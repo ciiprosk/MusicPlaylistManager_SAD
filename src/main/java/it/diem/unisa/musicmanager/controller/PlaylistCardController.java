@@ -17,6 +17,7 @@ import javafx.scene.control.Label;
 public class PlaylistCardController {
     private Playlist playlist;
     private PlaylistService playlistService;
+    private PlayerService playerService;
 
     private Runnable onOpenDetails;
 
@@ -31,6 +32,10 @@ public class PlaylistCardController {
     public void setPlaylistService(PlaylistService playlistService) {
         this.playlistService = playlistService;
     }
+
+    public void setPlayerService(PlayerService playerService) {
+    }
+
 
     public void handlePlay(ActionEvent actionEvent) {
     //da fare successivamente
@@ -55,8 +60,6 @@ public class PlaylistCardController {
 
     }
 
-    public void setPlayerService(PlayerService playerService) {
-    }
 
     public void setOnOpenDetails(Object o) {
     }

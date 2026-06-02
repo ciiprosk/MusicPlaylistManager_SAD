@@ -24,7 +24,7 @@ public class PlaylistController {
 
 
     @FXML
-    public void inizialize() throws IOException {
+    public void initialize() throws IOException {
         loadPlaylists();
     }
 
@@ -66,7 +66,7 @@ public class PlaylistController {
 
     @FXML
     public void openCreatePlaylist(ActionEvent actionEvent) throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/it/diem/unisa/musicmanager/components/createPlaylist.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/it/diem/unisa/musicmanager/pages/createPlaylist.fxml"));
         Parent root = loader.load();
 
 
