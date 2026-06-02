@@ -1,6 +1,7 @@
 package it.diem.unisa.musicmanager.controller;
 
 import it.diem.unisa.musicmanager.model.Genre;
+import it.diem.unisa.musicmanager.service.TrackService;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -18,14 +19,24 @@ import java.util.Arrays;
  */
 public class AddSongController {
 
-    @FXML private TextField fieldTitolo;
-    @FXML private TextField fieldAutore;
-    @FXML private TextField fieldAnno;
-    @FXML private TextField fieldDurata;
-    @FXML private ComboBox<Genre> comboGenere;
+    private TrackService trackService;
+    private String selectedAudioFilePath;
+
+    @FXML private TextField fieldTitle;
+    @FXML private TextField fieldAuthor;
+    @FXML private TextField fieldYear;
+    @FXML private TextField fieldSongLength;
+    @FXML private ComboBox<Genre> comboGenre;
+
     @FXML private Label lblFilePath;
     @FXML private Label lblError;
-    @FXML private Button btnCrea;
+
+    @FXML private Button audioLoadButton; // opzionale ma utile
+    @FXML private Button buttonCreate;
+
+    public void setTrackService(TrackService trackService) {
+        this.trackService = trackService;
+    }
 
     /**
      * Chiamato automaticamente da JavaFX una volta, subito dopo che l'FXML
@@ -37,14 +48,14 @@ public class AddSongController {
         // (UNKNOWN e' solo il valore di default quando l'utente non sceglie nulla)
         Arrays.stream(Genre.values())
                 .filter(g -> g != Genre.UNKNOWN)
-                .forEach(comboGenere.getItems()::add);
+                .forEach(comboGenre.getItems()::add);
     }
 
     /**
      * Genere scelto dall'utente, oppure UNKNOWN se non ha selezionato nulla.
      */
     private Genre getGenereSelezionato() {
-        Genre selezionato = comboGenere.getValue();
+        Genre selezionato = comboGenre.getValue();
         return (selezionato != null) ? selezionato : Genre.UNKNOWN;
     }
 
@@ -56,5 +67,11 @@ public class AddSongController {
     private void onAnnulla(ActionEvent e) {
         Stage stage = (Stage) ((Node) e.getSource()).getScene().getWindow();
         stage.close();
+    }
+
+    public void onCreateButton(ActionEvent actionEvent) {
+    }
+
+    public void onAudioLoad(ActionEvent actionEvent) {
     }
 }

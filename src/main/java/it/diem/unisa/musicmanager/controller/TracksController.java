@@ -1,14 +1,33 @@
 package it.diem.unisa.musicmanager.controller;
+import it.diem.unisa.musicmanager.model.Track;
+import it.diem.unisa.musicmanager.service.TrackService;
 import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.ListView;
+import javafx.scene.control.TextField;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import javafx.event.ActionEvent;
 
 public class TracksController {
+    private final TrackService trackService;
+
+    @FXML private ListView<Track> tracksList;
+    @FXML private TextField searchField;
+
+    public TracksController(TrackService trackService) {
+        this.trackService = trackService;
+    }
+
+    @FXML
+    private void initialize() {
+        tracksList.setItems(trackService.getAllTracks());
+        // opzionale: filtro searchBar con FilteredList
+    }
 
     /**
      * Apre una finestra popup per l'aggiunta di un nuovo brano.
