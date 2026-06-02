@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<!-- Contenuto della finestra modale "Modifica Brano" (aperta come Stage separato).
+     Durata e file sono mostrati in sola lettura (solo informativi);
+     titolo, autore, genere e anno sono modificabili. -->
+<VBox spacing="18.0" styleClass="sfondo-principale" stylesheets="@../../css/style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.diem.unisa.musicmanager.controller.EditSongController">
+
+    <padding>
+        <Insets bottom="25.0" left="30.0" right="30.0" top="20.0" />
+    </padding>
+
+    <children>
+
+        <!-- ===== TITOLO ===== -->
+        <HBox alignment="CENTER_LEFT" spacing="12.0">
+            <Label styleClass="menu-title" text="Modifica Brano" textFill="#a0a0a0" />
+        </HBox>
+
+        <!-- ===== FILE AUDIO (sola lettura, solo informativo) ===== -->
+        <HBox alignment="CENTER_LEFT" spacing="15.0">
+            <Label minWidth="160.0" styleClass="sottotitolo" text="File Audio" textFill="#cccccc" />
+            <Label fx:id="lblFilePath" text="" textFill="WHITE" />
+        </HBox>
+
+        <!-- Form -->
+        <VBox spacing="14.0">
+
+            <HBox alignment="CENTER_LEFT" spacing="15.0">
+                <Label minWidth="160.0" styleClass="sottotitolo" text="Titolo" textFill="#cccccc" />
+                <TextField fx:id="fieldTitle" styleClass="form-field" HBox.hgrow="ALWAYS" />
+            </HBox>
+
+            <HBox alignment="CENTER_LEFT" spacing="15.0">
+                <Label minWidth="160.0" styleClass="sottotitolo" text="Autore" textFill="#cccccc" />
+                <TextField fx:id="fieldAuthor" styleClass="form-field" HBox.hgrow="ALWAYS" />
+            </HBox>
+
+            <HBox alignment="CENTER_LEFT" spacing="15.0">
+                <Label minWidth="160.0" styleClass="sottotitolo" text="Genere" textFill="#cccccc" />
+                <ComboBox fx:id="comboGenre" maxWidth="Infinity" styleClass="form-field" HBox.hgrow="ALWAYS" />
+            </HBox>
+
+            <!-- Anno (modificabile) + Durata (sola lettura) sulla stessa riga -->
+            <HBox alignment="CENTER_LEFT" spacing="15.0">
+                <Label minWidth="160.0" styleClass="sottotitolo" text="Anno di pubblicazione" textFill="#cccccc" />
+                <TextField fx:id="fieldYear" maxWidth="90.0" promptText="aaaa" styleClass="form-field" />
+                <Label styleClass="sottotitolo" text="Durata" textFill="#cccccc">
+                    <HBox.margin>
+                        <Insets left="20.0" />
+                    </HBox.margin>
+                </Label>
+                <TextField fx:id="fieldDuration" editable="false" styleClass="form-field" HBox.hgrow="ALWAYS" />
+            </HBox>
+
+        </VBox>
+
+        <!-- ===== ERRORE + AZIONI (Annulla / Salva) ===== -->
+        <HBox alignment="CENTER_RIGHT" spacing="12.0">
+            <Label fx:id="lblError" maxWidth="Infinity" textFill="#ff5555" HBox.hgrow="ALWAYS" />
+            <Button onAction="#onCancel" styleClass="button-grigio" text="Annulla" textFill="WHITE" />
+            <Button fx:id="btnSave"  styleClass="button-verde" text="Salva" textFill="WHITE" /> <!-- =====onAction="#onSave" ===== -->
+        </HBox>
+
+    </children>
+</VBox>

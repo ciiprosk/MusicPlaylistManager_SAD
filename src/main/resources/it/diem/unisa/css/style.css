@@ -431,3 +431,15 @@
     -fx-background-color: transparent;
     -fx-text-fill: white;
 }
+
+.button-rosso {
+    -fx-background-color: #c94a4a;
+    -fx-text-fill: white;
+    -fx-background-radius: 18px;
+    -fx-padding: 8 22 8 22;
+    -fx-cursor: hand;
+}
+
+.button-rosso:hover {
+    -fx-background-color: #d85c5c;
+}
