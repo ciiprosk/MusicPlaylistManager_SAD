@@ -1,6 +1,7 @@
 package it.diem.unisa.musicmanager.controller;
 
 //import it.diem.unisa.musicmanager.service.PlaylistService;
+import it.diem.unisa.musicmanager.service.PlaylistService;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -22,7 +23,7 @@ public class AddPlaylistController {
     @FXML private Button btnCreate;
 
     // Service condiviso per la gestione delle playlist (passato da chi apre il popup).
-    // private PlaylistService playlistService;
+    private PlaylistService playlistService;
 
     /**
      * Imposta il service da usare per salvare la playlist.
@@ -82,6 +83,10 @@ public class AddPlaylistController {
         close(e);
     }
 
+    @FXML
+    public void onCreate(ActionEvent actionEvent) {
+    }
+
     /**
      * Chiude la finestra modale, ricavando lo Stage dal bottone che ha generato l'evento.
      *
@@ -91,4 +96,10 @@ public class AddPlaylistController {
         Stage stage = (Stage) ((Node) e.getSource()).getScene().getWindow();
         stage.close();
     }
+
+    public void setPlaylistService(PlaylistService playlistService) {
+        this.playlistService = playlistService;
+    }
+
+
 }

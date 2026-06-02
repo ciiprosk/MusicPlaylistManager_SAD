@@ -1,6 +1,8 @@
 package it.diem.unisa.musicmanager.controller;
 
 import it.diem.unisa.musicmanager.model.Playlist;
+import it.diem.unisa.musicmanager.service.PlayerService;
+import it.diem.unisa.musicmanager.service.PlaylistService;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -18,10 +20,12 @@ import javafx.stage.Stage;
  */
 public class PlaylistCardController {
 
+    private PlaylistService playlistService; //lo ricevo dal qyeelo che mi chiama
+    private PlayerService playerService;
     // --- Campi dell'interfaccia, collegati agli fx:id in playlistCard.fxml ---
     @FXML private Label lblPlaylistIcon;
-    @FXML private Label lblNome;
-    @FXML private Label lblTracce;
+    @FXML private Label labelName;
+    @FXML private Label labelTracks;
     @FXML private Button btnPlay;
     @FXML private Button btnModify;
     @FXML private Button btnMenu;
@@ -36,9 +40,9 @@ public class PlaylistCardController {
      */
     public void setPlaylist(Playlist playlist) {
         this.playlist = playlist;
-        lblNome.setText(playlist.getName());
+        labelName.setText(playlist.getName());
         int n = playlist.getTracks().size();
-        lblTracce.setText(n + (n == 1 ? " traccia" : " tracce"));
+        labelTracks.setText(n + (n == 1 ? " Track" : " Tracks"));
     }
 
     /**
@@ -47,7 +51,7 @@ public class PlaylistCardController {
      */
     @FXML
     private void handlePlay() {
-        // TODO: riproduzione della playlist
+        // gestione edl player servcie
     }
 
     /**
@@ -62,9 +66,9 @@ public class PlaylistCardController {
 
             // Passiamo la playlist al controller della modifica.
             EditPlaylistController controller = loader.getController();
-            //controller.setPlaylist(playlist);
+            controller.setPlaylist(playlist);
             // Quando il PlaylistService sara' attivo, qui passeremo anche il service:
-            // controller.setPlaylistService(playlistService);
+            controller.setPlaylistService(playlistService);
 
             Stage stage = new Stage();
             stage.setTitle("Modifica Playlist");
@@ -83,5 +87,14 @@ public class PlaylistCardController {
     @FXML
     private void handleMenu() {
         // TODO: menu con altre azioni (es. elimina, dettagli)
+    }
+
+    public void setPlaylistService(PlaylistService playlistService) {
+        this.playlistService = playlistService;
+    }
+
+    public void setPlayerService(PlayerService playerService) {
+        this.playerService = playerService;
+
     }
 }

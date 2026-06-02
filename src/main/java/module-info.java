@@ -3,7 +3,6 @@ module it.diem.unisa.musicplaylistmanager_sad {
     requires javafx.fxml;
     requires javafx.media;
     requires com.google.gson;
-    requires javafx.media;
 
     opens it.diem.unisa.musicmanager to javafx.fxml;
     exports it.diem.unisa.musicmanager;
