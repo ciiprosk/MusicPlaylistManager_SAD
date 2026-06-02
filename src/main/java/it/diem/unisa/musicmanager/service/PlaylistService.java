@@ -8,6 +8,7 @@ import javafx.collections.ObservableList;
 
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.IntStream;
 
 
 // nei service ogni operazione che modifica i dati deve
@@ -33,13 +34,24 @@ public class PlaylistService {
         return sharedState.getALlPlaylists();
     }
 
+    /**
+     * Metodo che crea una playlist:
+     * 1. eriifca i dati ed eventuali doppioni
+     * 2. inseirisce peersistenza
+     * 3. cambia lo stato di shared state
+     * @param name
+     * @return
+     */
     public Optional<String> createPlaylist(String name) {
         try{
             Playlist playlist = new Playlist(name);
 
-            if(playlistDAO.isDuplicated(playlist)) return Optional.of("Playlist name already exists");
+            if(playlistDAO.isDuplicated(playlist))
+                return Optional.of("Playlist name already exists");
+
             // ora posso inserrie la playlist nel file dao
             playlistDAO.insert(playlist);
+            sharedState.getALlPlaylists().add(playlist);
             return Optional.empty();
 
         } catch (PlaylistInfoException e){
@@ -67,14 +79,21 @@ public class PlaylistService {
      */
     public Optional<String> renamePlaylist(UUID playlistID, String newName) {
         Optional<Playlist> optionalPlaylist = playlistDAO.searchById(playlistID);
-        if (optionalPlaylist.isEmpty()) return Optional.of("Playlist not found");
+        if (optionalPlaylist.isEmpty())
+            return Optional.of("Playlist not found");
 
+        Playlist newPlaylist = null;
         // se siamo qui la playlist è stata trovata e posso eseguire l'update
-       Playlist playlist = optionalPlaylist.get();
-       Playlist newPlaylist = new Playlist(newName);
+       Playlist playlist = optionalPlaylist.get(); //mi dewrappo l aplaylist ritornata dal dao
+       try {
+           newPlaylist = new Playlist(newName);
+        }catch (PlaylistInfoException e){
+           return Optional.of("Playlist name already exists");
+       }
+       //controllo che il nuovo nome sia univoco
+        if(playlistDAO.isDuplicated(newPlaylist))
+            return Optional.of("Playlist name already exists");
 
-       //controllo che il nome sia univoco
-        if(playlistDAO.isDuplicated(newPlaylist)) return Optional.of("Playlist name already exists");
         playlist.setName(newName);
         playlistDAO.update(playlist);
         updateInState(playlist);
@@ -106,7 +125,7 @@ public class PlaylistService {
     public void removeTrackFromPlaylist(UUID playlistID, UUID trackID) {
         Playlist playlist = playlistDAO.searchById(playlistID).orElseThrow(()-> new PlaylistInfoException("Playlist not found"));
 
-        if(!playlist.containsTrack(trackID)){ //se la playlist contie la traccia la eliminizmao
+        if(playlist.containsTrack(trackID)){ //se la playlist contie la traccia la eliminizmao
             playlist.removeTrack(trackID);
             playlistDAO.update(playlist);
             updateInState(playlist);
@@ -121,8 +140,11 @@ public class PlaylistService {
 
     private void updateInState(Playlist playlist) {
         ObservableList<Playlist> playlists = sharedState.getALlPlaylists();
+        //ho ricevuuto tute le playlists ma le devo modificare con i nuovi aggiornameni rispetto alla playlist ricevuto come parametr
+        //1. devo cercare playlist nella lista
+        IntStream.range(0, playlists.size())
+                .filter(index -> playlists.get(index).equals(playlist.getId()))
+                .findFirst().ifPresent(index -> playlists.set(index, playlist));
 
-        int index = playlists.indexOf(playlist);
-        playlists.set(index, playlist);
     }
 }

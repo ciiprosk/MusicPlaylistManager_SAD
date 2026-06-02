@@ -118,4 +118,16 @@ public class Playlist {
         return check;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Playlist other = (Playlist) o;
+        return name != null && name.equalsIgnoreCase(other.name);
+    }
+    @Override
+    public int hashCode() {
+        return name != null ? name.hashCode() : 0;
+    }
+
 }

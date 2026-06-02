@@ -54,5 +54,10 @@ public class PlaylistCardController {
         if(playlist == null) return;
 
     }
-    
+
+    public void setPlayerService(PlayerService playerService) {
+    }
+
+    public void setOnOpenDetails(Object o) {
+    }
 }

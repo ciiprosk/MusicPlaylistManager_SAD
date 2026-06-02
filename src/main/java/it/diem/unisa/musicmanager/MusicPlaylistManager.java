@@ -5,6 +5,9 @@ import it.diem.unisa.musicmanager.dao.JSONPlaylistDAO;
 import it.diem.unisa.musicmanager.dao.JSONTrackDAO;
 import it.diem.unisa.musicmanager.model.Playlist;
 import it.diem.unisa.musicmanager.service.PersistenceService;
+import it.diem.unisa.musicmanager.service.PlayerService;
+import it.diem.unisa.musicmanager.service.PlaylistService;
+import it.diem.unisa.musicmanager.service.TrackService;
 import it.diem.unisa.musicmanager.state.SharedState;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -17,13 +20,9 @@ import java.io.IOException;
 public class MusicPlaylistManager extends Application {
     @Override
     public void start(Stage stage) throws IOException {
-        //chiamo i service
-        SharedState sharedState = new SharedState();
-        DAO<Track> trackDAO = new JSONTrackDAO("data", "tracks.jsonl");
-        DAO<Playlist> playlistDAO = new JSONPlaylistDAO("data", "playlists.jsonl");
-
-        // creo i service
-        PersistenceService persistenceService = new PersistenceService(trackDAO, playlistDAO, sharedState);
+        //chiamo i dao e shared
+        SharedState sharedState = getSharedState();
+        PlayerService playerService = new PlayerService(sharedState);
 
         FXMLLoader fxmlLoader = new FXMLLoader(MusicPlaylistManager.class.getResource("MusicPlaylistManagerGUI.fxml"));
 
@@ -36,6 +35,20 @@ public class MusicPlaylistManager extends Application {
         stage.setTitle("APP");
         stage.setScene(scene);
         stage.show();
+    }
+
+    private static SharedState getSharedState() {
+        SharedState sharedState = new SharedState();
+        DAO<Track> trackDAO = new JSONTrackDAO("data", "tracks.jsonl");
+        DAO<Playlist> playlistDAO = new JSONPlaylistDAO("data", "playlists.jsonl");
+
+        // creo i service e carico le tracce
+        PersistenceService persistenceService = new PersistenceService(trackDAO, playlistDAO, sharedState);
+        persistenceService.load();
+
+        PlaylistService playlistService = new PlaylistService(playlistDAO, sharedState);
+        TrackService trackService = new TrackService(trackDAO, sharedState);
+        return sharedState;
     }
 
 }
