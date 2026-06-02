@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<!-- Contenuto della finestra modale "Dettaglio Brano" -->
+
+<VBox spacing="18.0" styleClass="sfondo-principale" stylesheets="@../../css/style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.diem.unisa.musicmanager.controller.DetailSongController">
+
+    <padding>
+        <Insets bottom="25.0" left="30.0" right="30.0" top="20.0" />
+    </padding>
+
+    <children>
+
+        <!-- ===== TITOLO ===== -->
+        <HBox alignment="CENTER_LEFT" spacing="12.0">
+            <Label styleClass="menu-title" text="Dettaglio Brano" textFill="#a0a0a0" />
+        </HBox>
+
+        <!-- ===== DATI (sola lettura) ===== -->
+        <VBox spacing="14.0">
+
+            <HBox alignment="CENTER_LEFT" spacing="15.0">
+                <Label minWidth="160.0" styleClass="sottotitolo" text="Titolo" textFill="#cccccc" />
+                <Label fx:id="lblTitle" text="" textFill="WHITE" />
+            </HBox>
+
+            <HBox alignment="CENTER_LEFT" spacing="15.0">
+                <Label minWidth="160.0" styleClass="sottotitolo" text="Autore" textFill="#cccccc" />
+                <Label fx:id="lblAuthor" text="" textFill="WHITE" />
+            </HBox>
+
+            <HBox alignment="CENTER_LEFT" spacing="15.0">
+                <Label minWidth="160.0" styleClass="sottotitolo" text="Genere" textFill="#cccccc" />
+                <Label fx:id="lblGenre" text="" textFill="WHITE" />
+            </HBox>
+
+            <HBox alignment="CENTER_LEFT" spacing="15.0">
+                <Label minWidth="160.0" styleClass="sottotitolo" text="Anno di pubblicazione" textFill="#cccccc" />
+                <Label fx:id="lblYear" text="" textFill="WHITE" />
+            </HBox>
+
+            <HBox alignment="CENTER_LEFT" spacing="15.0">
+                <Label minWidth="160.0" styleClass="sottotitolo" text="Durata" textFill="#cccccc" />
+                <Label fx:id="lblDuration" text="" textFill="WHITE" />
+            </HBox>
+
+            <HBox alignment="CENTER_LEFT" spacing="15.0">
+                <Label minWidth="160.0" styleClass="sottotitolo" text="File Audio" textFill="#cccccc" />
+                <Label fx:id="lblFilePath" text="" textFill="WHITE" />
+            </HBox>
+
+        </VBox>
+
+        <!-- ===== AZIONI ===== -->
+        <HBox alignment="CENTER_RIGHT" spacing="12.0">
+            <Region HBox.hgrow="ALWAYS" />
+
+            <Button styleClass="button-grigio" text="Chiudi" textFill="WHITE" /> <!-- =====onAction="#onClose" ===== -->
+
+            <Button fx:id="btnEdit"  styleClass="button-verde" text="Modifica" textFill="WHITE" /> <!-- ===== onAction="#onEdit" ===== -->
+
+            <Button fx:id="btnDelete" text="Elimina" textFill="WHITE"> <!-- ===== onAction=#onDelete ===== -->
+            <styleClass>
+               <String fx:value="button-rosso" />
+               <String fx:value="button-grigio" />
+            </styleClass></Button>
+        </HBox>
+
+    </children>
+</VBox>
