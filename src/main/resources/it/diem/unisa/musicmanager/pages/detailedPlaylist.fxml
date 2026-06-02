@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<!-- Schermata di dettaglio di una playlist:
+     in alto il nome, sotto l'elenco delle tracce (titolo, autore, durata). -->
+<VBox spacing="15.0" styleClass="sfondo-principale" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.diem.unisa.musicmanager.controller.DetailedPlaylistController">
+    <padding>
+        <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+    </padding>
+
+    <children>
+
+        <!-- Intestazione: nome della playlist + azioni -->
+        <HBox alignment="CENTER_LEFT" spacing="12.0">
+            <Label fx:id="lblPlaylistName" styleClass="titolo-pagina" text="Nome Playlist" textFill="WHITE" />
+            <Region HBox.hgrow="ALWAYS" />
+            <Button fx:id="btnRename" mnemonicParsing="false" onAction="#handleRename" styleClass="btn-primario" text="Rinomina" />
+        </HBox>
+
+        <!-- Sottotitolo: numero tracce -->
+        <Label fx:id="lblTrackCount" styleClass="sottotitolo" text="0 tracce" textFill="#b3b3b3" />
+
+        <!-- Elenco delle tracce della playlist -->
+        <ListView fx:id="tracksList" styleClass="lista-brani" VBox.vgrow="ALWAYS" />
+
+    </children>
+</VBox>
+
