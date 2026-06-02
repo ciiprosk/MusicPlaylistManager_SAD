@@ -1,18 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ComboBox?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.ToggleButton?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 
 <!-- Contenuto della finestra modale "Crea Brano" (aperta come Stage separato da TracksController).
      sfondo-principale riempie la finestra di scuro; "Annulla" chiude lo Stage. -->
-
-<VBox spacing="18.0" styleClass="sfondo-principale" stylesheets="@../../css/style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.diem.unisa.musicmanager.controller.AddSongController">
+<VBox spacing="18.0" styleClass="sfondo-principale" stylesheets="@../../css/style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.diem.unisa.musicmanager.controller.AddSongController">
 
     <padding>
         <Insets bottom="25.0" left="30.0" right="30.0" top="20.0" />
@@ -26,9 +20,11 @@
         </HBox>
 
         <!-- ===== PULSANTE CARICA TRACCIA (azzurro) ===== -->
-        <HBox>
-            <Button fx:id="audioLoadButton" onAction="#onAudioLoad" styleClass="button-blu" text="Carica traccia Audio" textFill="WHITE" />
-            <Label fx:id="lblFilePath" managed="false" text="" visible="false" />
+        <HBox alignment="CENTER_LEFT" spacing="15.0">
+            <Button fx:id="btnCarica" onAction="#onLoadAudio" styleClass="button-blu" text="Carica traccia Audio" textFill="WHITE" />
+            <Region HBox.hgrow="ALWAYS" />
+            <Label fx:id="lblFilePath" managed="false" text="" textFill="WHITE" visible="false" />
+            <Region HBox.hgrow="ALWAYS" />
         </HBox>
 
         <!--Form-->
@@ -36,29 +32,29 @@
 
             <HBox alignment="CENTER_LEFT" spacing="15.0">
                 <Label minWidth="160.0" styleClass="sottotitolo" text="Titolo" textFill="#cccccc" />
-                <TextField fx:id="fieldTitle" styleClass="form-field" HBox.hgrow="ALWAYS" />
+                <TextField fx:id="fieldTitolo" styleClass="form-field" HBox.hgrow="ALWAYS" />
             </HBox>
 
             <HBox alignment="CENTER_LEFT" spacing="15.0">
                 <Label minWidth="160.0" styleClass="sottotitolo" text="Autore" textFill="#cccccc" />
-                <TextField fx:id="fieldAuthor" styleClass="form-field" HBox.hgrow="ALWAYS" />
+                <TextField fx:id="fieldAutore" styleClass="form-field" HBox.hgrow="ALWAYS" />
             </HBox>
 
             <HBox alignment="CENTER_LEFT" spacing="15.0">
                 <Label minWidth="160.0" styleClass="sottotitolo" text="Genere" textFill="#cccccc" />
-                <ComboBox fx:id="comboGenre" maxWidth="Infinity" styleClass="form-field" HBox.hgrow="ALWAYS" />
+                <ComboBox fx:id="comboGenere" maxWidth="Infinity" styleClass="form-field" HBox.hgrow="ALWAYS" />
             </HBox>
 
             <!-- Anno + Durata sulla stessa riga -->
             <HBox alignment="CENTER_LEFT" spacing="15.0">
                 <Label minWidth="160.0" styleClass="sottotitolo" text="Anno di pubblicazione" textFill="#cccccc" />
-                <TextField fx:id="fieldYear" maxWidth="90.0" promptText="aaaa" styleClass="form-field" />
+                <TextField fx:id="fieldAnno" maxWidth="90.0" promptText="aaaa" styleClass="form-field" />
                 <Label styleClass="sottotitolo" text="Durata" textFill="#cccccc">
                     <HBox.margin>
                         <Insets left="20.0" />
                     </HBox.margin>
                 </Label>
-                <TextField fx:id="fieldSongLength" editable="false" promptText="mm:ss" styleClass="form-field" HBox.hgrow="ALWAYS" />
+                <TextField fx:id="fieldDurata" editable="false" promptText="dal file" styleClass="form-field" HBox.hgrow="ALWAYS" />
             </HBox>
 
         </VBox>
@@ -76,8 +72,8 @@
         <!-- ===== ERRORE + AZIONI (Annulla / Crea) ===== -->
         <HBox alignment="CENTER_RIGHT" spacing="12.0">
             <Label fx:id="lblError" maxWidth="Infinity" textFill="#ff5555" HBox.hgrow="ALWAYS" />
-            <Button fx:id="buttonAnnulla" onAction="#onAnnulla" styleClass="button-grigio" text="Annulla" textFill="WHITE" />
-            <Button fx:id="buttonCreate" disable="true" onAction="#onCreateButton" styleClass="button-verde" text="Crea" textFill="WHITE" />
+            <Button onAction="#onCancel" styleClass="button-grigio" text="Annulla" textFill="WHITE" />
+            <Button fx:id="btnCrea"  styleClass="button-verde" text="Crea" textFill="WHITE" />
         </HBox>
 
     </children>
