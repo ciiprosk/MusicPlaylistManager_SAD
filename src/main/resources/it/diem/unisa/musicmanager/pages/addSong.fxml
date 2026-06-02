@@ -20,9 +20,11 @@
         </HBox>
 
         <!-- ===== PULSANTE CARICA TRACCIA (azzurro) ===== -->
-        <HBox>
-            <Button styleClass="button-blu" text="Carica traccia Audio" textFill="WHITE" />
-            <Label fx:id="lblFilePath" managed="false" text="" visible="false" />
+        <HBox alignment="CENTER_LEFT" spacing="15.0">
+            <Button fx:id="btnCarica" onAction="#onLoadAudio" styleClass="button-blu" text="Carica traccia Audio" textFill="WHITE" />
+            <Region HBox.hgrow="ALWAYS" />
+            <Label fx:id="lblFilePath" managed="false" text="" textFill="WHITE" visible="false" />
+            <Region HBox.hgrow="ALWAYS" />
         </HBox>
 
         <!--Form-->
@@ -52,7 +54,7 @@
                         <Insets left="20.0" />
                     </HBox.margin>
                 </Label>
-                <TextField fx:id="fieldDurata" editable="false" promptText="mm:ss" styleClass="form-field" HBox.hgrow="ALWAYS" />
+                <TextField fx:id="fieldDurata" editable="false" promptText="dal file" styleClass="form-field" HBox.hgrow="ALWAYS" />
             </HBox>
 
         </VBox>
@@ -70,8 +72,8 @@
         <!-- ===== ERRORE + AZIONI (Annulla / Crea) ===== -->
         <HBox alignment="CENTER_RIGHT" spacing="12.0">
             <Label fx:id="lblError" maxWidth="Infinity" textFill="#ff5555" HBox.hgrow="ALWAYS" />
-            <Button onAction="#onAnnulla" styleClass="button-grigio" text="Annulla" textFill="WHITE" />
-            <Button fx:id="btnCrea" disable="true" styleClass="button-verde" text="Crea" textFill="WHITE" />
+            <Button onAction="#onCancel" styleClass="button-grigio" text="Annulla" textFill="WHITE" />
+            <Button fx:id="btnCrea" onAction="#onSave" styleClass="button-verde" text="Crea" textFill="WHITE" />
         </HBox>
 
     </children>
