@@ -32,6 +32,7 @@ import java.util.Arrays;
  */
 public class AddSongController {
 
+
     // --- Campi dell'interfaccia, collegati agli fx:id presenti in addSong.fxml ---
     @FXML private TextField fieldTitolo;
     @FXML private TextField fieldAutore;
@@ -246,4 +247,5 @@ public class AddSongController {
         Stage stage = (Stage) ((Node) e.getSource()).getScene().getWindow();
         stage.close();
     }
+
 }
