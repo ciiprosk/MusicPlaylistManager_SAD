@@ -1,76 +1,48 @@
 package it.diem.unisa.musicmanager.controller;
 
 import it.diem.unisa.musicmanager.model.Playlist;
-import it.diem.unisa.musicmanager.service.PlayerService;
-import it.diem.unisa.musicmanager.service.PlaylistService;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.FlowPane;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
-import java.io.IOException;
-
+/**
+ * Controller della schermata "Playlists".
+ * Mostra le playlist come griglia di card e permette di crearne di nuove
+ * aprendo la finestra "Crea Playlist".
+ */
 public class PlaylistController {
 
-    //chiede al service le playlist e la creazione delle playlists
-    private PlaylistService playlistService;
-    private PlayerService playerService;
-
-    @FXML private FlowPane playlistsGrid;
+    // --- Campi dell'interfaccia, collegati agli fx:id in playlist.fxml ---
     @FXML private TextField searchBar;
+    @FXML private FlowPane playlistsGrid;
 
-
+    /**
+     * Apre la finestra modale "Crea Playlist".
+     * Per ora apre solo la finestra (senza service).
+     *
+     * @param actionEvent evento generato dal click sul pulsante "Add Playlist"
+     */
     @FXML
-    public void initialize() throws IOException {
-        loadPlaylists();
-    }
+    private void handleAdd(ActionEvent actionEvent) {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/it/diem/unisa/musicmanager/pages/addPlaylist.fxml"));
+            Parent root = loader.load();
 
-    public void setPlaylistService(PlaylistService playlistService) {
-        this.playlistService = playlistService;
-    }
+            Stage stage = new Stage();
+            stage.setTitle("Add Playlist");
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setScene(new Scene(root));
+            stage.showAndWait();
 
-    public void setPlayerService(PlayerService playerService){
-        this.playerService = playerService;
-    }
-
-    public void loadPlaylists() throws IOException {
-        playlistsGrid.getChildren().clear();
-
-        for(Playlist p : playlistService.getPlaylists()){
-            //per fare la ricerca
-
-            if(searchBar != null && !searchBar.getText().isBlank()){
-                if(!p.getName().toLowerCase().contains(searchBar.getText().toLowerCase())){
-                    continue;
-                }
-            }
-            playlistsGrid.getChildren().add(createPlaylistCard(p));
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
-
-    private Node createPlaylistCard(Playlist playlist) throws IOException {
-        FXMLLoader loader = new FXMLLoader(
-                getClass().getResource("/it/diem/unisa/musicmanager/components/playlistCard.fxml")
-        );
-        Node card = loader.load();
-        PlaylistCardController controller = loader.getController();
-        controller.setPlaylist(playlist);
-        controller.setPlaylistService(playlistService);
-        controller.setPlayerService(playerService);
-        //controller.setOnOpenDetails(this::openDetailsModal); // callback opzionale
-        return card;
-    }
-
-    @FXML
-    public void openCreatePlaylist(ActionEvent actionEvent) throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/it/diem/unisa/musicmanager/pages/createPlaylist.fxml"));
-        Parent root = loader.load();
-
-
-    }
 }
-
-

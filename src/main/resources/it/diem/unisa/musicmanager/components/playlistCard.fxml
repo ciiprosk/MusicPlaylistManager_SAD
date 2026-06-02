@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
@@ -21,14 +21,11 @@
 
     <!-- Cover area -->
     <StackPane prefHeight="140.0" prefWidth="140.0">
-        <!-- Background placeholder con rettangolo arrotondato -->
         <Rectangle arcHeight="8.0"
                    arcWidth="8.0"
                    fill="#333333"
                    height="140.0"
                    width="140.0"/>
-
-        <!-- Icona playlist (placeholder) -->
         <Label fx:id="lblPlaylistIcon"
                text="🎵"
                styleClass="playlist-icon"/>
@@ -54,6 +51,10 @@
                 text="▶"
                 onAction="#handlePlay"
                 styleClass="btn-playlist-play"/>
+        <Button fx:id="btnModify"
+                text="✎"
+                onAction="#handleModify"
+                styleClass="btn-playlist-menu"/>
         <Button fx:id="btnMenu"
                 text="···"
                 onAction="#handleMenu"
@@ -61,3 +62,4 @@
     </HBox>
 
 </VBox>
+

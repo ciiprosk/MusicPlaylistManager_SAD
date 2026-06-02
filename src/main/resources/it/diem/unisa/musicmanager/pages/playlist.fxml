@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox spacing="15.0" styleClass="sfondo-principale" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.diem.unisa.musicmanager.controller.PlaylistController">
+<VBox spacing="15.0" styleClass="sfondo-principale" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.diem.unisa.musicmanager.controller.PlaylistController">
     <padding>
         <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
     </padding>
@@ -18,10 +18,10 @@
         <HBox alignment="CENTER_LEFT">
             <Label styleClass="titolo-pagina" text="Playlists" textFill="WHITE" />
             <Region HBox.hgrow="ALWAYS" />
-            <Button fx:id="buttonAddPlaylist" maxWidth="150.0" minWidth="120.0" mnemonicParsing="false" onAction="#openCreatePlaylist" styleClass="btn-primario" text="Add Playlist" />
+            <Button minWidth="120.0" maxWidth="150.0" mnemonicParsing="false" onAction="#handleAdd" styleClass="btn-primario" text="Add Playlist" />
         </HBox>
 
-        <TextField fx:id="searchBar" maxWidth="600.0" minWidth="250.0" prefWidth="400.0" promptText="Search" styleClass="search-bar" />
+        <TextField fx:id="searchBar" minWidth="250.0" maxWidth="600.0" prefWidth="400.0" promptText="Search" styleClass="search-bar" />
 
         <FlowPane fx:id="playlistsGrid" hgap="20.0" vgap="20.0" VBox.vgrow="ALWAYS">
         </FlowPane>

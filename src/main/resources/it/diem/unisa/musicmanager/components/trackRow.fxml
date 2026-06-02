@@ -4,18 +4,36 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
 
-
-<HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="56.0" minWidth="-Infinity" prefHeight="56.0"
-      prefWidth="400.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+<!-- Una singola riga della lista dei brani.
+     Testo a sinistra, durata e pulsanti (Play / Modifica / Elimina) a destra. -->
+<HBox alignment="CENTER_LEFT" maxWidth="Infinity" minHeight="56.0" prefHeight="56.0" spacing="12.0"
+      styleClass="brano-row" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="it.diem.unisa.musicmanager.controller.RowTrackController">
    <padding>
       <Insets bottom="8.0" left="12.0" right="12.0" top="8.0"/>
    </padding>
 
-   <Label text="Title"/>
-   <Label text="-"/>
-   <Label text="Author"/>
-   <Label text="Time"/>
-   <Button mnemonicParsing="false" text="Play"/>
-   <Button mnemonicParsing="false" text="..."/>
+   <children>
+
+      <!-- Titolo + autore impilati -->
+      <VBox spacing="2.0">
+         <Label fx:id="lblTitle" styleClass="brano-titolo" text="Title" />
+         <Label fx:id="lblAuthor" styleClass="brano-artista" text="Author" />
+      </VBox>
+
+      <!-- Spazio elastico che spinge il resto a destra -->
+      <Region HBox.hgrow="ALWAYS" />
+
+      <!-- Durata -->
+      <Label fx:id="lblDuration" styleClass="brano-durata" text="0:00" />
+
+      <!-- Azioni sulla riga -->
+      <Button fx:id="btnPlay" mnemonicParsing="false" onAction="#handlePlay" styleClass="btn-azioni" text="▶" />
+      <Button fx:id="btnModify" mnemonicParsing="false" onAction="#handleModify" styleClass="btn-azioni" text="✎" />
+      <Button fx:id="btnDelete" mnemonicParsing="false" onAction="#handleDelete" styleClass="btn-azioni" text="🗑" />
+
+   </children>
 </HBox>
