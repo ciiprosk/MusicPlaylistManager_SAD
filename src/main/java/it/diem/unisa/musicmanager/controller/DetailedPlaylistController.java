@@ -125,8 +125,8 @@ public class DetailedPlaylistController {
 
                     //se premo il tasto elimina, rimuovo la traccia dalla playlist
                     controller.setOnDeleteAction(() -> {
-                        if(playlistService!=null){
-                        playlistService.removeTrackFromPlaylist(playlist.getId(), track.getId());
+                        if (playlistService != null) {
+                            playlistService.removeTrackFromPlaylist(playlist.getId(), track.getId());
                             javafx.application.Platform.runLater(() -> {
                                 updateTrackCount();
                                 loadTracks();
