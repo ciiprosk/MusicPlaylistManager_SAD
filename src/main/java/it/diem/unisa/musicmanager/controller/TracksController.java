@@ -44,30 +44,7 @@ public class TracksController {
     public void setPlayerService(PlayerService playerService) {
         this.playerService = playerService;
     }
-/*
-    @FXML
-    private void handleAggiungi(ActionEvent event) {
-        try {
-            FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource("/it/diem/unisa/musicmanager/pages/addSong.fxml")
-            );
 
-            Parent root = loader.load();
-
-            AddSongController controller = loader.getController();
-            controller.setTrackService(trackService);
-
-            Stage stage = new Stage();
-            stage.setTitle("Add Track");
-            stage.initModality(Modality.APPLICATION_MODAL);
-            stage.setScene(new Scene(root));
-            stage.showAndWait();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-    */
 
     public void handleAdd(ActionEvent actionEvent) throws IOException {
         FXMLLoader loader = WindowUtil.openWindow("/it/diem/unisa/musicmanager/pages/addSong.fxml", "Add Track",Modality.WINDOW_MODAL);

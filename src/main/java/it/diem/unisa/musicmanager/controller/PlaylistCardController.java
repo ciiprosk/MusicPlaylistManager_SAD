@@ -105,13 +105,13 @@ public class PlaylistCardController {
 
         ContextMenu menu = new ContextMenu();
 
-        MenuItem detailItem = new MenuItem("Apri dettaglio");
+        MenuItem detailItem = new MenuItem("Open Detail");
         detailItem.setOnAction(e -> openDetail());
 
-        MenuItem modifyItem = new MenuItem("Modifica nome");
+        MenuItem modifyItem = new MenuItem("Modify Name");
         modifyItem.setOnAction(e -> openEditPlaylist());
 
-        MenuItem deleteItem = new MenuItem("Elimina playlist");
+        MenuItem deleteItem = new MenuItem("Delete playlist");
         deleteItem.setOnAction(e -> deletePlaylist());
 
         menu.getItems().addAll(detailItem, modifyItem, deleteItem);

@@ -45,7 +45,7 @@ public class RowTrackController {
 
     @FXML
     public void handleModify(ActionEvent actionEvent) throws IOException {
-        FXMLLoader loader = WindowUtil.openWindow("/it/diem/unisa/resources//musicmanager/pages/addSong.fxml", "", Modality.NONE);
+        FXMLLoader loader = WindowUtil.openWindow("/it/diem/unisa/resources//musicmanager/pages/editSong.fxml", "", Modality.WINDOW_MODAL);
         AddSongController controller = loader.getController();
         //creo i set dei servicenei controller
     }
@@ -58,5 +58,9 @@ public class RowTrackController {
         if (trackService != null && track != null) {
             trackService.deleteTrack(track.getId());
         }
+    }
+
+    public void handleMenu(ActionEvent actionEvent) {
+
     }
 }

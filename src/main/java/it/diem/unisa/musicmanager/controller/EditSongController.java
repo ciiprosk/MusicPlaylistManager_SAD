@@ -4,6 +4,7 @@ import it.diem.unisa.musicmanager.model.Genre;
 import it.diem.unisa.musicmanager.model.Track;
 //import it.diem.unisa.musicmanager.exception.TrackInfoException;
 //import it.diem.unisa.musicmanager.service.TrackService;
+import it.diem.unisa.musicmanager.service.TrackService;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -34,7 +35,7 @@ public class EditSongController {
     @FXML private Button btnSave;
 
     // Service condiviso per la gestione dei brani (passato da chi apre il popup).
-    // private TrackService trackService;
+    private TrackService trackService;
 
     // Il brano in fase di modifica (passato prima di mostrare la finestra).
     private Track track;
@@ -43,11 +44,12 @@ public class EditSongController {
      * Imposta il service da usare per salvare le modifiche.
      *
      * @param trackService il service condiviso dei brani
+    */
 
     public void setTrackService(TrackService trackService) {
     this.trackService = trackService;
     }
-     */
+
 
     /**
      * Imposta il brano da modificare e riempie il form con i suoi valori attuali.
