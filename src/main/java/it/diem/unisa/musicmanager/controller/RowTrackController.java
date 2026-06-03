@@ -58,6 +58,9 @@ public class RowTrackController {
     }
     @FXML
     public void handlePlay(ActionEvent actionEvent) {
+        if (playerService != null && track != null) {
+            playerService.play(track);
+        }
     }
 
     @FXML
