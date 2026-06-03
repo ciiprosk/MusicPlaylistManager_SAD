@@ -22,7 +22,7 @@ import java.util.stream.IntStream;
 //1. leggere o modificare l'oggetto da state o dao
 // 2. fare operazioni con dao
 //3. aggiornare lo stato globale
-public class PlaylistService {
+public class PlaylistService implements TrackObserver{
     // serve a gestire le operazioni crud sulle playlist
     private final DAO<Playlist> playlistDAO;
 
@@ -36,6 +36,17 @@ public class PlaylistService {
     public PlaylistService(DAO<Playlist> playlistDAO, SharedState sharedState) {
         this.playlistDAO = playlistDAO;
         this.sharedState = sharedState;
+    }
+
+    @Override
+    public void onTrackDeleted(UUID trackId) {
+        // la playlist è un observer di tracce: gestisce l'eliminazione delle tracce eliminate nella playlist
+        for (Playlist playlist : sharedState.getALlPlaylists()) {
+            if (playlist.containsTrack(trackId)) {
+                playlist.removeTrack(trackId);
+                playlistDAO.update(playlist);
+            }
+        }
     }
 
     /**
