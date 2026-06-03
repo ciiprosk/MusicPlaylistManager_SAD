@@ -8,10 +8,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Side;
-import javafx.scene.control.Button;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Label;
-import javafx.scene.control.MenuItem;
+import javafx.scene.control.*;
 import javafx.stage.Modality;
 import javafx.stage.Window;
 
@@ -30,6 +27,29 @@ public class RowTrackController {
     @FXML private Label lblDuration;
 
     @FXML private Button buttonMenu;
+    @FXML private Button btnModify;
+    @FXML private Button btnPlay;
+
+    @FXML private CheckBox checkkSelect;
+
+    public void setSelectionMode(boolean isSelectionMode, boolean isAlreadyInPlaylist) {
+        // Mostra la checkbox
+        checkkSelect.setVisible(isSelectionMode);
+        checkkSelect.setManaged(isSelectionMode);
+        checkkSelect.setSelected(isAlreadyInPlaylist);
+
+        // Nascondi i bottoni play/modifica/elimina se siamo in modalità selezione
+        btnPlay.setVisible(!isSelectionMode);
+        btnPlay.setManaged(!isSelectionMode);
+        btnModify.setVisible(!isSelectionMode);
+        btnModify.setManaged(!isSelectionMode);
+//        btnDelete.setVisible(!isSelectionMode);
+//        btnDelete.setManaged(!isSelectionMode);
+    }
+
+    public boolean isSelected() {
+        return checkkSelect.isSelected();
+    }
 
     public void setTrack(Track track) {
         this.track = track;
@@ -80,7 +100,7 @@ public class RowTrackController {
                 MenuItem modifyItem = new MenuItem("Modify Name");
                 modifyItem.setOnAction(e -> openEditPlaylist());
 
-                MenuItem deleteItem = new MenuItem("Delete playlist");
+                MenuItem deleteItem = new MenuItem("Delete Track");
                 deleteItem.setOnAction(e -> deletePlaylist());
 
                 menu.getItems().addAll(detailItem, modifyItem, deleteItem);
@@ -108,5 +128,9 @@ public class RowTrackController {
         if (trackService != null && track != null) {
             trackService.deleteTrack(track.getId());
         }
+    }
+
+    public Track getTrack() {
+        return track;
     }
 }

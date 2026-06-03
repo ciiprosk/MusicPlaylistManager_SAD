@@ -67,7 +67,8 @@ public class DetailedPlaylistController {
         labelName.setText(playlist.getName());
         int n = playlist.getTracks().size();
         lblTrackCount.setText(n + (n == 1 ? " track" : " tracks"));
-        loadTracks();
+        if(trackService != null) loadTracks();
+
 
         // Quando il TrackService sara' disponibile, qui risolveremo gli UUID
         // della playlist nei rispettivi Track e riempiremo la lista:
@@ -84,6 +85,7 @@ public class DetailedPlaylistController {
     }
     public void setTrackService(TrackService trackService){
         this.trackService = trackService;
+        if(trackService != null) loadTracks();
     }
 
     public void setPlayerService(PlayerService playerService) {
@@ -101,7 +103,7 @@ public class DetailedPlaylistController {
         for(UUID id : playlist.getTracks()){
             trackService.searchTrackById(id).ifPresent(track -> {
                 try{
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/it/diem/unisa/musicmanager/pages/rowTrack.fxml"));
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/it/diem/unisa/musicmanager/components/trackRow.fxml"));
                     HBox row = loader.load();
 
                     RowTrackController controller = loader.getController();
@@ -116,7 +118,7 @@ public class DetailedPlaylistController {
 
     public void onModify(ActionEvent actionEvent) {
         try {
-            FXMLLoader loader = WindowUtil.openWindow("/it/diem/unisa/musicmanager/pages/editPlaylist.fxml", playlist.getName(),Modality.WINDOW_MODAL);
+            FXMLLoader loader = WindowUtil.openWindow("/it/diem/unisa/musicmanager/pages/editPlaylist.fxml", playlist.getName(),Modality.APPLICATION_MODAL);
 
             EditPlaylistController controller = loader.getController();
             controller.setPlaylist(playlist);
@@ -155,7 +157,17 @@ public class DetailedPlaylistController {
 
     public void onAddTrack(ActionEvent actionEvent) {
         //con trackseevice aggiungo una traccia alla playlist ma manca una view
+        try {
+            FXMLLoader loader = WindowUtil.openWindow("/it/diem/unisa/musicmanager/pages/addTrackPlaylist.fxml", playlist.getName(), Modality.APPLICATION_MODAL);
+            AddTrackPlaylisController controller= loader.getController();
 
+            //gli passo la playlist corrente e il service
+            controller.setPlaylist(playlist);
+            controller.setPlaylistService(playlistService);
+            controller.setTrackService(trackService);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
     }
 
