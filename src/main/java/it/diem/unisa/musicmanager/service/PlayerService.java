@@ -30,6 +30,11 @@ public class PlayerService {
         this.sharedState = sharedState;
     }
 
+
+    public SharedState getSharedState() {
+        return sharedState;
+    }
+
     /**
      * Avvia la riproduzione di un brano.
      * Se il brano e' gia' quello caricato, riprende da dove era; altrimenti
