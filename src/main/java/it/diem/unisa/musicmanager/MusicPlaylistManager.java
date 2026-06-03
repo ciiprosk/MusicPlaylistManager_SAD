@@ -1,16 +1,46 @@
 package it.diem.unisa.musicmanager;
 
+import it.diem.unisa.musicmanager.controller.MainController;
+import it.diem.unisa.musicmanager.dao.DAO;
+import it.diem.unisa.musicmanager.dao.JSONPlaylistDAO;
+import it.diem.unisa.musicmanager.dao.JSONTrackDAO;
+import it.diem.unisa.musicmanager.model.Playlist;
+import it.diem.unisa.musicmanager.service.PersistenceService;
+import it.diem.unisa.musicmanager.service.PlayerService;
+import it.diem.unisa.musicmanager.service.PlaylistService;
+import it.diem.unisa.musicmanager.service.TrackService;
+import it.diem.unisa.musicmanager.state.SharedState;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+
+import it.diem.unisa.musicmanager.model.Track;
 import java.io.IOException;
 
-public class HelloApplication extends Application {
+public class MusicPlaylistManager extends Application {
     @Override
     public void start(Stage stage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("MusicPlaylistManagerGUI.fxml"));
+        //chiamo i dao e shared
+        SharedState sharedState = new SharedState();
+        DAO<Track> trackDAO = new JSONTrackDAO("data", "tracks.jsonl");
+        DAO<Playlist> playlistDAO = new JSONPlaylistDAO("data", "playlists.jsonl");
+
+        // creo i service e carico le tracce
+        PersistenceService persistenceService = new PersistenceService(trackDAO, playlistDAO, sharedState);
+        persistenceService.load();
+        PlaylistService playlistService = new PlaylistService(playlistDAO, sharedState);
+        TrackService trackService = new TrackService(trackDAO, sharedState);
+        PlayerService playerService = new PlayerService(sharedState);
+
+        FXMLLoader fxmlLoader = new FXMLLoader(MusicPlaylistManager.class.getResource("MusicPlaylistManagerGUI.fxml"));
+
         Scene scene = new Scene(fxmlLoader.load(), 1080, 720);
+
+        MainController controller = fxmlLoader.getController();
+        controller.getPlaylistsPageController().setPlaylistService(playlistService);
+        controller.getPlaylistsPageController().setPlayerService(playerService);
+        controller.getPlaylistsPageController().loadPlaylists();
 
 
         stage.setMinWidth(900);
@@ -20,6 +50,7 @@ public class HelloApplication extends Application {
         stage.setScene(scene);
         stage.show();
     }
+
 
 }
 // per evitare il piu possibile il pattern singleton usiamo quetsa inizializzazione tipo:

@@ -5,9 +5,12 @@ import javafx.scene.Node;
 
 public class MainController {
 
+
     @FXML private Node homePage;
     @FXML private Node tracksPage;
     @FXML private Node playlistsPage;
+
+    @FXML private PlaylistController playlistsPageController;
 
     @FXML
     public void initialize() {
@@ -38,5 +41,9 @@ public class MainController {
             pageToShow.setVisible(true);
             pageToShow.toFront();
         }
+    }
+
+    public PlaylistController getPlaylistsPageController() {
+        return playlistsPageController;
     }
 }

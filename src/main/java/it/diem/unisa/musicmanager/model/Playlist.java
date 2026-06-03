@@ -1,6 +1,5 @@
 package it.diem.unisa.musicmanager.model;
 
-import it.diem.unisa.musicmanager.PlaylistException;
 import it.diem.unisa.musicmanager.exception.PlaylistInfoException;
 
 import java.util.ArrayList;
@@ -42,10 +41,17 @@ public class Playlist {
      * @param tracks: una lista di tracce identificate dai UUID.
      */
     public Playlist(UUID id, String name, List<UUID> tracks) {
+        if (checkRulesName(name.trim()))  this.name = name.trim();
         this.id = id;
-        this.name = name;
         this.tracks = tracks;
     }
+
+    public Playlist(UUID playlistID, String name) {
+        if (checkRulesName(name.trim()))  this.name = name.trim();
+        this.id = playlistID;
+        this.tracks = new ArrayList<>();
+    }
+
     /**
      * Getter per il nome della playlist.
      * @return il nome della playlist.
@@ -98,6 +104,9 @@ public class Playlist {
         return tracks.contains(trackID);
      }
 
+     public int numberOfTrakcs(){
+        return tracks.size();
+     }
     /**
      * Valida le business rules per il nome della playlist.
      * Si assicura che il nome non sia vuoto e che non superi i 50 caratteri.
@@ -114,6 +123,18 @@ public class Playlist {
 
         check = true;
         return check;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Playlist other = (Playlist) o;
+        return name != null && name.equalsIgnoreCase(other.name);
+    }
+    @Override
+    public int hashCode() {
+        return name != null ? name.hashCode() : 0;
     }
 
 }

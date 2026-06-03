@@ -1,15 +1,21 @@
 package it.diem.unisa.musicmanager.controller;
 
 import it.diem.unisa.musicmanager.model.Playlist;
+import it.diem.unisa.musicmanager.service.PlayerService;
+import it.diem.unisa.musicmanager.service.PlaylistService;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Side;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 /**
  * Controller di una card playlist (playlistCard.fxml).
  * Mostra nome e numero di tracce, e offre le azioni Play / Modifica / Menu.
@@ -18,10 +24,12 @@ import javafx.stage.Stage;
  */
 public class PlaylistCardController {
 
+    private PlaylistService playlistService; //lo ricevo dal qyeelo che mi chiama
+    private PlayerService playerService;
     // --- Campi dell'interfaccia, collegati agli fx:id in playlistCard.fxml ---
     @FXML private Label lblPlaylistIcon;
-    @FXML private Label lblNome;
-    @FXML private Label lblTracce;
+    @FXML private Label labelName;
+    @FXML private Label labelTracks;
     @FXML private Button btnPlay;
     @FXML private Button btnModify;
     @FXML private Button btnMenu;
@@ -36,9 +44,18 @@ public class PlaylistCardController {
      */
     public void setPlaylist(Playlist playlist) {
         this.playlist = playlist;
-        lblNome.setText(playlist.getName());
+        labelName.setText(playlist.getName());
         int n = playlist.getTracks().size();
-        lblTracce.setText(n + (n == 1 ? " traccia" : " tracce"));
+        labelTracks.setText(n + (n == 1 ? " Track" : " Tracks"));
+    }
+
+    public void setPlaylistService(PlaylistService playlistService) {
+        this.playlistService = playlistService;
+    }
+
+    public void setPlayerService(PlayerService playerService) {
+        this.playerService = playerService;
+
     }
 
     /**
@@ -47,7 +64,7 @@ public class PlaylistCardController {
      */
     @FXML
     private void handlePlay() {
-        // TODO: riproduzione della playlist
+        // gestione edl player servcie
     }
 
     /**
@@ -62,13 +79,14 @@ public class PlaylistCardController {
 
             // Passiamo la playlist al controller della modifica.
             EditPlaylistController controller = loader.getController();
-            //controller.setPlaylist(playlist);
+            controller.setPlaylist(playlist);
             // Quando il PlaylistService sara' attivo, qui passeremo anche il service:
-            // controller.setPlaylistService(playlistService);
+            controller.setPlaylistService(playlistService);
 
             Stage stage = new Stage();
             stage.setTitle("Modifica Playlist");
             stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setResizable(false);
             stage.setScene(new Scene(root));
             stage.showAndWait();
 
@@ -82,6 +100,85 @@ public class PlaylistCardController {
      */
     @FXML
     private void handleMenu() {
-        // TODO: menu con altre azioni (es. elimina, dettagli)
+        if (playlist == null) return;
+
+        ContextMenu menu = new ContextMenu();
+
+        MenuItem detailItem = new MenuItem("Apri dettaglio");
+        detailItem.setOnAction(e -> openDetail());
+
+        MenuItem modifyItem = new MenuItem("Modifica nome");
+        modifyItem.setOnAction(e -> openEditPlaylist());
+
+        MenuItem deleteItem = new MenuItem("Elimina playlist");
+        deleteItem.setOnAction(e -> deletePlaylist());
+
+        menu.getItems().addAll(detailItem, modifyItem, deleteItem);
+        menu.show(btnMenu, Side.BOTTOM, 0, 0);
+    }
+
+    private void openEditPlaylist() {
+        if (playlistService == null) return;
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/it/diem/unisa/musicmanager/pages/editPlaylist.fxml"));
+            Parent root = loader.load();
+
+            EditPlaylistController ctrl = loader.getController();
+            ctrl.setPlaylist(playlist);
+            ctrl.setPlaylistService(playlistService);
+
+            Stage stage = new Stage();
+            stage.setTitle("Modify Playlist");
+            stage.setResizable(false);
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setScene(new Scene(root));
+            stage.showAndWait();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void openDetail() {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/it/diem/unisa/musicmanager/pages/detailedPlaylist.fxml"));
+            Parent root = loader.load();
+
+            DetailedPlaylistController ctrl = loader.getController();
+            ctrl.setPlaylist(playlist);
+            ctrl.setPlaylistService(playlistService);
+
+            Stage stage = new Stage();
+            stage.setTitle(playlist.getName());
+            stage.setResizable(false);
+            stage.initModality(Modality.NONE);
+            stage.setScene(new Scene(root, 900, 650));
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void deletePlaylist() {
+        if (playlistService == null || playlist == null) return;
+
+        Alert confirm = new Alert(
+                Alert.AlertType.CONFIRMATION,
+                "Delete the Playlist \"" + playlist.getName() + "\"?",
+                ButtonType.YES,
+                ButtonType.NO
+        );
+        confirm.setTitle("Confirm Delete");
+        confirm.setHeaderText(null);
+
+        confirm.showAndWait().ifPresent(btn -> {
+            if (btn == ButtonType.YES) {
+                playlistService.deletePlaylist(playlist.getId());
+            }
+        });
+    }
+    private void openAddTrackToPlaylist() {
+        //DA FAREE
     }
 }
