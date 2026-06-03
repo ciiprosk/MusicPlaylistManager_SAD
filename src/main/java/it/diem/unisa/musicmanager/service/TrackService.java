@@ -7,18 +7,21 @@ import it.diem.unisa.musicmanager.model.Playlist;
 import it.diem.unisa.musicmanager.model.Track;
 import it.diem.unisa.musicmanager.state.SharedState;
 import javafx.collections.ObservableList;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 // bisgna imolemneare a logica crud ei brano e l'agiornmaento di sharedstate
 public class TrackService {
 
     private final DAO<Track> trackDAO;  //serve per operazioni CRUD sulle tracce
-    private final DAO<Playlist> playlistDAO;
     private final SharedState sharedState;  //serve per lo stato condiviso delle tracce
 
-    public TrackService(DAO<Track> trackDAO, DAO<Playlist> playlistDAO, SharedState sharedState) {
+    private final List<TrackObserver> observers = new ArrayList<>();
+
+    public TrackService(DAO<Track> trackDAO, SharedState sharedState) {
         this.trackDAO = trackDAO;
-        this.playlistDAO = playlistDAO;
         this.sharedState = sharedState;
     }
 
@@ -92,19 +95,20 @@ public class TrackService {
 
     }
 
+    public void addObserver(TrackObserver observer) {
+
+        this.observers.add(observer);
+
+    }
+
     public void deleteTrack(UUID trackId){
 
         trackDAO.delete(trackId);   //eliminazione traccia dall'archivio
 
         sharedState.getALlTracks().removeIf(t -> t.getId().equals(trackId));    //eliminazione visiva della traccia
 
-        for (Playlist playlist: sharedState.getALlPlaylists()) {    //scorriamo playlist, vogliamo togliere la traccia eliminata da tutte le playlist
-
-            if (playlist.containsTrack(trackId)) {
-                playlist.removeTrack(trackId);
-                playlistDAO.update(playlist);   //aggiornamento in archivio della playlist
-            }
-
+        for (TrackObserver observer : observers) {  //tutti gli Observer delle tracce vengono avvisati che la traccia è stata eliminata
+            observer.onTrackDeleted(trackId);
         }
 
     }

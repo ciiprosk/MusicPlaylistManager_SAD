@@ -33,7 +33,7 @@ class TrackServiceTest {
         DAO<Playlist> playlistDAO = new JSONPlaylistDAO("test-data", "playlists-service-test.jsonl");
 
         sharedState = new SharedState();
-        service = new TrackService(trackDAO, playlistDAO, sharedState);
+        service = new TrackService(trackDAO, sharedState);
     }
 
     //TEST AGGIUNTA TRACCIA NEGATA CON CAMPO TITOLO VUOTO
@@ -484,6 +484,14 @@ class TrackServiceTest {
 
         sharedState.getALlPlaylists().add(playlist1);
         sharedState.getALlPlaylists().add(playlist2);
+
+        // --- FIX OBSERVER: Simuliamo che qualcuno stia ascoltando la notifica ---
+        service.addObserver(deletedId -> {
+            for (Playlist p : sharedState.getALlPlaylists()) {
+                p.removeTrack(deletedId);
+            }
+        });
+        // -----------------------------------------------------------------------
 
         service.deleteTrack(track.getId());
 

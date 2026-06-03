@@ -19,16 +19,13 @@ public class JSONTrackDAO extends JSONAbstractDAO implements DAO<Track> {
 
     private final String filePath;
 
-    private final String folderPath;
-
     private Gson json;
 
     public JSONTrackDAO(String folderPath, String fileName) {
 
-        this.folderPath = folderPath;
         this.filePath = folderPath + File.separator + fileName;
         json = new Gson();
-        super.createFileJSON(this.filePath, this.folderPath);
+        super.createFileJSON(this.filePath, folderPath);
     }
 
     /**
