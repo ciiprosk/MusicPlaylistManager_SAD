@@ -206,6 +206,13 @@
     -fx-background-color: #2e2e2e;
     -fx-cursor: hand;
 }
+
+.brano-row.brano-row-playing {
+    -fx-background-color: #383838;
+    -fx-background-radius: 10px;
+    -fx-border-color: #456b59;
+    -fx-border-radius: 10px;
+}
 .brano-titolo {
     -fx-text-fill: #ffffff;
     -fx-font-size: 14px;

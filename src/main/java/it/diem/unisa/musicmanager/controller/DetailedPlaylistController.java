@@ -108,6 +108,9 @@ public class DetailedPlaylistController {
 
                     RowTrackController controller = loader.getController();
                     controller.setTrack(track);
+
+                    //se premo il tasto elimina, rimuovo la traccia dalla playlist
+                    controller.setOnDeleteAction(() -> playlistService.removeTrackFromPlaylist(playlist.getId(), track.getId()));
                     controller.setPlayerService(playerService);
                     trackList.getChildren().add(row);
 

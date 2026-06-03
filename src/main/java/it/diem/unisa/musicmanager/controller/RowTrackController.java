@@ -30,6 +30,7 @@ public class RowTrackController {
     @FXML private Label lblTitle;
     @FXML private Label lblAuthor;
     @FXML private Label lblDuration;
+    @FXML private javafx.scene.layout.HBox rootContainer;
 
     @FXML private Button buttonMenu;
     @FXML private Button btnModify;
@@ -81,9 +82,13 @@ public class RowTrackController {
 
         // Quando cambia il brano corrente o lo stato play/pausa,
         // ogni riga ridisegna il proprio bottone.
-        sharedState.getCurrentTrack().addListener((o, ov, nv) -> updateButton());
+        sharedState.getCurrentTrack().addListener((o, ov, nv) -> {
+            updateButton();
+            updateCurrentTrackStyle();  //evidenzia traccia in ascolto
+        });
         sharedState.getIsPlaying().addListener((o, ov, nv) -> updateButton());
         updateButton(); // stato iniziale
+        updateCurrentTrackStyle();  //evidenzia traccia in ascolto allo stato iniziale
     }
 
     // true solo se QUESTA riga è il brano corrente E sta suonando
@@ -158,6 +163,18 @@ public class RowTrackController {
         }
 
     }
+
+    //metodo per evidenziare qual è la traccia in ascolto
+    private void updateCurrentTrackStyle() {
+
+        //reset della traccia corrente
+        rootContainer.getStyleClass().remove("brano-row-playing");
+
+        if (track != null && track.equals(sharedState.getCurrentTrack().get())) {
+            rootContainer.getStyleClass().add("brano-row-playing");
+        }
+    }
+
     private void openEditPlaylist(){
         try {
             FXMLLoader loader = WindowUtil.openWindow("/it/diem/unisa/musicmanager/pages/editSong.fxml", track.getTitle(), Modality.WINDOW_MODAL);

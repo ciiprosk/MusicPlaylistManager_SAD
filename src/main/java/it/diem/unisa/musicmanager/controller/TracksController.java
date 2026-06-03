@@ -72,6 +72,7 @@ public class TracksController {
         Node card = loader.load();
         RowTrackController controller = loader.getController();
         controller.setTrack(track); //gli passo la track ddi cui creare la row
+        controller.setOnDeleteAction(() -> trackService.deleteTrack(track.getId()));    //elimina dall'archivio la traccia
         controller.setTrackService(trackService); //i serviceeeee
         controller.setPlayerService(playerService);
         return card;
