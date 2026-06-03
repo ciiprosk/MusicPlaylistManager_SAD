@@ -11,6 +11,13 @@ import java.util.UUID;
 import java.util.stream.IntStream;
 
 
+/**
+ * La classe PlaylistService gestisce le operazioni CRUD sulle playlist. In particolare si occupa di:
+ * - Leggere e scrivere playlist dal file JSON;
+ * - Gestire le modifiche nello stato globale;
+ * - Effettuare operazioni di aggiornamento nel file JSON.
+ * - Effettuare operazioni di aggiornamento nello stato globale (sharedState).
+ */
 // nei service ogni operazione che modifica i dati deve
 //1. leggere o modificare l'oggetto da state o dao
 // 2. fare operazioni con dao
@@ -21,6 +28,11 @@ public class PlaylistService {
 
     private final SharedState sharedState;
 
+    /**
+     * Costruttore della classe PlaylistService.
+     * @param playlistDAO: è l'oggetto DAO che gestisce le operazioni CRUD sulle playlist.
+     * @param sharedState: è l'oggetto SharedState che gestisce lo stato globale delle applicazioni.
+     */
     public PlaylistService(DAO<Playlist> playlistDAO, SharedState sharedState) {
         this.playlistDAO = playlistDAO;
         this.sharedState = sharedState;
@@ -43,16 +55,22 @@ public class PlaylistService {
      * @return
      */
     public Optional<String> createPlaylist(String name) {
+            Playlist playlist = null;
+            try {
+                playlist = new Playlist(name);
 
-            Playlist playlist = new Playlist(name);
+                if(playlistDAO.isDuplicated(playlist))
+                    return Optional.of("Playlist name already exists");
 
-            if(playlistDAO.isDuplicated(playlist))
-                return Optional.of("Playlist name already exists");
+                // ora posso inserrie la playlist nel file dao
+                playlistDAO.insert(playlist);
+                sharedState.getALlPlaylists().add(playlist);
 
-            // ora posso inserrie la playlist nel file dao
-            playlistDAO.insert(playlist);
-            sharedState.getALlPlaylists().add(playlist);
-            return Optional.empty();
+
+            }catch(PlaylistInfoException e){
+                return Optional.of(e.getMessage()); // in questo modo posso gestire i vari tipi di messaggi di errore nel controller
+            }
+        return Optional.empty();
 
     }
 
@@ -83,17 +101,20 @@ public class PlaylistService {
         // se siamo qui la playlist è stata trovata e posso eseguire l'update
        Playlist playlist = optionalPlaylist.get(); //mi dewrappo l aplaylist ritornata dal dao
        try {
-           newPlaylist = new Playlist(playlistID, newName); //non vedo se il nome è vuoto
-        }catch (PlaylistInfoException e){
-           return Optional.of("Playlist name already exists");
-       }
-       //controllo che il nuovo nome sia univoco
-        if(playlistDAO.isDuplicated(newPlaylist))
-            return Optional.of("Playlist name already exists");
+           newPlaylist = new Playlist(playlistID, newName); //in questo modo faccio verifiche su business rules
 
-        playlist.setName(newName);
-        playlistDAO.update(playlist);
-        updateInState(playlist);
+           //controllo che il nuovo nome sia univoco
+           if(playlistDAO.isDuplicated(newPlaylist))
+               return Optional.of("Playlist name already exists");
+
+           playlist.setName(newName);
+           playlistDAO.update(playlist);
+           updateInState(playlist);
+
+        }catch (PlaylistInfoException e){
+           return Optional.of(e.getMessage());
+       }
+
         return Optional.empty();
     }
 
@@ -137,8 +158,8 @@ public class PlaylistService {
 
     private void updateInState(Playlist playlist) {
         ObservableList<Playlist> playlists = sharedState.getALlPlaylists();
-        //ho ricevuuto tute le playlists ma le devo modificare con i nuovi aggiornameni rispetto alla playlist ricevuto come parametr
-        //1. devo cercare playlist nella lista
+
+        //ho ricevuuto tute le playlists ma le devo modificare con i nuovi aggiornameni rispetto alla playlist ricevuto come paramet
         IntStream.range(0, playlists.size())
                 .filter(index -> playlists.get(index).getId().equals(playlist.getId()))
                 .findFirst().ifPresent(index -> playlists.set(index, playlist));

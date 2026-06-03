@@ -3,6 +3,7 @@ package it.diem.unisa.musicmanager.controller;
 import it.diem.unisa.musicmanager.model.Playlist;
 import it.diem.unisa.musicmanager.service.PlayerService;
 import it.diem.unisa.musicmanager.service.PlaylistService;
+import it.diem.unisa.musicmanager.util.WindowUtil;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.event.ActionEvent;
@@ -116,9 +117,11 @@ public class PlaylistController {
      * @throws IOException
      */
     private Node createPlaylistCard(Playlist playlist) throws IOException {
-        FXMLLoader loader = new FXMLLoader(
-                getClass().getResource("/it/diem/unisa/musicmanager/components/playlistCard.fxml")
-        );
+
+
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/it/diem/unisa/musicmanager/components/playlistCard.fxml"));
+
+
         Node card = loader.load();
         PlaylistCardController controller = loader.getController();
         controller.setPlaylist(playlist); //gli passo la playlist ddi cui creare la card

@@ -5,20 +5,20 @@ import it.diem.unisa.musicmanager.model.Track;
 //import it.diem.unisa.musicmanager.service.PlaylistService;
 //import it.diem.unisa.musicmanager.service.TrackService;
 import it.diem.unisa.musicmanager.service.PlaylistService;
+import it.diem.unisa.musicmanager.util.WindowUtil;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 
 /**
  * Controller della schermata di dettaglio playlist (detailedPlaylist.fxml).
@@ -125,6 +125,13 @@ public class DetailedPlaylistController {
 
     public void onModify(ActionEvent actionEvent) {
         try {
+            FXMLLoader loader = WindowUtil.openWindow("/it/diem/unisa/musicmanager/pages/editPlaylist.fxml", playlist.getName(),Modality.APPLICATION_MODAL);
+
+            EditPlaylistController controller = loader.getController();
+            controller.setPlaylist(playlist);
+            controller.setPlaylistService(playlistService);
+
+            /*
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource("/it/diem/unisa/musicmanager/pages/editPlaylist.fxml"));
             Parent root = loader.load();
@@ -133,14 +140,16 @@ public class DetailedPlaylistController {
             controller.setPlaylist(playlist);
 
             controller.setPlaylistService(playlistService);
-            close(actionEvent);
+            //close(actionEvent);
+
             Stage stage = new Stage();
             stage.setTitle("Modifica Playlist");
             stage.setResizable(false);
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.setScene(new Scene(root));
             stage.showAndWait();
-
+            */
+            WindowUtil.close( (Node) actionEvent.getSource());
 
 
             // Dopo la chiusura, aggiorniamo il nome mostrato (potrebbe essere cambiato).
@@ -157,10 +166,38 @@ public class DetailedPlaylistController {
     }
 
     public void onDelete(ActionEvent actionEvent) {
+        //uso il service per eliminare la playlist
+        deletePlaylist();
+        //close(actionEvent);
+        WindowUtil.close( (Node) actionEvent.getSource());
+
     }
+
+    /*
     private void close(ActionEvent e) {
         Stage stage = (Stage) ((Node) e.getSource()).getScene().getWindow();
         stage.close();
+    }
+
+     */
+
+    private void deletePlaylist() {
+        if (playlistService == null || playlist == null) return;
+
+        Alert confirm = new Alert(
+                Alert.AlertType.CONFIRMATION,
+                "Delete the Playlist \"" + playlist.getName() + "\"?",
+                ButtonType.YES,
+                ButtonType.NO
+        );
+        confirm.setTitle("Confirm Delete");
+        confirm.setHeaderText(null);
+
+        confirm.showAndWait().ifPresent(btn -> {
+            if (btn == ButtonType.YES) {
+                playlistService.deletePlaylist(playlist.getId());
+            }
+        });
     }
 
 }
