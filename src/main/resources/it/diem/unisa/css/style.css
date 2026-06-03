@@ -589,56 +589,6 @@
     -fx-shape: " ";
 }
 
-/* ==========================================================================
-   PLAYER BAR
-   ========================================================================== */
-.player-bar {
-    -fx-background-color: #252525;
-    -fx-border-color: #333333;
-    -fx-border-width: 1 0 0 0;
-}
-.btn-player {
-    -fx-background-color: transparent;
-    -fx-text-fill: #cccccc;
-    -fx-font-size: 16px;
-    -fx-padding: 8 10 8 10;
-    -fx-background-radius: 6px;
-    -fx-cursor: hand;
-}
-.btn-player:hover {
-    -fx-background-color: #333333;
-    -fx-text-fill: #ffffff;
-}
-.btn-player:disabled {
-    -fx-opacity: 0.3;
-}
-.btn-player-main {
-    -fx-background-color: #456b59;
-    -fx-text-fill: #ffffff;
-    -fx-font-size: 20px;
-    -fx-padding: 8 14 8 14;
-    -fx-background-radius: 50px;
-    -fx-cursor: hand;
-}
-.btn-player-main:hover {
-    -fx-background-color: #55826d;
-}
-.player-timer {
-    -fx-text-fill: #7a7a7a;
-    -fx-font-size: 12px;
-}
-.player-titolo {
-    -fx-text-fill: #ffffff;
-    -fx-font-size: 13px;
-    -fx-font-weight: bold;
-}
-.player-artista {
-    -fx-text-fill: #7a7a7a;
-    -fx-font-size: 12px;
-}
-.slider-progresso {
-    -fx-accent: #456b59;
-}
 
 /* ==========================================================================
    BRANO ROW

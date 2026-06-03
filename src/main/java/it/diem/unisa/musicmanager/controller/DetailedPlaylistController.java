@@ -8,6 +8,7 @@ import it.diem.unisa.musicmanager.service.PlaylistService;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -130,14 +131,17 @@ public class DetailedPlaylistController {
 
             EditPlaylistController controller = loader.getController();
             controller.setPlaylist(playlist);
-            // Quando il PlaylistService sara' attivo:
-            controller.setPlaylistService(playlistService);
 
+            controller.setPlaylistService(playlistService);
+            close(actionEvent);
             Stage stage = new Stage();
             stage.setTitle("Modifica Playlist");
+            stage.setResizable(false);
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.setScene(new Scene(root));
             stage.showAndWait();
+
+
 
             // Dopo la chiusura, aggiorniamo il nome mostrato (potrebbe essere cambiato).
             if (playlist != null) {
@@ -153,6 +157,10 @@ public class DetailedPlaylistController {
     }
 
     public void onDelete(ActionEvent actionEvent) {
+    }
+    private void close(ActionEvent e) {
+        Stage stage = (Stage) ((Node) e.getSource()).getScene().getWindow();
+        stage.close();
     }
 
 }
