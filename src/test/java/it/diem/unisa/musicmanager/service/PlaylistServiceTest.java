@@ -667,31 +667,7 @@ class PlaylistServiceTest {
         assertTrue(updatedPlaylist.getTracks().isEmpty());
     }
 
-    //TEST RESTITUZIONE ELENCO TRACCE CONTENUTE IN UNA PLAYLIST
-
-    @Test
-    void getTracksFromPlaylistShouldReturnPlaylistTrackList() {
-
-        playlistService.createPlaylist("Rock");
-
-        Playlist playlist =
-                sharedState.getALlPlaylists().get(0);
-
-        UUID track1 = UUID.randomUUID();
-        UUID track2 = UUID.randomUUID();
-
-        playlistService.addTrackToPlaylist(playlist.getId(), track1);
-        playlistService.addTrackToPlaylist(playlist.getId(), track2);
-
-        List<UUID> tracks =
-                playlistService.getTracksFromPlaylist(playlist.getId());
-
-        assertEquals(2, tracks.size());
-        assertEquals(track1, tracks.get(0));
-        assertEquals(track2, tracks.get(1));
-    }
-
-    //TEST
+    //TEST RESTITUISCI PLAYLIST PER ID SELEZIONATO
 
     @Test
     void getPlaylistByIdShouldReturnSpecificPlaylist() {
@@ -708,7 +684,7 @@ class PlaylistServiceTest {
         assertEquals("Rock", result.get().getName());
     }
 
-    //TEST
+    //TEST RECUPERA PLAYLIST INESISTENTE RESTITUISCE OPTIONAL VUOTO
 
     @Test
     void getPlaylistByIdShouldReturnEmptyWhenPlaylistDoesNotExist() {
@@ -719,7 +695,7 @@ class PlaylistServiceTest {
         assertTrue(result.isEmpty());
     }
 
-    //TEST
+    //TEST RESTITUISCI TRACCE DA UNA PLAYLIST
 
     @Test
     void getTracksFromPlaylistShouldReturnTrackList() {
@@ -742,5 +718,4 @@ class PlaylistServiceTest {
         assertEquals(track1, tracks.get(0));
         assertEquals(track2, tracks.get(1));
     }
-
 }
