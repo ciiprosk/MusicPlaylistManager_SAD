@@ -200,6 +200,10 @@ class PlaylistServiceTest {
                 playlistService.createPlaylist("Rock");
 
         assertTrue(result.isPresent());
+        assertEquals(
+                "Playlist name already exists",
+                result.get()
+        );
     }
 
     //TEST CANCELLA PLAYLIST RIMUOVE PLAYLIST DA SHARED STATE
@@ -265,6 +269,10 @@ class PlaylistServiceTest {
                 playlistService.createPlaylist("");
 
         assertTrue(result.isPresent());
+        assertEquals(
+                "The name cannot be empty",
+                result.get()
+        );
     }
 
     //TEST CREA PLAYLIST AGGIUNGE LA PLAYLIST ALLO SHARED STATE
@@ -301,4 +309,199 @@ class PlaylistServiceTest {
 
         assertTrue(result.isEmpty());
     }
+
+    //TEST CREA PLAYLIST NEAGTO CON CAMPO NOME CONTENENTE SOLO SPAZI
+
+    @Test
+    void createPlaylistShouldFailWhenNameContainsOnlySpaces() {
+
+        Optional<String> result =
+                playlistService.createPlaylist("   ");
+
+        assertTrue(result.isPresent());
+        assertEquals(
+                "The name cannot be empty",
+                result.get()
+        );
+    }
+
+    //TEST CREAZIONE PLAYLIST NEGATO CON CAMPO NOME MAGGIORE DI 50 CARATTERI
+
+    @Test
+    void createPlaylistShouldFailWhenNameIsLongerThan50Characters() {
+
+        String longName = "A".repeat(51);
+
+        Optional<String> result =
+                playlistService.createPlaylist(longName);
+
+        assertTrue(result.isPresent());
+        assertEquals(
+                "The name cannot be longer than 50 characters",
+                result.get()
+        );
+    }
+
+    //TEST CREAZIONE PLAYLIST GENERA UN ID PER LA PLAYLIST
+
+    @Test
+    void createPlaylistShouldGenerateUUID() {
+        playlistService.createPlaylist("Rock");
+
+        Playlist playlist = sharedState.getALlPlaylists().get(0);
+
+        assertNotNull(playlist.getId());
+    }
+
+    //TEST CREAZIONE PLAYLIST RIMUOVE SPAZI DA INIZIO E FINE DEL CAMPO NOME PLAYLIST
+
+    @Test
+    void createPlaylistShouldTrimName() {
+        playlistService.createPlaylist("   Rock   ");
+
+        Playlist playlist = sharedState.getALlPlaylists().get(0);
+
+        assertEquals("Rock", playlist.getName());
+    }
+
+    //TEST OBSERVER NOTIFICA SU CAMBIO NOME PLAYLIST
+
+    @Test
+    void observableListShouldNotifyWhenPlaylistIsRenamed() {
+        playlistService.createPlaylist("Rock");
+
+        final boolean[] notified = {false};
+
+        sharedState.getALlPlaylists().addListener(
+                (javafx.collections.ListChangeListener<Playlist>) change -> notified[0] = true
+        );
+
+        Playlist playlist = sharedState.getALlPlaylists().get(0);
+
+        playlistService.renamePlaylist(playlist.getId(), "New Rock");
+
+        assertTrue(notified[0]);
+    }
+
+    //TEST OBSERVER NOTIFICA SU CANCELLAZIONE PLAYLIST
+
+    @Test
+    void observableListShouldNotifyWhenPlaylistIsDeleted() {
+        playlistService.createPlaylist("Rock");
+
+        final boolean[] notified = {false};
+
+        sharedState.getALlPlaylists().addListener(
+                (javafx.collections.ListChangeListener<Playlist>) change -> notified[0] = true
+        );
+
+        Playlist playlist = sharedState.getALlPlaylists().get(0);
+
+        playlistService.deletePlaylist(playlist.getId());
+
+        assertTrue(notified[0]);
+    }
+
+    //TEST RINOMINA PLAYLIST NEGATO SE CAMPO NOME NUOVO è VUOTO
+
+    @Test
+    void renamePlaylistShouldFailWhenNewNameIsEmpty() {
+
+        playlistService.createPlaylist("Rock");
+
+        Playlist playlist =
+                sharedState.getALlPlaylists().get(0);
+
+        Optional<String> result =
+                playlistService.renamePlaylist(
+                        playlist.getId(),
+                        ""
+                );
+
+        assertTrue(result.isPresent());
+        assertEquals(
+                "The name cannot be empty",
+                result.get()
+        );
+    }
+
+    //TEST RINOMINA PLAYLIST NEGATO SE CAMPO NOME NUOVO è MAGGIORE DI 50 CARATTERI
+
+    @Test
+    void renamePlaylistShouldFailWhenNewNameIsLongerThan50Characters() {
+
+        playlistService.createPlaylist("Rock");
+
+        Playlist playlist =
+                sharedState.getALlPlaylists().get(0);
+
+        String longName = "A".repeat(51);
+
+        Optional<String> result =
+                playlistService.renamePlaylist(
+                        playlist.getId(),
+                        longName
+                );
+
+        assertTrue(result.isPresent());
+        assertEquals(
+                "The name cannot be longer than 50 characters",
+                result.get()
+        );
+    }
+
+    //TEST RINOMINA PLAYLIST RIMUOVE SPAZI DA INIZIO E FINE CAMPO NOME PLAYLIST
+
+    @Test
+    void renamePlaylistShouldTrimNewName() {
+
+        playlistService.createPlaylist("Rock");
+
+        Playlist playlist =
+                sharedState.getALlPlaylists().get(0);
+
+        Optional<String> result =
+                playlistService.renamePlaylist(
+                        playlist.getId(),
+                        "   Pop   "
+                );
+
+        assertTrue(result.isEmpty());
+
+        Playlist updatedPlaylist =
+                sharedState.getALlPlaylists().get(0);
+
+        assertEquals(
+                "Pop",
+                updatedPlaylist.getName()
+        );
+    }
+
+    //TEST RINOMINA PLAYLIST CONSETITO CON NOME PLAYLIST UGUALE AL PRECEDENTE
+    
+    @Test
+    void renamePlaylistWithSameNameShouldSucceed() {
+
+        playlistService.createPlaylist("Rock");
+
+        Playlist playlist =
+                sharedState.getALlPlaylists().get(0);
+
+        Optional<String> result =
+                playlistService.renamePlaylist(
+                        playlist.getId(),
+                        "Rock"
+                );
+
+        assertTrue(result.isEmpty());
+
+        Playlist updatedPlaylist =
+                sharedState.getALlPlaylists().get(0);
+
+        assertEquals(
+                "Rock",
+                updatedPlaylist.getName()
+        );
+    }
+
 }

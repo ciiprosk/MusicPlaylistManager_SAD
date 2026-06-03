@@ -26,6 +26,8 @@ class JSONPlaylistDAOTest {
         );
     }
 
+    //TEST PERSISTENZA FISICA REALE
+
     @Test
     void insertShouldSaveEmptyPlaylistOnFile() {
 
@@ -33,8 +35,14 @@ class JSONPlaylistDAOTest {
 
         playlistDAO.insert(playlist);
 
+        DAO<Playlist> newPlaylistDAO =
+                new JSONPlaylistDAO(
+                        "test-data",
+                        "playlists-test.jsonl"
+                );
+
         Optional<Playlist> result =
-                playlistDAO.searchById(playlist.getId());
+                newPlaylistDAO.searchById(playlist.getId());
 
         assertTrue(result.isPresent());
         assertEquals("Rock", result.get().getName());
