@@ -34,6 +34,7 @@ public class RowTrackController {
     @FXML private CheckBox checkkSelect;
 
     private boolean isListenerAttached = false;
+    private Runnable onDeleteAction;
 
     public void setSelectionMode(boolean isSelectionMode, boolean isAlreadyInPlaylist) {
         checkkSelect.setVisible(isSelectionMode);
@@ -152,5 +153,9 @@ public class RowTrackController {
 
     public Track getTrack() {
         return track;
+    }
+
+    public void setOnDeleteAction(Runnable onDeleteAction) {
+        this.onDeleteAction = onDeleteAction;
     }
 }

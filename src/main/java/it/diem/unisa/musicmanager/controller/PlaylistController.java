@@ -31,7 +31,7 @@ public class PlaylistController {
     @FXML private FlowPane playlistsGrid;
 
     private PlaylistService playlistService;
-    //private PlayerService playerService; non mi serve
+    private PlayerService playerService;
     private TrackService trackService;
     private boolean isListenerAttached = false;
 
@@ -66,6 +66,7 @@ public class PlaylistController {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
     }
 
     // metodi setere da chiamare per passare i service
@@ -87,15 +88,17 @@ public class PlaylistController {
             });
             isListenerAttached = true;
         }
-
+        checkReadyAndLoad();
     }
-    /*public void setPlayerService(PlayerService playerService) {
+    public void setPlayerService(PlayerService playerService) {
         this.playerService = playerService;
+        checkReadyAndLoad();
     }
 
-     */
+
     public void setTrackService(TrackService trackService) {
         this.trackService = trackService;
+        checkReadyAndLoad();
     }
 
     /**
@@ -131,12 +134,23 @@ public class PlaylistController {
 
         Node card = loader.load();
         PlaylistCardController controller = loader.getController();
-        controller.setPlaylist(playlist); //gli passo la playlist ddi cui creare la card
+
         controller.setTrackService(trackService);
         controller.setPlaylistService(playlistService); //i serviceeeee
-        //controller.setPlayerService(playerService);
+        controller.setPlayerService(playerService);
+        controller.setPlaylist(playlist); //gli passo la playlist ddi cui creare la card
 
         return card;
+    }
+
+    private void checkReadyAndLoad() {
+        if (playlistService != null && trackService != null && playerService != null) {
+            try {
+                loadPlaylists();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 }
