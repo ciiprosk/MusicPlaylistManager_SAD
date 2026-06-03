@@ -26,8 +26,8 @@ public class TrackService {
         return sharedState.getALlTracks();  //compito delegato dallo stato condiviso, caricato dal Persistance Service
     }
 
-    public Optional<String> findById() {
-        return null;
+    public Optional<Track> searchTrackById(UUID trackId) {
+        return trackDAO.searchById(trackId);
     }
 
     public Optional<String> addTrack(String title, String author, Genre genre, String songPath, int songLength, String year){
@@ -92,9 +92,21 @@ public class TrackService {
 
     }
 
-    public Optional<String> deleteTrack(Track track){
+    public void deleteTrack(UUID trackId){
 
-        return null;
+        trackDAO.delete(trackId);   //eliminazione traccia dall'archivio
+
+        sharedState.getALlTracks().removeIf(t -> t.getId().equals(trackId));    //eliminazione visiva della traccia
+
+        for (Playlist playlist: sharedState.getALlPlaylists()) {    //scorriamo playlist, vogliamo togliere la traccia eliminata da tutte le playlist
+
+            if (playlist.containsTrack(trackId)) {
+                playlist.removeTrack(trackId);
+                playlistDAO.update(playlist);   //aggiornamento in archivio della playlist
+            }
+
+        }
+
     }
 
     //si occupa dell'update della traccia nell'interfaccia grafica
