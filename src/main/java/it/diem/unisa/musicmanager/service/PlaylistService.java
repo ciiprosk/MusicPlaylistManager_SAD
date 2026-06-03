@@ -111,6 +111,11 @@ public class PlaylistService implements TrackObserver{
         Playlist newPlaylist = null;
         // se siamo qui la playlist è stata trovata e posso eseguire l'update
        Playlist playlist = optionalPlaylist.get(); //mi dewrappo l aplaylist ritornata dal dao
+
+        if (playlist.getName().equals(newName)) {   //se ho salvato la playlist con lo stesso nome, ho finito
+            return Optional.empty();
+        }
+
        try {
            newPlaylist = new Playlist(playlistID, newName); //in questo modo faccio verifiche su business rules
 
