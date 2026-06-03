@@ -34,6 +34,7 @@ public class RowTrackController {
 
         lblDuration.setText(String.format("%02d:%02d", minutes, seconds));
     }
+
     public void setTrackService(TrackService trackService) {
         this.trackService = trackService;
     }

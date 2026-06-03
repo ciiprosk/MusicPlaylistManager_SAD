@@ -3,13 +3,12 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox spacing="15.0" styleClass="sfondo-principale" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.diem.unisa.musicmanager.controller.TracksController">
+<VBox spacing="15.0" styleClass="sfondo-principale" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.diem.unisa.musicmanager.controller.TracksController">
     <padding>
         <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
     </padding>
@@ -18,11 +17,10 @@
         <HBox alignment="CENTER_LEFT">
             <Label styleClass="titolo-pagina" text="Tracks" textFill="WHITE" />
             <Region HBox.hgrow="ALWAYS" />
-            <Button minWidth="120.0" maxWidth="150.0" mnemonicParsing="false" styleClass="btn-primario" text="Add Track" onAction="#handleAggiungi" />
+            <Button maxWidth="150.0" minWidth="120.0" mnemonicParsing="false" onAction="#handleAdd" styleClass="btn-primario" text="Add Track" />
         </HBox>
 
-        <TextField fx:id="searchBar" minWidth="250.0" maxWidth="600.0" prefWidth="400.0" promptText="Search" styleClass="search-bar" />
-
-        <ListView fx:id="tracksList" styleClass="lista-brani" VBox.vgrow="ALWAYS" />
+        <TextField fx:id="searchBar" maxWidth="600.0" minWidth="250.0" prefWidth="400.0" promptText="Search" styleClass="search-bar" />
+      <VBox fx:id="trackList" prefHeight="200.0" prefWidth="100.0" />
     </children>
 </VBox>

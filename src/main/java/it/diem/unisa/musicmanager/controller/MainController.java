@@ -50,7 +50,8 @@ public class MainController {
         return playlistsPageController;
     }
 
-    public TracksController getTracksPageController() {
+    public TracksController getTracksPageController()
+    {
         return tracksPageController;
     }
 }
