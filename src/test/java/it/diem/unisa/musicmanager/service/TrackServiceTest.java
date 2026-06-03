@@ -499,4 +499,42 @@ class TrackServiceTest {
         assertFalse(playlist2.containsTrack(track.getId()));
         assertFalse(sharedState.getALlTracks().contains(track));
     }
+
+    //TEST RIMOZIONE TRACCIA DA PLAYLIST NON DEVE RIMUOVERE TRACCIA DALL'ARCHIVIO
+
+    @Test
+    void removeTrackFromPlaylistShouldNotDeleteTrackFromGeneralArchive() {
+
+        Optional<String> result =
+                service.addTrack(
+                        "Numb",
+                        "Linkin Park",
+                        Genre.ROCK,
+                        "songs/numb.mp3",
+                        185,
+                        "2003"
+                );
+
+        assertTrue(result.isEmpty());
+
+        Track track =
+                sharedState.getALlTracks().get(0);
+
+        Playlist playlist =
+                new Playlist("Rock");
+
+        playlist.addTrack(track.getId());
+
+        sharedState.getALlPlaylists().add(playlist);
+
+        playlist.removeTrack(track.getId());
+
+        assertFalse(playlist.containsTrack(track.getId()));
+
+        assertTrue(
+                sharedState.getALlTracks()
+                        .stream()
+                        .anyMatch(t -> t.getId().equals(track.getId()))
+        );
+    }
 }
