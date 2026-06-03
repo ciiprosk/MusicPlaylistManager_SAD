@@ -2,6 +2,7 @@ package it.diem.unisa.musicmanager.service;
 
 import it.diem.unisa.musicmanager.model.Track;
 import javafx.application.Platform;
+import javafx.beans.property.*;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import it.diem.unisa.musicmanager.state.SharedState;
@@ -15,45 +16,37 @@ import java.io.File;
  */
 public class PlayerService {
 
-    private final SharedState sharedState;
 
-    // Player JavaFX corrente; viene ricreato a ogni nuovo brano.
+    private final ObjectProperty<Track> currentTrack = new SimpleObjectProperty<>(null);
+    private final BooleanProperty isPlaying = new SimpleBooleanProperty(false);
+    private final DoubleProperty progress = new SimpleDoubleProperty(0.0);
+
+
     private MediaPlayer mediaPlayer;
 
     // Brano attualmente caricato nel player (per capire se "play" e' un resume).
     private Track loadedTrack;
 
-    /**
-     * @param sharedState lo stato condiviso (brano corrente, stato, avanzamento)
-     */
-    public PlayerService(SharedState sharedState) {
-        this.sharedState = sharedState;
+    public ReadOnlyObjectProperty<Track> currentTrackProperty() {
+        return currentTrack;
     }
 
-
-    public SharedState getSharedState() {
-        return sharedState;
+    public ReadOnlyBooleanProperty isPlayingProperty() {
+        return isPlaying;
     }
 
-    /**
-     * Avvia la riproduzione di un brano.
-     * Se il brano e' gia' quello caricato, riprende da dove era; altrimenti
-     * carica e riproduce il nuovo brano.
-     *
-     * @param track il brano da riprodurre
-     */
+    public ReadOnlyDoubleProperty progressProperty() {
+        return progress;
+    }
+
     public void play(Track track) {
-        if (track == null || track.getSongPath() == null) {
-            return;
-        }
+        if (track == null || track.getSongPath() == null) return;
 
-        // Stesso brano gia' caricato: basta riprendere.
         if (track.equals(loadedTrack) && mediaPlayer != null) {
             resume();
             return;
         }
 
-        // Nuovo brano: fermiamo il precedente e carichiamo questo.
         stopCurrent();
 
         try {
@@ -62,51 +55,44 @@ public class PlayerService {
             mediaPlayer = new MediaPlayer(media);
             loadedTrack = track;
 
-            // Brano corrente -> SharedState (la player bar si aggiorna da sola).
-            sharedState.getCurrentTrack().set(track);
+            // Scriviamo nella nostra Property interna
+            currentTrack.set(track);
 
-            // Avanzamento (0..1) -> SharedState, sul thread UI.
+            // Calcolo dell'avanzamento sulle Property interne
             mediaPlayer.currentTimeProperty().addListener((obs, oldV, newV) -> {
                 double total = media.getDuration().toSeconds();
                 if (total > 0) {
                     double p = newV.toSeconds() / total;
-                    Platform.runLater(() -> sharedState.getProgress().set(p));
+                    Platform.runLater(() -> progress.set(p)); // Aggiorna progress
                 }
             });
 
-            // Fine brano: azzeriamo stato e avanzamento.
+            // Gestione fine brano
             mediaPlayer.setOnEndOfMedia(() -> {
-                sharedState.getIsPlaying().set(false);
-                sharedState.getProgress().set(0.0);
+                isPlaying.set(false);
+                progress.set(0.0);
             });
 
             mediaPlayer.play();
-            sharedState.getIsPlaying().set(true);
+            isPlaying.set(true); // Aggiorna isPlaying
 
         } catch (Exception e) {
-            // File non valido o non riproducibile: non blocchiamo l'app.
             e.printStackTrace();
-            sharedState.getIsPlaying().set(false);
+            isPlaying.set(false);
         }
     }
 
-    /**
-     * Mette in pausa la riproduzione corrente.
-     */
     public void pause() {
         if (mediaPlayer != null) {
             mediaPlayer.pause();
-            sharedState.getIsPlaying().set(false);
+            isPlaying.set(false); // Aggiorna isPlaying
         }
     }
 
-    /**
-     * Riprende la riproduzione dopo una pausa.
-     */
     public void resume() {
         if (mediaPlayer != null) {
             mediaPlayer.play();
-            sharedState.getIsPlaying().set(true);
+            isPlaying.set(true); // Aggiorna isPlaying
         }
     }
 
@@ -142,6 +128,23 @@ public class PlayerService {
                 // Es. fraction = 0.5 su un brano di 3:00 -> salta a 1:30.
                 mediaPlayer.seek(total.multiply(fraction));
             }
+        }
+    }
+
+    /**
+     * Gestisce l'alternanza di riproduzione e pausa per una determinata traccia.
+     * Se la traccia è già in esecuzione, viene messa in pausa.
+     * Se era in pausa, riprende. Se è un brano nuovo, lo fa partire.
+     */
+    public void togglePlay(Track track) {
+        if (track == null) return;
+
+        // Se il brano passato è quello corrente e sta già suonando -> Pausa
+        if (track.equals(currentTrack.get()) && isPlaying.get()) {
+            pause();
+        } else {
+            // Altrimenti (è un brano nuovo o era in pausa) -> Riproduci
+            play(track);
         }
     }
 

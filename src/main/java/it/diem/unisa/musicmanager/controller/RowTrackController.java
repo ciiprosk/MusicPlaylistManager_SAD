@@ -3,8 +3,6 @@ package it.diem.unisa.musicmanager.controller;
 import it.diem.unisa.musicmanager.model.Track;
 import it.diem.unisa.musicmanager.service.PlayerService;
 import it.diem.unisa.musicmanager.service.TrackService;
-import it.diem.unisa.musicmanager.state.SharedState;
-import it.diem.unisa.musicmanager.util.AlertUtil;
 import it.diem.unisa.musicmanager.util.WindowUtil;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -12,25 +10,22 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.Side;
 import javafx.scene.control.*;
 import javafx.stage.Modality;
-import javafx.stage.Window;
 
 import java.io.IOException;
 
+/**
+ * Controller per la singola riga di un brano.
+ * Totalmente disaccoppiato dalla logica di riproduzione.
+ */
 public class RowTrackController {
 
-    // ho sbigno della singola tracca e del service per gestire le cosed ipersistenza
     private Track track;
     private TrackService trackService;
     private PlayerService playerService;
-    private SharedState sharedState;
-    private Runnable onDeleteAction;    //ci aiuta a capire se stiamo eliminando dall'archivio tracce
-    //o dalla playlist
-
 
     @FXML private Label lblTitle;
     @FXML private Label lblAuthor;
     @FXML private Label lblDuration;
-    @FXML private javafx.scene.layout.HBox rootContainer;
 
     @FXML private Button buttonMenu;
     @FXML private Button btnModify;
@@ -38,23 +33,18 @@ public class RowTrackController {
 
     @FXML private CheckBox checkkSelect;
 
+    private boolean isListenerAttached = false;
+    private Runnable onDeleteAction;
+
     public void setSelectionMode(boolean isSelectionMode, boolean isAlreadyInPlaylist) {
-        // Mostra la checkbox
         checkkSelect.setVisible(isSelectionMode);
         checkkSelect.setManaged(isSelectionMode);
         checkkSelect.setSelected(isAlreadyInPlaylist);
 
-        // Nascondi i bottoni play/modifica/elimina se siamo in modalità selezione
         btnPlay.setVisible(!isSelectionMode);
         btnPlay.setManaged(!isSelectionMode);
         btnModify.setVisible(!isSelectionMode);
         btnModify.setManaged(!isSelectionMode);
-//        btnDelete.setVisible(!isSelectionMode);
-//        btnDelete.setManaged(!isSelectionMode);
-    }
-
-    public void setOnDeleteAction(Runnable onDeleteAction) {
-        this.onDeleteAction = onDeleteAction;
     }
 
     public boolean isSelected() {
@@ -68,7 +58,6 @@ public class RowTrackController {
 
         int minutes = (int) (track.getSongLength() / 60);
         int seconds = (int) (track.getSongLength() % 60);
-
         lblDuration.setText(String.format("%02d:%02d", minutes, seconds));
     }
 
@@ -78,121 +67,95 @@ public class RowTrackController {
 
     public void setPlayerService(PlayerService playerService) {
         this.playerService = playerService;
-        this.sharedState = playerService.getSharedState();
 
-        // Quando cambia il brano corrente o lo stato play/pausa,
-        // ogni riga ridisegna il proprio bottone.
-        sharedState.getCurrentTrack().addListener((o, ov, nv) -> {
-            updateButton();
-            updateCurrentTrackStyle();  //evidenzia traccia in ascolto
-        });
-        sharedState.getIsPlaying().addListener((o, ov, nv) -> updateButton());
-        updateButton(); // stato iniziale
-        updateCurrentTrackStyle();  //evidenzia traccia in ascolto allo stato iniziale
+        if (!isListenerAttached) {
+            // Reagisce ai cambiamenti del servizio per aggiornare l'icona
+            playerService.currentTrackProperty().addListener((o, ov, nv) -> updateButtonState());
+            playerService.isPlayingProperty().addListener((o, ov, nv) -> updateButtonState());
+            isListenerAttached = true;
+        }
+        updateButtonState();
     }
 
-    // true solo se QUESTA riga è il brano corrente E sta suonando
-    private boolean isThisPlaying() {
-        return track != null
-                && track.equals(sharedState.getCurrentTrack().get())
-                && sharedState.getIsPlaying().get();
+    /**
+     * Aggiorna graficamente l'icona del pulsante basandosi esclusivamente sullo stato del Service.
+     */
+    private void updateButtonState() {
+        boolean isCurrentAndPlaying = track != null
+                && playerService != null
+                && track.equals(playerService.currentTrackProperty().get())
+                && playerService.isPlayingProperty().get();
+
+        btnPlay.setText(isCurrentAndPlaying ? "⏸" : "▶");
     }
 
-    private void updateButton() {
-        btnPlay.setText(isThisPlaying() ? "⏸" : "▶");
-    }
-
-    @FXML
-    public void handleModify(ActionEvent actionEvent) throws IOException {
-        FXMLLoader loader = WindowUtil.openWindow(
-                "/it/diem/unisa/musicmanager/pages/editSong.fxml",
-                track.getTitle(), Modality.WINDOW_MODAL);
-        EditSongController controller = loader.getController();
-        controller.setTrackService(trackService);
-        controller.setTrack(track);
-    }
+    /**
+     * L'azione di riproduzione ora è una semplice delega diretta (sottilissima!)
+     */
     @FXML
     public void handlePlay(ActionEvent actionEvent) {
-        if (playerService == null || track == null) return;
-
-        if (isThisPlaying()) {
-            playerService.pause();   // sto suonando io → metti in pausa
-        } else {
-            playerService.play(track); // non sto suonando → parti (o riprendi)
+        if (playerService != null && track != null) {
+            playerService.togglePlay(track);//lo fa il seerivce
         }
+    }
+
+    @FXML
+    public void handleModify(ActionEvent actionEvent) {
+        openEditTrack();
     }
 
     @FXML
     public void handleDelete(ActionEvent actionEvent) {
-        if (trackService != null && track != null) {
+        deleteTrackAction();
+    }
 
-            //alert di conferma
-            boolean isConfirmed = AlertUtil.showConfirmation("Delete Confirm", "Are you sure you wanna delete this track?");
+    @FXML
+    public void handleMenu(ActionEvent actionEvent) {
+        if (track == null) return;
 
-            //se l'utente ha confermato, allora elimino la traccia (o dalla playlist, o dall'archivio)
-            if(isConfirmed && onDeleteAction != null)
-                onDeleteAction.run();
+        ContextMenu menu = new ContextMenu();
+        MenuItem detailItem = new MenuItem("Open Detail");
+        detailItem.setOnAction(e -> openDetail());
 
+        MenuItem modifyItem = new MenuItem("Modify Track");
+        modifyItem.setOnAction(e -> openEditTrack());
+
+        MenuItem deleteItem = new MenuItem("Delete Track");
+        deleteItem.setOnAction(e -> deleteTrackAction());
+
+        menu.getItems().addAll(detailItem, modifyItem, deleteItem);
+        menu.show(buttonMenu, Side.BOTTOM, 0, 0);
+    }
+
+    private void openDetail() {
+        try {
+            WindowUtil.openWindow("/it/diem/unisa/musicmanager/pages/detailSong.fxml", track.getTitle(), Modality.WINDOW_MODAL);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
-    public void handleMenu(ActionEvent actionEvent) throws IOException{
-
-            if (track == null) return;
-
-            ContextMenu menu = new ContextMenu();
-
-            MenuItem detailItem = new MenuItem("Open Detail");
-
-                detailItem.setOnAction(e -> openDetail());
-
-                MenuItem modifyItem = new MenuItem("Modify Name");
-                modifyItem.setOnAction(e -> openEditPlaylist());
-
-                MenuItem deleteItem = new MenuItem("Delete Track");
-                deleteItem.setOnAction(e -> handleDelete(null));
-
-                menu.getItems().addAll(detailItem, modifyItem, deleteItem);
-                menu.show(buttonMenu, Side.BOTTOM, 0, 0);
-
-    }
-
-    /** Apre la finestra di dettaglio passandole la traccia. */
-    private void openDetail() {
+    private void openEditTrack() {
         try {
-            FXMLLoader loader = WindowUtil.openWindow(
-                    "/it/diem/unisa/musicmanager/pages/detailSong.fxml",
-                    track.getTitle(), Modality.WINDOW_MODAL);
-            DetailSongController controller = loader.getController();
-            controller.setTrack(track);
+            FXMLLoader loader = WindowUtil.openWindow("/it/diem/unisa/musicmanager/pages/editSong.fxml", "Modify Track", Modality.WINDOW_MODAL);
+            EditSongController controller = loader.getController();
             controller.setTrackService(trackService);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    //metodo per evidenziare qual è la traccia in ascolto
-    private void updateCurrentTrackStyle() {
-
-        //reset della traccia corrente
-        rootContainer.getStyleClass().remove("brano-row-playing");
-
-        if (track != null && track.equals(sharedState.getCurrentTrack().get())) {
-            rootContainer.getStyleClass().add("brano-row-playing");
+    private void deleteTrackAction() {
+        if (trackService != null && track != null) {
+            trackService.deleteTrack(track.getId());
         }
-    }
-
-    private void openEditPlaylist(){
-        try {
-            FXMLLoader loader = WindowUtil.openWindow("/it/diem/unisa/musicmanager/pages/editSong.fxml", track.getTitle(), Modality.WINDOW_MODAL);
-            AddSongController controller = loader.getController();
-            controller.setTrackService(trackService);
-        }catch(IOException e){}
     }
 
     public Track getTrack() {
         return track;
     }
 
-
+    public void setOnDeleteAction(Runnable onDeleteAction) {
+        this.onDeleteAction = onDeleteAction;
+    }
 }
