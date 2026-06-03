@@ -54,7 +54,7 @@
                         <Insets left="20.0" />
                     </HBox.margin>
                 </Label>
-                <TextField fx:id="fieldDurata" editable="false" promptText="dal file" styleClass="form-field" HBox.hgrow="ALWAYS" />
+                <TextField fx:id="fieldDurata" editable="false" promptText="from file" styleClass="form-field" HBox.hgrow="ALWAYS" />
             </HBox>
 
         </VBox>
