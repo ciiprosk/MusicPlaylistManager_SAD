@@ -153,10 +153,28 @@ private String validateTitle(String title) {
     }
 
     private String validateYear(String year) {
-        if (year != null && !year.equals("UNKNOWN") && !year.matches("\\d{4}")) {
-            throw new TrackInfoException("Year must be exactly 4 digits or 'UNKNOWN'.");
+
+        //caso di campo vuoto --> si mette il default
+        String finalYear = (year != null && !year.trim().isEmpty()) ? year.trim() : "UNKNOWN";
+
+        //caso non vuoto (quindi non default)
+        if (!finalYear.equals("UNKNOWN")) {
+
+            // controllo formato --> esattamente 4 cifre
+            if (!finalYear.matches("\\d{4}")) {
+                throw new TrackInfoException("Year must be exactly 4 digits or 'UNKNOWN'.");
+            }
+
+            // controllo anno --> non può essere un anno futuro
+            int currentYear = java.time.Year.now().getValue();
+            int parsedYear = Integer.parseInt(finalYear);   //devo farlo per poter confrontare gli anni
+
+            if (parsedYear > currentYear) {
+                throw new TrackInfoException("Year cannot be in the future (max " + currentYear + ").");
+            }
         }
-        return (year != null && !year.trim().isEmpty()) ? year : "UNKNOWN";
+
+        return finalYear;
     }
 
 
