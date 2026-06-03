@@ -46,7 +46,7 @@ public class DetailedPlaylistController {
 
     private TrackService trackService;
     private PlaylistService playlistService;
-    private PlayerService playerService;
+    //private PlayerService playerService; non serve
 
     /**
      * Chiamato automaticamente da JavaFX appena la schermata e' pronta.
@@ -67,7 +67,9 @@ public class DetailedPlaylistController {
         labelName.setText(playlist.getName());
         int n = playlist.getTracks().size();
         lblTrackCount.setText(n + (n == 1 ? " track" : " tracks"));
-        if(trackService != null) loadTracks();
+        if (trackService != null) {
+            loadTracks();
+        }
 
 
         // Quando il TrackService sara' disponibile, qui risolveremo gli UUID
@@ -82,20 +84,29 @@ public class DetailedPlaylistController {
 
     public void setPlaylistService(PlaylistService playlistService){
         this.playlistService = playlistService;
+
     }
     public void setTrackService(TrackService trackService){
         this.trackService = trackService;
-        if(trackService != null) loadTracks();
+        if (this.playlist != null) {
+            loadTracks();
+        }
     }
 
+    /*
     public void setPlayerService(PlayerService playerService) {
         this.playerService = playerService;
+        checkReadyAndLoad();
     }
+
+
+     */
 
     private void updateTrackCount() {
         int n = playlist.numberOfTrakcs();
         lblTrackCount.setText(n + (n == 1 ? " track" : " tracks"));
     }
+
     private void loadTracks(){
         //devo cricare la lista delle tracce dal serviceeee
         trackList.getChildren().clear();
@@ -108,10 +119,12 @@ public class DetailedPlaylistController {
 
                     RowTrackController controller = loader.getController();
                     controller.setTrack(track);
-                    controller.setPlayerService(playerService);
+                    //controller.setPlayerService(playerService);
                     trackList.getChildren().add(row);
 
-                }catch(IOException e){}
+                }catch(IOException e){
+                    e.printStackTrace();
+                }
             });
         }
     }
@@ -121,8 +134,9 @@ public class DetailedPlaylistController {
             FXMLLoader loader = WindowUtil.openWindow("/it/diem/unisa/musicmanager/pages/editPlaylist.fxml", playlist.getName(),Modality.APPLICATION_MODAL);
 
             EditPlaylistController controller = loader.getController();
-            controller.setPlaylist(playlist);
+
             controller.setPlaylistService(playlistService);
+            controller.setPlaylist(playlist);
 
             /*
             FXMLLoader loader = new FXMLLoader(
@@ -162,9 +176,11 @@ public class DetailedPlaylistController {
             AddTrackPlaylisController controller= loader.getController();
 
             //gli passo la playlist corrente e il service
-            controller.setPlaylist(playlist);
+
             controller.setPlaylistService(playlistService);
             controller.setTrackService(trackService);
+            controller.setPlaylist(playlist);
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -204,6 +220,13 @@ public class DetailedPlaylistController {
                 playlistService.deletePlaylist(playlist.getId());
             }
         });
+    }
+    private void checkReadyAndLoad() {
+        System.out.println("PORCO DI OSENON FUNZIONA MI AMMAZZO SONO FUORI");
+        if (playlist != null && trackService != null) {
+            loadTracks();
+            System.out.println("PORCO DI OSENON FUNZIONA MI AMMAZZO SONO IN");
+        }
     }
 
 }

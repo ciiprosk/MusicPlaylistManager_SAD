@@ -127,11 +127,13 @@ public class PlaylistCardController {
     private void openEditPlaylist() {
         if (playlistService == null) return;
         try {
-            FXMLLoader loader = WindowUtil.openWindow("/it/diem/unisa/musicmanager/pages/detailedPlaylist.fxml", playlist.getName(),Modality.APPLICATION_MODAL);
+            FXMLLoader loader = WindowUtil.openWindow("/it/diem/unisa/musicmanager/pages/editPlaylist.fxml", playlist.getName(),Modality.APPLICATION_MODAL);
             DetailedPlaylistController ctrl = loader.getController();
-            ctrl.setPlaylist(playlist);
-            ctrl.setPlaylistService(playlistService);
+
+            //ctrl.setPlaylistService(playlistService); jìnon serveeeeee
             ctrl.setTrackService(trackService);
+            ctrl.setPlaylist(playlist);
+            //ctrl.setPlayerService(playerService); non serve
 
             /*
             FXMLLoader loader = new FXMLLoader(
@@ -158,9 +160,10 @@ public class PlaylistCardController {
         try {
             FXMLLoader loader = WindowUtil.openWindow("/it/diem/unisa/musicmanager/pages/detailedPlaylist.fxml", playlist.getName(),Modality.NONE);
             DetailedPlaylistController ctrl = loader.getController();
-            ctrl.setPlaylist(playlist);
+
             ctrl.setPlaylistService(playlistService);
             ctrl.setTrackService(trackService);
+            ctrl.setPlaylist(playlist);
             /*
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource("/it/diem/unisa/musicmanager/pages/detailedPlaylist.fxml"));

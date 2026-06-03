@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<HBox alignment="CENTER" maxHeight="80.0" maxWidth="Infinity" minHeight="80.0" prefHeight="80.0" spacing="15.0" styleClass="player-bar" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.diem.unisa.musicmanager.controller.PlayerBarController">
+<HBox alignment="CENTER" maxHeight="80.0" maxWidth="Infinity" minHeight="80.0" prefHeight="80.0" spacing="15.0" styleClass="player-bar" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.diem.unisa.musicmanager.controller.PlayerController">
 
    <padding>
       <Insets left="20.0" right="20.0" />

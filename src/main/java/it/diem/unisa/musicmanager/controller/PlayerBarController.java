@@ -26,6 +26,8 @@ public class PlayerBarController {
     private PlayerService playerService;
     private SharedState sharedState;
 
+    private boolean isListenerAttached = false;
+
     // True mentre l'utente trascina lo slider: blocca gli aggiornamenti
     // automatici dal player, cosi' il pallino non "scappa" sotto le dita.
     private boolean userIsSeeking = false;
@@ -33,8 +35,15 @@ public class PlayerBarController {
     public void setPlayerService(PlayerService playerService) {
         System.out.println(">>> PlayerBar setPlayerService chiamato");
         this.playerService = playerService;
-        this.sharedState = playerService.getSharedState();
-        bind();
+        //this.sharedState = playerService.getSharedState();
+        if (!isListenerAttached) {
+            bind();
+            isListenerAttached = true;
+        } else {
+            // Se i listener ci sono già, rinfresca solo i testi con lo stato attuale
+            updateTrackInfo(sharedState.getCurrentTrack().get());
+            updatePlayButton(sharedState.getIsPlaying().get());
+        }
     }
 
     /** Collega le Property dello SharedState alla UI della player bar. */

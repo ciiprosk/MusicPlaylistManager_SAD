@@ -41,10 +41,12 @@ public class TracksController {
         this.trackService = trackService;
         createTrackListener();
     }
-
+/*
     public void setPlayerService(PlayerService playerService) {
         this.playerService = playerService;
     }
+
+ */
 
 
     public void handleAdd(ActionEvent actionEvent) throws IOException {
@@ -92,5 +94,9 @@ public class TracksController {
             });
             isListenerAttached = true;
         }
+    }
+
+    public void setPlayerService(PlayerService playerService) {
+        this.playerService = playerService;
     }
 }

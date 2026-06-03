@@ -31,7 +31,7 @@ public class PlaylistController {
     @FXML private FlowPane playlistsGrid;
 
     private PlaylistService playlistService;
-    private PlayerService playerService;
+    //private PlayerService playerService; non mi serve
     private TrackService trackService;
     private boolean isListenerAttached = false;
 
@@ -89,9 +89,11 @@ public class PlaylistController {
         }
 
     }
-    public void setPlayerService(PlayerService playerService) {
+    /*public void setPlayerService(PlayerService playerService) {
         this.playerService = playerService;
     }
+
+     */
     public void setTrackService(TrackService trackService) {
         this.trackService = trackService;
     }
@@ -130,9 +132,10 @@ public class PlaylistController {
         Node card = loader.load();
         PlaylistCardController controller = loader.getController();
         controller.setPlaylist(playlist); //gli passo la playlist ddi cui creare la card
-        controller.setPlaylistService(playlistService); //i serviceeeee
-        controller.setPlayerService(playerService);
         controller.setTrackService(trackService);
+        controller.setPlaylistService(playlistService); //i serviceeeee
+        //controller.setPlayerService(playerService);
+
         return card;
     }
 

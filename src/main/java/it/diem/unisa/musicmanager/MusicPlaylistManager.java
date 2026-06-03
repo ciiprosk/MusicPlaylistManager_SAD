@@ -29,9 +29,10 @@ public class MusicPlaylistManager extends Application {
         // creo i service e carico le tracce
         PersistenceService persistenceService = new PersistenceService(trackDAO, playlistDAO, sharedState);
         persistenceService.load();
+
         PlaylistService playlistService = new PlaylistService(playlistDAO, sharedState);
         TrackService trackService = new TrackService(trackDAO, sharedState);
-        PlayerService playerService = new PlayerService(sharedState);
+        PlayerService playerService = new PlayerService();
 
         FXMLLoader fxmlLoader = new FXMLLoader(MusicPlaylistManager.class.getResource("MusicPlaylistManagerGUI.fxml"));
 
@@ -39,17 +40,20 @@ public class MusicPlaylistManager extends Application {
 
         MainController controller = fxmlLoader.getController();
         // Playlists page
-        controller.getPlaylistsPageController().setPlayerService(playerService);
+
         controller.getPlaylistsPageController().setTrackService(trackService);
         controller.getPlaylistsPageController().setPlaylistService(playlistService);
+        //controller.getPlaylistsPageController().setPlayerService(playerService);
+
         controller.getPlaylistsPageController().loadPlaylists();
 
         // Tracks page
-        controller.getTracksPageController().setPlayerService(playerService);
+
         controller.getTracksPageController().setTrackService(trackService);
+        controller.getTracksPageController().setPlayerService(playerService);
         controller.getTracksPageController().loadTracks();
 
-        controller.getPlayerBarController().setPlayerService(playerService);
+        controller.getPlayerController().setPlayerService(playerService);
 
 
         stage.setMinWidth(900);
@@ -62,51 +66,3 @@ public class MusicPlaylistManager extends Application {
 
 
 }
-// per evitare il piu possibile il pattern singleton usiamo quetsa inizializzazione tipo:
-/*
-// App.java — unico punto di creazione
-public class App extends Application {
-
-    @Override
-    public void start(Stage stage) throws Exception {
-
-        // creati UNA VOLTA SOLA — ma non sono Singleton statici
-        TrackDAO    trackDAO    = new JsonTrackDAO();
-        DAO playlistDAO = new JsonPlaylistDAO();
-        AppState    appState    = new AppState();
-
-        TrackService    trackService    = new TrackService(trackDAO, appState);
-        PlaylistService playlistService = new PlaylistService(playlistDAO, appState);
-        PlayerService   playerService   = new PlayerService(appState);
-
-        // inietti nei controller tramite ControllerFactory
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/main.fxml"));
-        loader.setControllerFactory(controllerClass -> {
-            if (controllerClass == MainController.class)
-                return new MainController(trackService, playlistService, playerService);
-            if (controllerClass == PlayerController.class)
-                return new PlayerController(playerService);
-            // ... altri controller
-            return null;
-        });
-
-        stage.setScene(new Scene(loader.load()));
-        stage.show();
-    }
-}
-
-i singoli controller le ricveono dal costruttore
-// ✅ Con DI — dipendenze esplicite
-public class BraniController {
-    private final TrackService trackService;
-
-    public BraniController(TrackService trackService) {
-        this.trackService = trackService; // dichiarata, non pescata
-    }
-
-    @FXML
-    public void initialize() {
-        trackService.getAll(); // stesso risultato, ma dipendenza visibile
-    }
-}
- */
