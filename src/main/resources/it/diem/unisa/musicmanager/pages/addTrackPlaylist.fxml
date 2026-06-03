@@ -17,7 +17,7 @@
     </padding>
 
     <HBox alignment="CENTER_LEFT">
-        <Label styleClass="sottotitolo" text="Seleziona i brani da aggiungere" textFill="WHITE" />
+        <Label styleClass="sottotitolo" text="Select the tracks to add" textFill="WHITE" />
     </HBox>
 
     <ScrollPane fitToWidth="true" styleClass="scroll-trasparente" VBox.vgrow="ALWAYS">

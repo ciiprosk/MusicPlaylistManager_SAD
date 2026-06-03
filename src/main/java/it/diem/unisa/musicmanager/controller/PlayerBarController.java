@@ -33,7 +33,6 @@ public class PlayerBarController {
     private boolean userIsSeeking = false;
 
     public void setPlayerService(PlayerService playerService) {
-        System.out.println(">>> PlayerBar setPlayerService chiamato");
         this.playerService = playerService;
         //this.sharedState = playerService.getSharedState();
         if (!isListenerAttached) {

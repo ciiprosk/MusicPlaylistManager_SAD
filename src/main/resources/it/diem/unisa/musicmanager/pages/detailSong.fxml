@@ -17,34 +17,34 @@
 
         <!-- ===== TITOLO ===== -->
         <HBox alignment="CENTER_LEFT" spacing="12.0">
-            <Label styleClass="menu-title" text="Dettaglio Brano" textFill="#a0a0a0" />
+            <Label styleClass="menu-title" text="Track Details" textFill="#a0a0a0" />
         </HBox>
 
         <!-- ===== DATI (sola lettura) ===== -->
         <VBox spacing="14.0">
 
             <HBox alignment="CENTER_LEFT" spacing="15.0">
-                <Label minWidth="160.0" styleClass="sottotitolo" text="Titolo" textFill="#cccccc" />
+                <Label minWidth="160.0" styleClass="sottotitolo" text="Title" textFill="#cccccc" />
                 <Label fx:id="lblTitle" text="" textFill="WHITE" />
             </HBox>
 
             <HBox alignment="CENTER_LEFT" spacing="15.0">
-                <Label minWidth="160.0" styleClass="sottotitolo" text="Autore" textFill="#cccccc" />
+                <Label minWidth="160.0" styleClass="sottotitolo" text="Author" textFill="#cccccc" />
                 <Label fx:id="lblAuthor" text="" textFill="WHITE" />
             </HBox>
 
             <HBox alignment="CENTER_LEFT" spacing="15.0">
-                <Label minWidth="160.0" styleClass="sottotitolo" text="Genere" textFill="#cccccc" />
+                <Label minWidth="160.0" styleClass="sottotitolo" text="Genre" textFill="#cccccc" />
                 <Label fx:id="lblGenre" text="" textFill="WHITE" />
             </HBox>
 
             <HBox alignment="CENTER_LEFT" spacing="15.0">
-                <Label minWidth="160.0" styleClass="sottotitolo" text="Anno di pubblicazione" textFill="#cccccc" />
+                <Label minWidth="160.0" styleClass="sottotitolo" text="Release Year" textFill="#cccccc" />
                 <Label fx:id="lblYear" text="" textFill="WHITE" />
             </HBox>
 
             <HBox alignment="CENTER_LEFT" spacing="15.0">
-                <Label minWidth="160.0" styleClass="sottotitolo" text="Durata" textFill="#cccccc" />
+                <Label minWidth="160.0" styleClass="sottotitolo" text="Track Duration" textFill="#cccccc" />
                 <Label fx:id="lblDuration" text="" textFill="WHITE" />
             </HBox>
 
@@ -59,11 +59,11 @@
         <HBox alignment="CENTER_RIGHT" spacing="12.0">
             <Region HBox.hgrow="ALWAYS" />
 
-            <Button styleClass="button-grigio" text="Chiudi" textFill="WHITE" /> <!-- =====onAction="#onClose" ===== -->
+            <Button styleClass="button-grigio" text="Cancel" textFill="WHITE"  onAction="#onClose"/>
 
-            <Button fx:id="btnEdit"  styleClass="button-verde" text="Modifica" textFill="WHITE" /> <!-- ===== onAction="#onEdit" ===== -->
+            <Button fx:id="btnEdit"  styleClass="button-verde" text="Modify" textFill="WHITE" onAction="#handleEdit" />
 
-            <Button fx:id="btnDelete" text="Elimina" textFill="WHITE"> <!-- ===== onAction=#onDelete ===== -->
+            <Button fx:id="btnDelete" text="Delete" textFill="WHITE" onAction="#handleDelete">
             <styleClass>
                <String fx:value="button-rosso" />
                <String fx:value="button-grigio" />

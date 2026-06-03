@@ -46,7 +46,7 @@ public class DetailedPlaylistController {
 
     private TrackService trackService;
     private PlaylistService playlistService;
-    //private PlayerService playerService; non serve
+    private PlayerService playerService;
 
     /**
      * Chiamato automaticamente da JavaFX appena la schermata e' pronta.
@@ -65,9 +65,8 @@ public class DetailedPlaylistController {
     public void setPlaylist(Playlist playlist) {
         this.playlist = playlist;
         labelName.setText(playlist.getName());
-        int n = playlist.getTracks().size();
-        lblTrackCount.setText(n + (n == 1 ? " track" : " tracks"));
-        if (trackService != null) {
+        updateTrackCount();
+        if (trackService != null && playerService != null) {
             loadTracks();
         }
 
@@ -88,21 +87,24 @@ public class DetailedPlaylistController {
     }
     public void setTrackService(TrackService trackService){
         this.trackService = trackService;
-        if (this.playlist != null) {
+        if (this.playlist != null && this.playerService != null) {
             loadTracks();
         }
     }
 
-    /*
+
     public void setPlayerService(PlayerService playerService) {
         this.playerService = playerService;
-        checkReadyAndLoad();
+        if (this.playlist != null && this.trackService != null) {
+            loadTracks();
+        }
     }
 
 
-     */
+
 
     private void updateTrackCount() {
+        if (playlist == null) return;
         int n = playlist.numberOfTrakcs();
         lblTrackCount.setText(n + (n == 1 ? " track" : " tracks"));
     }
@@ -119,6 +121,18 @@ public class DetailedPlaylistController {
 
                     RowTrackController controller = loader.getController();
                     controller.setTrack(track);
+                    controller.setPlayerService(playerService);
+
+                    //se premo il tasto elimina, rimuovo la traccia dalla playlist
+                    controller.setOnDeleteAction(() -> {
+                        if(playlistService!=null){
+                        playlistService.removeTrackFromPlaylist(playlist.getId(), track.getId());
+                            javafx.application.Platform.runLater(() -> {
+                                updateTrackCount();
+                                loadTracks();
+                        });
+                        }
+                    });
                     //controller.setPlayerService(playerService);
                     trackList.getChildren().add(row);
 
@@ -221,12 +235,6 @@ public class DetailedPlaylistController {
             }
         });
     }
-    private void checkReadyAndLoad() {
-        System.out.println("PORCO DI OSENON FUNZIONA MI AMMAZZO SONO FUORI");
-        if (playlist != null && trackService != null) {
-            loadTracks();
-            System.out.println("PORCO DI OSENON FUNZIONA MI AMMAZZO SONO IN");
-        }
-    }
+
 
 }
