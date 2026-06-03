@@ -1,5 +1,7 @@
 package it.diem.unisa.musicmanager.model;
 
+import it.diem.unisa.musicmanager.exception.TrackInfoException;
+
 import java.util.UUID;
 
 public class Track {
@@ -23,21 +25,17 @@ public class Track {
 
         this.id = UUID.randomUUID();
 
-        String trimTitle = title.trim();
+        this.title = validateTitle(title);
 
-        String trimAuthor = author.trim();
+        this.author = validateAuthor(author);
 
-        this.title = trimTitle;
-
-        this.author = trimAuthor;
-
-        this.genre = genre;
+        this.genre = genre != null ? genre : Genre.UNKNOWN;
 
         this.songPath = songPath;
 
-        this.songLength = songLength;
+        this.songLength = validateSongLength(songLength);
 
-        this.year = year;
+        this.year = validateYear(year);
 
     }
 
@@ -46,25 +44,22 @@ public class Track {
 
         this.id = id;
 
-        String trimTitle = title.trim();
+        this.title = validateTitle(title);
 
-        String trimAuthor = author.trim();
+        this.author = validateAuthor(author);
 
-        this.title = trimTitle;
-
-        this.author = trimAuthor;
-
-        this.genre = genre;
+        this.genre = genre != null ? genre : Genre.UNKNOWN;
 
         this.songPath = songPath;
 
-        this.songLength = songLength;
+        this.songLength = validateSongLength(songLength);
 
-        this.year = year;
+        this.year = validateYear(year);
 
     }
 
     //costruttore con solo id, ci serve per la delete nel DAO
+    //è un costruttore con dati Dummy, per cui non applico validazione dei dati
     public Track(UUID id) {
         this.id = id;
         this.title = "Unknkwon";
@@ -104,11 +99,11 @@ public class Track {
     }
 
     public void setTitle(String title) {
-        this.title = title;
+        this.title = validateTitle(title);
     }
 
     public void setAuthor(String author) {
-        this.author = author;
+        this.author = validateAuthor(author);
     }
 
     public void setGenre(Genre genre) {
@@ -116,7 +111,7 @@ public class Track {
     }
 
     public void setYear(String year) {
-        this.year = year;
+        this.year = validateYear(year);
     }
 
     public boolean isDuplicate(Track track) {
@@ -130,29 +125,40 @@ public class Track {
 
     }
 
-    /* forse va nel controller?
-    public boolean checkValidFields(String title, String author, Genre genre, int songLength, String year) {
+//metodi privati di validazione, chiamati dai costruttori e dai setter
+// per rispettare le business rules
 
-        if (!title.isEmpty() && title.length() <= 100) {
-            return false;
+private String validateTitle(String title) {
+    if (title == null || title.trim().isEmpty()) {
+        throw new TrackInfoException("Title cannot be empty.");
+    }
+    if (title.trim().length() > 100) {
+        throw new TrackInfoException("Title cannot exceed 100 characters.");
+    }
+    return title.trim();
+}
+
+    private String validateAuthor(String author) {
+        if (author != null && author.trim().length() > 100) {
+            throw new TrackInfoException("Author cannot exceed 100 characters.");
         }
-
-        if (author.length() <= 100) {
-            return false;
-        }
-
-        if (genre.name().length() > 50) {
-            return false;
-        }
-
-        if (songLength > 0) {
-            return false;
-        }
-
-        if (year != "UNKNOWN" || year.matches(""))
-
+        return (author != null && !author.trim().isEmpty()) ? author.trim() : "Unknown";
     }
 
-    */
+    private int validateSongLength(int songLength) {
+        if (songLength <= 0) {
+            throw new TrackInfoException("Song length must be greater than 0 seconds.");
+        }
+        return songLength;
+    }
+
+    private String validateYear(String year) {
+        if (year != null && !year.equals("UNKNOWN") && !year.matches("\\d{4}")) {
+            throw new TrackInfoException("Year must be exactly 4 digits or 'UNKNOWN'.");
+        }
+        return (year != null && !year.trim().isEmpty()) ? year : "UNKNOWN";
+    }
+
+
 
 }
