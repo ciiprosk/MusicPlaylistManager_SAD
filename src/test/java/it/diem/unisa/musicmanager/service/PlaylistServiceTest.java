@@ -188,4 +188,117 @@ class PlaylistServiceTest {
                 updatedPlaylist.getTracks().size()
         );
     }
+
+    //TEST CREAZIONE PLAYLIST NEGATA CON NOME PLAYLIST DUPLICATO
+
+    @Test
+    void createPlaylistShouldFailWhenNameAlreadyExists() {
+
+        playlistService.createPlaylist("Rock");
+
+        Optional<String> result =
+                playlistService.createPlaylist("Rock");
+
+        assertTrue(result.isPresent());
+    }
+
+    //TEST CANCELLA PLAYLIST RIMUOVE PLAYLIST DA SHARED STATE
+
+    @Test
+    void deletePlaylistShouldRemovePlaylistFromSharedState() {
+
+        playlistService.createPlaylist("Rock");
+
+        Playlist playlist =
+                sharedState.getALlPlaylists().get(0);
+
+        playlistService.deletePlaylist(
+                playlist.getId()
+        );
+
+        assertTrue(
+                sharedState.getALlPlaylists().isEmpty()
+        );
+    }
+
+    //TEST RIMOZIONE TRACCIA DA PLAYLIST RIMUOVE LA TRACCIA CORRETTA DALLA PLAYLIST CORRENTE
+
+    @Test
+    void removeTrackFromPlaylistShouldRemoveTrackCorrectly() {
+
+        playlistService.createPlaylist("Rock");
+
+        Playlist playlist =
+                sharedState.getALlPlaylists().get(0);
+
+        UUID trackId = UUID.randomUUID();
+
+        playlistService.addTrackToPlaylist(
+                playlist.getId(),
+                trackId
+        );
+
+        playlistService.removeTrackFromPlaylist(
+                playlist.getId(),
+                trackId
+        );
+
+        Playlist updatedPlaylist =
+                sharedState.getALlPlaylists().get(0);
+
+        assertFalse(
+                updatedPlaylist.containsTrack(trackId)
+        );
+
+        assertEquals(
+                0,
+                updatedPlaylist.getTracks().size()
+        );
+    }
+
+    //TEST CREAZIONE PLAYLIST NEGATO CON CAMPO NOME PLAYLIST VUOTO
+
+    @Test
+    void createPlaylistShouldFailWhenNameIsEmpty() {
+
+        Optional<String> result =
+                playlistService.createPlaylist("");
+
+        assertTrue(result.isPresent());
+    }
+
+    //TEST CREA PLAYLIST AGGIUNGE LA PLAYLIST ALLO SHARED STATE
+
+    @Test
+    void createPlaylistShouldAddPlaylistToSharedState() {
+        playlistService.createPlaylist("Rock");
+
+        assertEquals(1, sharedState.getALlPlaylists().size());
+        assertEquals("Rock", sharedState.getALlPlaylists().get(0).getName());
+    }
+
+    //TEST CREA PLAYLIST NOTIFICA OBSERVABLE LIST QUANDO CREATA
+
+    @Test
+    void createPlaylistShouldNotifyObservableListWhenPlaylistIsCreated() {
+        final boolean[] notified = {false};
+
+        sharedState.getALlPlaylists().addListener(
+                (javafx.collections.ListChangeListener<Playlist>) change -> notified[0] = true
+        );
+
+        playlistService.createPlaylist("Rock");
+
+        assertTrue(notified[0]);
+    }
+
+    //TEST CREA PLAYLIST RESTITUISCE MESSAGGIO DI CONFERMA CREAZIONE O ERRORE
+
+    @Test
+    void createPlaylistShouldReturnEmptyOptionalWhenPlaylistIsCreated() {
+        Optional<String> result =
+                playlistService.createPlaylist("Rock");
+
+        assertTrue(result.isEmpty());
+    }
 }
