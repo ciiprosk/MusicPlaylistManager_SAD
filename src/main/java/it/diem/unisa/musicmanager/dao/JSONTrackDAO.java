@@ -58,7 +58,7 @@ public class JSONTrackDAO extends JSONAbstractDAO implements DAO<Track> {
             }
 
         } catch (IOException e) {
-            // Catturo l'eccezione checked e lancio la tua RuntimeException custom
+            //
             throw new FilePathException("Error: Selection of tracks failed!");
         }
 
