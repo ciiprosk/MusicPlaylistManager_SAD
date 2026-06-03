@@ -58,7 +58,7 @@ public class JSONTrackDAO extends JSONAbstractDAO implements DAO<Track> {
             }
 
         } catch (IOException e) {
-            // Catturo l'eccezione checked e lancio la tua RuntimeException custom
+            //
             throw new FilePathException("Error: Selection of tracks failed!");
         }
 
@@ -166,7 +166,7 @@ public class JSONTrackDAO extends JSONAbstractDAO implements DAO<Track> {
 
 
         } catch (FileNotFoundException e) {
-            throw new JSONFileException("File not found: " + filePath );
+            throw new FilePathException("File not found: " + filePath );
         } catch (UnsupportedEncodingException e) {
             throw new JSONFileException("Unsupported encoding: " + filePath );
         } catch (IOException e) {

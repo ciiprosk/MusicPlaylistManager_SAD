@@ -3,6 +3,7 @@ package it.diem.unisa.musicmanager.controller;
 import it.diem.unisa.musicmanager.model.Track;
 import it.diem.unisa.musicmanager.service.PlayerService;
 import it.diem.unisa.musicmanager.service.TrackService;
+import it.diem.unisa.musicmanager.state.SharedState;
 import it.diem.unisa.musicmanager.util.WindowUtil;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -20,6 +21,7 @@ public class RowTrackController {
     private Track track;
     private TrackService trackService;
     private PlayerService playerService;
+    private SharedState sharedState;
 
 
     @FXML private Label lblTitle;
@@ -68,6 +70,24 @@ public class RowTrackController {
 
     public void setPlayerService(PlayerService playerService) {
         this.playerService = playerService;
+        this.sharedState = playerService.getSharedState();
+
+        // Quando cambia il brano corrente o lo stato play/pausa,
+        // ogni riga ridisegna il proprio bottone.
+        sharedState.getCurrentTrack().addListener((o, ov, nv) -> updateButton());
+        sharedState.getIsPlaying().addListener((o, ov, nv) -> updateButton());
+        updateButton(); // stato iniziale
+    }
+
+    // true solo se QUESTA riga è il brano corrente E sta suonando
+    private boolean isThisPlaying() {
+        return track != null
+                && track.equals(sharedState.getCurrentTrack().get())
+                && sharedState.getIsPlaying().get();
+    }
+
+    private void updateButton() {
+        btnPlay.setText(isThisPlaying() ? "⏸" : "▶");
     }
 
     @FXML
@@ -78,6 +98,13 @@ public class RowTrackController {
     }
     @FXML
     public void handlePlay(ActionEvent actionEvent) {
+        if (playerService == null || track == null) return;
+
+        if (isThisPlaying()) {
+            playerService.pause();   // sto suonando io → metti in pausa
+        } else {
+            playerService.play(track); // non sto suonando → parti (o riprendi)
+        }
     }
 
     @FXML
@@ -133,4 +160,6 @@ public class RowTrackController {
     public Track getTrack() {
         return track;
     }
+
+
 }

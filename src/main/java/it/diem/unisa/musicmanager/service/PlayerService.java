@@ -30,6 +30,11 @@ public class PlayerService {
         this.sharedState = sharedState;
     }
 
+
+    public SharedState getSharedState() {
+        return sharedState;
+    }
+
     /**
      * Avvia la riproduzione di un brano.
      * Se il brano e' gia' quello caricato, riprende da dove era; altrimenti
@@ -113,6 +118,15 @@ public class PlayerService {
             mediaPlayer.stop();
             mediaPlayer.dispose();
             mediaPlayer = null;
+        }
+    }
+
+    public void seek(double fraction) {
+        if (mediaPlayer != null) {
+            javafx.util.Duration total = mediaPlayer.getTotalDuration();
+            if (total != null && !total.isUnknown()) {
+                mediaPlayer.seek(total.multiply(fraction));
+            }
         }
     }
 

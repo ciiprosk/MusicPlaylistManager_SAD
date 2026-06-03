@@ -6,6 +6,7 @@ import it.diem.unisa.musicmanager.model.Playlist;
 import it.diem.unisa.musicmanager.state.SharedState;
 import javafx.collections.ObservableList;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.IntStream;
@@ -111,6 +112,11 @@ public class PlaylistService implements TrackObserver{
         Playlist newPlaylist = null;
         // se siamo qui la playlist è stata trovata e posso eseguire l'update
        Playlist playlist = optionalPlaylist.get(); //mi dewrappo l aplaylist ritornata dal dao
+
+        if (playlist.getName().equals(newName)) {   //se ho salvato la playlist con lo stesso nome, ho finito
+            return Optional.empty();
+        }
+
        try {
            newPlaylist = new Playlist(playlistID, newName); //in questo modo faccio verifiche su business rules
 
@@ -175,5 +181,32 @@ public class PlaylistService implements TrackObserver{
                 .filter(index -> playlists.get(index).getId().equals(playlist.getId()))
                 .findFirst().ifPresent(index -> playlists.set(index, playlist));
 
+    }
+
+    /**
+     * Recupera una playlist specifica dal sistema tramite il suo identificatore univoco.
+     *
+     * @param playlistID l'identificatore UUID della playlist da cercare.
+     * @return un Optional contenente la playlist se presente nel sistema,
+     *         oppure Optional.empty() se non esiste alcuna playlist con l'ID specificato.
+     */
+
+    public Optional<Playlist> getPlaylistById(UUID playlistID) {
+        return playlistDAO.searchById(playlistID);
+    }
+
+    /**
+     * Restituisce l'elenco delle tracce contenute in una specifica playlist.
+     *
+     * @param playlistID l'identificatore UUID della playlist.
+     * @return una lista contenente gli identificatori delle tracce presenti nella playlist.
+     * @throws PlaylistInfoException se la playlist richiesta non esiste nel sistema.
+     */
+
+    public List<UUID> getTracksFromPlaylist(UUID playlistID) {
+        Playlist playlist = playlistDAO.searchById(playlistID)
+                .orElseThrow(() -> new PlaylistInfoException("Playlist not found"));
+
+        return playlist.getTracks();
     }
 }
