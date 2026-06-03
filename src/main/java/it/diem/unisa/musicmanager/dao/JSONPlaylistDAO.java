@@ -162,7 +162,7 @@ public class JSONPlaylistDAO  extends JSONAbstractDAO implements DAO<Playlist> {
                 }
             }
         } catch (FileNotFoundException e) {
-            throw new JSONFileException("File not found: " + filePath);
+            throw new FilePathException("File not found: " + filePath);
         } catch (IOException e) {
             throw new JSONFileException("Error reading or writing file: " + filePath);
         }
