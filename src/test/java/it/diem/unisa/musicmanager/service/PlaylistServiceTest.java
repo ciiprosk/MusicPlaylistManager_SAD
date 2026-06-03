@@ -157,38 +157,6 @@ class PlaylistServiceTest {
                 updatedPlaylist.getTracks().size()
         );
     }
-
-    //TEST AGGIUNTA TRACCIA A PLAYLIST NEGATO SE LA TRACCIA è UN DUPLICATO
-
-    @Test
-    void addTrackToPlaylistShouldNotInsertDuplicateTrack() {
-
-        playlistService.createPlaylist("Rock");
-
-        Playlist playlist =
-                sharedState.getALlPlaylists().get(0);
-
-        UUID trackId = UUID.randomUUID();
-
-        playlistService.addTrackToPlaylist(
-                playlist.getId(),
-                trackId
-        );
-
-        playlistService.addTrackToPlaylist(
-                playlist.getId(),
-                trackId
-        );
-
-        Playlist updatedPlaylist =
-                sharedState.getALlPlaylists().get(0);
-
-        assertEquals(
-                1,
-                updatedPlaylist.getTracks().size()
-        );
-    }
-
     //TEST CREAZIONE PLAYLIST NEGATA CON NOME PLAYLIST DUPLICATO
 
     @Test
@@ -478,7 +446,7 @@ class PlaylistServiceTest {
     }
 
     //TEST RINOMINA PLAYLIST CONSETITO CON NOME PLAYLIST UGUALE AL PRECEDENTE
-    
+
     @Test
     void renamePlaylistWithSameNameShouldSucceed() {
 
@@ -501,6 +469,176 @@ class PlaylistServiceTest {
         assertEquals(
                 "Rock",
                 updatedPlaylist.getName()
+        );
+    }
+
+    //TEST AGGIUNTA BRANO A PLAYLIST AGGIUNGE BRANO ALLA FINE DELLA PLAYLIST
+
+    @Test
+    void addTrackToPlaylistShouldAddSelectedTrackAtTheEnd() {
+
+        playlistService.createPlaylist("Rock");
+
+        Playlist playlist =
+                sharedState.getALlPlaylists().get(0);
+
+        UUID track1 = UUID.randomUUID();
+        UUID track2 = UUID.randomUUID();
+
+        playlistService.addTrackToPlaylist(playlist.getId(), track1);
+        playlistService.addTrackToPlaylist(playlist.getId(), track2);
+
+        Playlist updatedPlaylist =
+                sharedState.getALlPlaylists().get(0);
+
+        assertEquals(2, updatedPlaylist.getTracks().size());
+        assertEquals(track1, updatedPlaylist.getTracks().get(0));
+        assertEquals(track2, updatedPlaylist.getTracks().get(1));
+    }
+
+    //TEST AGGIUNGERE UN BRANO ALLA PLAYLIST NOTIFICA OBSERVER
+
+    @Test
+    void addTrackToPlaylistShouldNotifyObservableList() {
+
+        playlistService.createPlaylist("Rock");
+
+        final boolean[] notified = {false};
+
+        sharedState.getALlPlaylists().addListener(
+                (javafx.collections.ListChangeListener<Playlist>) change -> notified[0] = true
+        );
+
+        Playlist playlist =
+                sharedState.getALlPlaylists().get(0);
+
+        UUID trackId = UUID.randomUUID();
+
+        playlistService.addTrackToPlaylist(playlist.getId(), trackId);
+
+        assertTrue(notified[0]);
+    }
+
+    //TEST AGGIUNTA BRANO IN UNA PLAYLIST DEVE ESSERE POSSIBILE ANCHE DURANTE LA RIPRODUZIONE DELLA PLAYLIST
+
+    @Test
+    void addTrackToPlaylistShouldWorkWhilePlaying() {
+
+        playlistService.createPlaylist("Rock");
+
+        Playlist playlist =
+                sharedState.getALlPlaylists().get(0);
+
+        UUID currentTrackId = UUID.randomUUID();
+        UUID newTrackId = UUID.randomUUID();
+
+        sharedState.getIsPlaying().set(true);
+
+        playlistService.addTrackToPlaylist(playlist.getId(), currentTrackId);
+        playlistService.addTrackToPlaylist(playlist.getId(), newTrackId);
+
+        Playlist updatedPlaylist =
+                sharedState.getALlPlaylists().get(0);
+
+        assertTrue(sharedState.getIsPlaying().get());
+        assertTrue(updatedPlaylist.containsTrack(newTrackId));
+        assertEquals(newTrackId, updatedPlaylist.getTracks().get(1));
+    }
+
+    //TEST AGGIUNTA BRANO A PLAYLIST NON DEVE PERMETTERE DI AGGIUNGERE BRANI DUPLICATI
+
+    @Test
+    void addTrackToPlaylistShouldNotAddDuplicateTrack() {
+
+        playlistService.createPlaylist("Rock");
+
+        Playlist playlist =
+                sharedState.getALlPlaylists().get(0);
+
+        UUID trackId = UUID.randomUUID();
+
+        playlistService.addTrackToPlaylist(playlist.getId(), trackId);
+        playlistService.addTrackToPlaylist(playlist.getId(), trackId);
+
+        Playlist updatedPlaylist =
+                sharedState.getALlPlaylists().get(0);
+
+        assertEquals(1, updatedPlaylist.getTracks().size());
+    }
+
+    //TEST PERSISTENZA TRAMITE UPDATE DAO SU AGGIUNTA TRACCIA A PLAYLIST
+
+    @Test
+    void addTrackToPlaylistShouldPersistUpdatedPlaylistOnFile() {
+
+        playlistService.createPlaylist("Rock");
+
+        Playlist playlist =
+                sharedState.getALlPlaylists().get(0);
+
+        UUID trackId = UUID.randomUUID();
+
+        playlistService.addTrackToPlaylist(playlist.getId(), trackId);
+
+        DAO<Playlist> newPlaylistDAO =
+                new JSONPlaylistDAO(
+                        "test-data",
+                        "playlists-service-test.jsonl"
+                );
+
+        Optional<Playlist> result =
+                newPlaylistDAO.searchById(playlist.getId());
+
+        assertTrue(result.isPresent());
+        assertTrue(result.get().containsTrack(trackId));
+    }
+
+    //TEST VIETATO AGGIUNGERE UN BRANO AD UNA PLAYLIST INESISTENTE
+
+    @Test
+    void addTrackToPlaylistShouldFailWhenPlaylistDoesNotExist() {
+
+        UUID fakePlaylistId = UUID.randomUUID();
+        UUID trackId = UUID.randomUUID();
+
+        assertThrows(
+                RuntimeException.class,
+                () -> playlistService.addTrackToPlaylist(fakePlaylistId, trackId)
+        );
+    }
+
+    //TEST OBSERVER NOTIFICA CAMBIAMENTO INTERNO QUANDO VIENE AGGIUNTO UN BRANO
+
+    @Test
+    void addTrackToPlaylistShouldNotifyViewOfInternalChange() {
+
+        playlistService.createPlaylist("Rock");
+
+        Playlist playlist =
+                sharedState.getALlPlaylists().get(0);
+
+        final boolean[] notified = {false};
+
+        sharedState.getALlPlaylists().addListener(
+                (javafx.collections.ListChangeListener<Playlist>) change -> {
+                    while (change.next()) {
+                        if (change.wasUpdated() || change.wasReplaced()) {
+                            notified[0] = true;
+                        }
+                    }
+                }
+        );
+
+        UUID trackId = UUID.randomUUID();
+
+        playlistService.addTrackToPlaylist(
+                playlist.getId(),
+                trackId
+        );
+
+        assertTrue(
+                notified[0],
+                "La View non è stata notificata della modifica interna alla playlist"
         );
     }
 
