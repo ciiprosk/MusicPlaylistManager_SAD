@@ -121,5 +121,14 @@ public class PlayerService {
         }
     }
 
+    public void seek(double fraction) {
+        if (mediaPlayer != null) {
+            javafx.util.Duration total = mediaPlayer.getTotalDuration();
+            if (total != null && !total.isUnknown()) {
+                mediaPlayer.seek(total.multiply(fraction));
+            }
+        }
+    }
+
     // TODO: next() - DA FARE DOPO (richiede una coda di riproduzione)
 }

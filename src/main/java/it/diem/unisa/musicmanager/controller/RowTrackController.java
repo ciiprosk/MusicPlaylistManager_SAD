@@ -76,7 +76,6 @@ public class RowTrackController {
         // ogni riga ridisegna il proprio bottone.
         sharedState.getCurrentTrack().addListener((o, ov, nv) -> updateButton());
         sharedState.getIsPlaying().addListener((o, ov, nv) -> updateButton());
-        sharedState.getProgress().addListener((o, ov, nv) -> updateTime());
         updateButton(); // stato iniziale
     }
 
@@ -162,22 +161,5 @@ public class RowTrackController {
         return track;
     }
 
-    // true se questa riga è il brano corrente (suoni o in pausa)
-    private boolean isCurrent() {
-        return track != null && track.equals(sharedState.getCurrentTrack().get());
-    }
 
-    //Per il tempo che si decrementa
-    private void updateTime() {
-        long secondsToShow;
-        if (isCurrent()) {
-            double remaining = track.getSongLength() * (1.0 - sharedState.getProgress().get());
-            secondsToShow = Math.max(0, Math.round(remaining)); // conto alla rovescia
-        } else {
-            secondsToShow = (long) track.getSongLength();        // durata piena
-        }
-        int m = (int) (secondsToShow / 60);
-        int s = (int) (secondsToShow % 60);
-        lblDuration.setText(String.format("%02d:%02d", m, s));
-    }
 }
