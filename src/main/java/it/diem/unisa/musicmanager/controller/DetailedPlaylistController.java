@@ -38,7 +38,7 @@ public class DetailedPlaylistController {
     // --- Campi dell'interfaccia, collegati agli fx:id in detailedPlaylist.fxml ---
     @FXML private Label labelName;
     @FXML private Label lblTrackCount;
-    @FXML private VBox tracksList;
+    @FXML private VBox trackList;
 
 
     // La playlist mostrata.
@@ -96,7 +96,7 @@ public class DetailedPlaylistController {
     }
     private void loadTracks(){
         //devo cricare la lista delle tracce dal serviceeee
-        tracksList.getChildren().clear();
+        trackList.getChildren().clear();
 
         for(UUID id : playlist.getTracks()){
             trackService.searchTrackById(id).ifPresent(track -> {
@@ -107,7 +107,7 @@ public class DetailedPlaylistController {
                     RowTrackController controller = loader.getController();
                     controller.setTrack(track);
                     controller.setPlayerService(playerService);
-                    tracksList.getChildren().add(row);
+                    trackList.getChildren().add(row);
 
                 }catch(IOException e){}
             });
@@ -116,7 +116,7 @@ public class DetailedPlaylistController {
 
     public void onModify(ActionEvent actionEvent) {
         try {
-            FXMLLoader loader = WindowUtil.openWindow("/it/diem/unisa/musicmanager/pages/editPlaylist.fxml", playlist.getName(),Modality.APPLICATION_MODAL);
+            FXMLLoader loader = WindowUtil.openWindow("/it/diem/unisa/musicmanager/pages/editPlaylist.fxml", playlist.getName(),Modality.WINDOW_MODAL);
 
             EditPlaylistController controller = loader.getController();
             controller.setPlaylist(playlist);
@@ -154,6 +154,8 @@ public class DetailedPlaylistController {
     }
 
     public void onAddTrack(ActionEvent actionEvent) {
+        //con trackseevice aggiungo una traccia alla playlist ma manca una view
+
 
     }
 

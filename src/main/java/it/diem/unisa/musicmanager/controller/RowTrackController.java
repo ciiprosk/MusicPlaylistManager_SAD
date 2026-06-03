@@ -7,8 +7,13 @@ import it.diem.unisa.musicmanager.util.WindowUtil;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Side;
+import javafx.scene.control.Button;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
 import javafx.stage.Modality;
+import javafx.stage.Window;
 
 import java.io.IOException;
 
@@ -23,6 +28,8 @@ public class RowTrackController {
     @FXML private Label lblTitle;
     @FXML private Label lblAuthor;
     @FXML private Label lblDuration;
+
+    @FXML private Button buttonMenu;
 
     public void setTrack(Track track) {
         this.track = track;
@@ -60,7 +67,46 @@ public class RowTrackController {
         }
     }
 
-    public void handleMenu(ActionEvent actionEvent) {
+    public void handleMenu(ActionEvent actionEvent) throws IOException{
 
+            if (track == null) return;
+
+            ContextMenu menu = new ContextMenu();
+
+            MenuItem detailItem = new MenuItem("Open Detail");
+
+                detailItem.setOnAction(e -> openDetail());
+
+                MenuItem modifyItem = new MenuItem("Modify Name");
+                modifyItem.setOnAction(e -> openEditPlaylist());
+
+                MenuItem deleteItem = new MenuItem("Delete playlist");
+                deleteItem.setOnAction(e -> deletePlaylist());
+
+                menu.getItems().addAll(detailItem, modifyItem, deleteItem);
+                menu.show(buttonMenu, Side.BOTTOM, 0, 0);
+
+    }
+
+    private void openDetail()  {
+        try {
+            FXMLLoader loader = WindowUtil.openWindow("/it/diem/unisa/musicmanager/pages/detailSong.fxml", track.getTitle(), Modality.WINDOW_MODAL);
+            DetailSongController controller = loader.getController();
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+
+    }
+    private void openEditPlaylist(){
+        try {
+            FXMLLoader loader = WindowUtil.openWindow("/it/diem/unisa/musicmanager/pages/editSong.fxml", track.getTitle(), Modality.WINDOW_MODAL);
+            AddSongController controller = loader.getController();
+            controller.setTrackService(trackService);
+        }catch(IOException e){}
+    }
+    private void deletePlaylist(){
+        if (trackService != null && track != null) {
+            trackService.deleteTrack(track.getId());
+        }
     }
 }

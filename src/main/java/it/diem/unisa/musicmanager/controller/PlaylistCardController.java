@@ -3,6 +3,7 @@ package it.diem.unisa.musicmanager.controller;
 import it.diem.unisa.musicmanager.model.Playlist;
 import it.diem.unisa.musicmanager.service.PlayerService;
 import it.diem.unisa.musicmanager.service.PlaylistService;
+import it.diem.unisa.musicmanager.service.TrackService;
 import it.diem.unisa.musicmanager.util.WindowUtil;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -27,6 +28,7 @@ public class PlaylistCardController {
 
     private PlaylistService playlistService; //lo ricevo dal qyeelo che mi chiama
     private PlayerService playerService;
+    private TrackService trackService;
 
 
     @FXML private Label labelName;
@@ -52,6 +54,9 @@ public class PlaylistCardController {
 
     public void setPlaylistService(PlaylistService playlistService) {
         this.playlistService = playlistService;
+    }
+    public void setTrackService(TrackService trackService) {
+        this.trackService = trackService;
     }
 
     public void setPlayerService(PlayerService playerService) {
@@ -125,6 +130,7 @@ public class PlaylistCardController {
             DetailedPlaylistController ctrl = loader.getController();
             ctrl.setPlaylist(playlist);
             ctrl.setPlaylistService(playlistService);
+            ctrl.setTrackService(trackService);
 
             /*
             FXMLLoader loader = new FXMLLoader(
@@ -153,6 +159,7 @@ public class PlaylistCardController {
             DetailedPlaylistController ctrl = loader.getController();
             ctrl.setPlaylist(playlist);
             ctrl.setPlaylistService(playlistService);
+            ctrl.setTrackService(trackService);
             /*
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource("/it/diem/unisa/musicmanager/pages/detailedPlaylist.fxml"));
