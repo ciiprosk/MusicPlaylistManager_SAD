@@ -166,7 +166,7 @@ public class JSONTrackDAO extends JSONAbstractDAO implements DAO<Track> {
 
 
         } catch (FileNotFoundException e) {
-            throw new JSONFileException("File not found: " + filePath );
+            throw new FilePathException("File not found: " + filePath );
         } catch (UnsupportedEncodingException e) {
             throw new JSONFileException("Unsupported encoding: " + filePath );
         } catch (IOException e) {
