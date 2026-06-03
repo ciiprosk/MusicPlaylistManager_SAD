@@ -4,6 +4,7 @@ import it.diem.unisa.musicmanager.model.Track;
 import it.diem.unisa.musicmanager.service.PlayerService;
 import it.diem.unisa.musicmanager.service.TrackService;
 import it.diem.unisa.musicmanager.state.SharedState;
+import it.diem.unisa.musicmanager.util.AlertUtil;
 import it.diem.unisa.musicmanager.util.WindowUtil;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -22,6 +23,8 @@ public class RowTrackController {
     private TrackService trackService;
     private PlayerService playerService;
     private SharedState sharedState;
+    private Runnable onDeleteAction;    //ci aiuta a capire se stiamo eliminando dall'archivio tracce
+    //o dalla playlist
 
 
     @FXML private Label lblTitle;
@@ -47,6 +50,10 @@ public class RowTrackController {
         btnModify.setManaged(!isSelectionMode);
 //        btnDelete.setVisible(!isSelectionMode);
 //        btnDelete.setManaged(!isSelectionMode);
+    }
+
+    public void setOnDeleteAction(Runnable onDeleteAction) {
+        this.onDeleteAction = onDeleteAction;
     }
 
     public boolean isSelected() {
@@ -94,7 +101,7 @@ public class RowTrackController {
     public void handleModify(ActionEvent actionEvent) throws IOException {
         FXMLLoader loader = WindowUtil.openWindow("/it/diem/unisa/resources//musicmanager/pages/editSong.fxml", "", Modality.WINDOW_MODAL);
         AddSongController controller = loader.getController();
-        //creo i set dei servicenei controller
+        //creo i set dei service nei controller
     }
     @FXML
     public void handlePlay(ActionEvent actionEvent) {
@@ -110,7 +117,14 @@ public class RowTrackController {
     @FXML
     public void handleDelete(ActionEvent actionEvent) {
         if (trackService != null && track != null) {
-            trackService.deleteTrack(track.getId());
+
+            //alert di conferma
+            boolean isConfirmed = AlertUtil.showConfirmation("Delete Confirm", "Are you sure you wanna delete this track?");
+
+            //se l'utente ha confermato, allora elimino la traccia (o dalla playlist, o dall'archivio)
+            if(isConfirmed && onDeleteAction != null)
+                onDeleteAction.run();
+
         }
     }
 
@@ -128,7 +142,7 @@ public class RowTrackController {
                 modifyItem.setOnAction(e -> openEditPlaylist());
 
                 MenuItem deleteItem = new MenuItem("Delete Track");
-                deleteItem.setOnAction(e -> deletePlaylist());
+                deleteItem.setOnAction(e -> handleDelete(null));
 
                 menu.getItems().addAll(detailItem, modifyItem, deleteItem);
                 menu.show(buttonMenu, Side.BOTTOM, 0, 0);
@@ -150,11 +164,6 @@ public class RowTrackController {
             AddSongController controller = loader.getController();
             controller.setTrackService(trackService);
         }catch(IOException e){}
-    }
-    private void deletePlaylist(){
-        if (trackService != null && track != null) {
-            trackService.deleteTrack(track.getId());
-        }
     }
 
     public Track getTrack() {
