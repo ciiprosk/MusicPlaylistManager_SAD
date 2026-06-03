@@ -3,6 +3,7 @@ package it.diem.unisa.musicmanager.controller;
 import it.diem.unisa.musicmanager.model.Track;
 import it.diem.unisa.musicmanager.service.PlayerService;
 import it.diem.unisa.musicmanager.service.TrackService;
+import it.diem.unisa.musicmanager.state.SharedState;
 import it.diem.unisa.musicmanager.util.WindowUtil;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -20,6 +21,7 @@ public class RowTrackController {
     private Track track;
     private TrackService trackService;
     private PlayerService playerService;
+    private SharedState sharedState;
 
 
     @FXML private Label lblTitle;
@@ -68,6 +70,25 @@ public class RowTrackController {
 
     public void setPlayerService(PlayerService playerService) {
         this.playerService = playerService;
+        this.sharedState = playerService.getSharedState();
+
+        // Quando cambia il brano corrente o lo stato play/pausa,
+        // ogni riga ridisegna il proprio bottone.
+        sharedState.getCurrentTrack().addListener((o, ov, nv) -> updateButton());
+        sharedState.getIsPlaying().addListener((o, ov, nv) -> updateButton());
+        sharedState.getProgress().addListener((o, ov, nv) -> updateTime());
+        updateButton(); // stato iniziale
+    }
+
+    // true solo se QUESTA riga è il brano corrente E sta suonando
+    private boolean isThisPlaying() {
+        return track != null
+                && track.equals(sharedState.getCurrentTrack().get())
+                && sharedState.getIsPlaying().get();
+    }
+
+    private void updateButton() {
+        btnPlay.setText(isThisPlaying() ? "⏸" : "▶");
     }
 
     @FXML
@@ -78,8 +99,12 @@ public class RowTrackController {
     }
     @FXML
     public void handlePlay(ActionEvent actionEvent) {
-        if (playerService != null && track != null) {
-            playerService.play(track);
+        if (playerService == null || track == null) return;
+
+        if (isThisPlaying()) {
+            playerService.pause();   // sto suonando io → metti in pausa
+        } else {
+            playerService.play(track); // non sto suonando → parti (o riprendi)
         }
     }
 
@@ -135,5 +160,24 @@ public class RowTrackController {
 
     public Track getTrack() {
         return track;
+    }
+
+    // true se questa riga è il brano corrente (suoni o in pausa)
+    private boolean isCurrent() {
+        return track != null && track.equals(sharedState.getCurrentTrack().get());
+    }
+
+    //Per il tempo che si decrementa
+    private void updateTime() {
+        long secondsToShow;
+        if (isCurrent()) {
+            double remaining = track.getSongLength() * (1.0 - sharedState.getProgress().get());
+            secondsToShow = Math.max(0, Math.round(remaining)); // conto alla rovescia
+        } else {
+            secondsToShow = (long) track.getSongLength();        // durata piena
+        }
+        int m = (int) (secondsToShow / 60);
+        int s = (int) (secondsToShow % 60);
+        lblDuration.setText(String.format("%02d:%02d", m, s));
     }
 }
