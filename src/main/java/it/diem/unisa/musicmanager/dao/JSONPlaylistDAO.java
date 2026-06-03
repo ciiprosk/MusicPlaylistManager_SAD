@@ -16,7 +16,6 @@ import java.util.UUID;
 
 public class JSONPlaylistDAO  extends JSONAbstractDAO implements DAO<Playlist> {
     private final String filePath;
-    private final String folderPath;
     private Gson json;
 
     /**
@@ -26,10 +25,10 @@ public class JSONPlaylistDAO  extends JSONAbstractDAO implements DAO<Playlist> {
 
     public JSONPlaylistDAO(String folderPath, String fileName) {
 
-        this.folderPath = folderPath;
         this.filePath = folderPath + File.separator + fileName;
         json = new Gson();
         super.createFileJSON(filePath, folderPath);
+
     }
 
     /**
