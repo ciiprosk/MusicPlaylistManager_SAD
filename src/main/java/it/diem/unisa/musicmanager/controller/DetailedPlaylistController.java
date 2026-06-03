@@ -4,7 +4,9 @@ import it.diem.unisa.musicmanager.model.Playlist;
 import it.diem.unisa.musicmanager.model.Track;
 //import it.diem.unisa.musicmanager.service.PlaylistService;
 //import it.diem.unisa.musicmanager.service.TrackService;
+import it.diem.unisa.musicmanager.service.PlayerService;
 import it.diem.unisa.musicmanager.service.PlaylistService;
+import it.diem.unisa.musicmanager.service.TrackService;
 import it.diem.unisa.musicmanager.util.WindowUtil;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -16,9 +18,13 @@ import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
+
+import java.io.IOException;
+import java.util.UUID;
 
 /**
  * Controller della schermata di dettaglio playlist (detailedPlaylist.fxml).
@@ -32,14 +38,15 @@ public class DetailedPlaylistController {
     // --- Campi dell'interfaccia, collegati agli fx:id in detailedPlaylist.fxml ---
     @FXML private Label labelName;
     @FXML private Label lblTrackCount;
-    @FXML private ListView<Track> tracksList;
+    @FXML private VBox tracksList;
+
 
     // La playlist mostrata.
     private Playlist playlist;
 
-    // Service (da collegare quando disponibili).
-    // private TrackService trackService;
+    private TrackService trackService;
     private PlaylistService playlistService;
+    private PlayerService playerService;
 
     /**
      * Chiamato automaticamente da JavaFX appena la schermata e' pronta.
@@ -47,7 +54,7 @@ public class DetailedPlaylistController {
      */
     @FXML
     private void initialize() {
-      //  tracksList.setCellFactory(lv -> createTrackCell());
+
     }
 
     /**
@@ -60,6 +67,7 @@ public class DetailedPlaylistController {
         labelName.setText(playlist.getName());
         int n = playlist.getTracks().size();
         lblTrackCount.setText(n + (n == 1 ? " track" : " tracks"));
+        loadTracks();
 
         // Quando il TrackService sara' disponibile, qui risolveremo gli UUID
         // della playlist nei rispettivi Track e riempiremo la lista:
@@ -74,53 +82,36 @@ public class DetailedPlaylistController {
     public void setPlaylistService(PlaylistService playlistService){
         this.playlistService = playlistService;
     }
-    /**
-     * Crea una cella che mostra "Titolo - Autore" a sinistra e la durata a destra.
-     *
-     * @return una cella personalizzata per un Track
-     */
-    private ListCell<Track> createTrackCell() {
-        return new ListCell<>() {
-            private final Label info = new Label();
-            private final Label durata = new Label();
-            private final HBox riga = new HBox(10, info, space(), durata);
-
-            {
-                info.getStyleClass().add("brano-titolo");
-                durata.getStyleClass().add("brano-durata");
-            }
-
-            @Override
-            protected void updateItem(Track t, boolean empty) {
-                super.updateItem(t, empty);
-                if (empty || t == null) {
-                    setGraphic(null);
-                } else {
-                    info.setText(t.getTitle() + " - " + t.getAuthor());
-                    durata.setText(formatDuration(t.getSongLength()));
-                    setGraphic(riga);
-                }
-            }
-        };
+    public void setTrackService(TrackService trackService){
+        this.trackService = trackService;
     }
 
-    /** Region elastica che spinge la durata a destra. */
-    private Region space() {
-        Region r = new Region();
-        HBox.setHgrow(r, Priority.ALWAYS);
-        return r;
+    public void setPlayerService(PlayerService playerService) {
+        this.playerService = playerService;
     }
 
-    /**
-     * Trasforma una durata in secondi in una stringa minuti:secondi.
-     *
-     * @param totalSeconds durata in secondi
-     * @return la durata come testo, es. "3:45"
-     */
-    private String formatDuration(int totalSeconds) {
-        int minutes = totalSeconds / 60;
-        int seconds = totalSeconds % 60;
-        return String.format("%d:%02d", minutes, seconds);
+    private void updateTrackCount() {
+        int n = playlist.numberOfTrakcs();
+        lblTrackCount.setText(n + (n == 1 ? " track" : " tracks"));
+    }
+    private void loadTracks(){
+        //devo cricare la lista delle tracce dal serviceeee
+        tracksList.getChildren().clear();
+
+        for(UUID id : playlist.getTracks()){
+            trackService.searchTrackById(id).ifPresent(track -> {
+                try{
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/it/diem/unisa/musicmanager/pages/rowTrack.fxml"));
+                    HBox row = loader.load();
+
+                    RowTrackController controller = loader.getController();
+                    controller.setTrack(track);
+                    controller.setPlayerService(playerService);
+                    tracksList.getChildren().add(row);
+
+                }catch(IOException e){}
+            });
+        }
     }
 
     public void onModify(ActionEvent actionEvent) {
@@ -163,6 +154,7 @@ public class DetailedPlaylistController {
     }
 
     public void onAddTrack(ActionEvent actionEvent) {
+
     }
 
     public void onDelete(ActionEvent actionEvent) {

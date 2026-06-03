@@ -44,6 +44,6 @@
     <!-- Sezione tracce -->
     <Label styleClass="sottotitolo" text="Tracks" textFill="#cccccc" />
 
-    <VBox fx:id="listaTracce" spacing="10.0" VBox.vgrow="ALWAYS" />
+    <VBox fx:id="trackList" spacing="10.0" VBox.vgrow="ALWAYS" />
 
 </VBox>
