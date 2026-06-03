@@ -22,7 +22,7 @@ public class WindowUtil {
 
         Stage stage = new Stage();
         stage.setTitle(title);
-        stage.setResizable(false);
+        //stage.setResizable(false);
         stage.initModality(modality);
         stage.setScene(new Scene(root));
         stage.show();
