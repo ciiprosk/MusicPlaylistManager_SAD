@@ -73,7 +73,7 @@
         <HBox alignment="CENTER_RIGHT" spacing="12.0">
             <Label fx:id="lblError" maxWidth="Infinity" textFill="#ff5555" HBox.hgrow="ALWAYS" />
             <Button onAction="#onCancel" styleClass="button-grigio" text="Annulla" textFill="WHITE" />
-            <Button fx:id="btnCrea"  styleClass="button-verde" text="Crea" textFill="WHITE" />
+            <Button fx:id="btnCrea" onAction="#onSave" styleClass="button-verde" text="Crea" textFill="WHITE"  />
         </HBox>
 
     </children>

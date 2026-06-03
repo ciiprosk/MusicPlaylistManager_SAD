@@ -10,7 +10,10 @@ public class MainController {
     @FXML private Node tracksPage;
     @FXML private Node playlistsPage;
 
+
     @FXML private PlaylistController playlistsPageController;
+    @FXML private TracksController tracksPageController;
+
 
     @FXML
     public void initialize() {
@@ -45,5 +48,9 @@ public class MainController {
 
     public PlaylistController getPlaylistsPageController() {
         return playlistsPageController;
+    }
+
+    public TracksController getTracksPageController() {
+        return tracksPageController;
     }
 }

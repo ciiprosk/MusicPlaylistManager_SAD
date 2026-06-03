@@ -1,6 +1,8 @@
 package it.diem.unisa.musicmanager.controller;
 
 import it.diem.unisa.musicmanager.model.Track;
+import it.diem.unisa.musicmanager.service.PlayerService;
+import it.diem.unisa.musicmanager.service.TrackService;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -11,29 +13,37 @@ import javafx.scene.control.TextField;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-/**
- * Controller della schermata "Tracks".
- * Per ora gestisce SOLO la navigazione: apre la finestra "Crea Brano".
- * La logica (service, lista dei brani, salvataggio) verra' aggiunta dopo.
- */
 public class TracksController {
 
-    // --- Campi dell'interfaccia, collegati agli fx:id in tracks.fxml ---
     @FXML private ListView<Track> tracksList;
     @FXML private TextField searchBar;
 
-    /**
-     * Apre la finestra modale "Crea Brano".
-     * Per ora apre solo la finestra, senza passare alcun service.
-     *
-     * @param actionEvent evento generato dal click sul pulsante "Add Track"
-     */
+    private TrackService trackService;
+    private PlayerService playerService;
+
+
+    public TracksController() {
+    }
+
+    public void setTrackService(TrackService trackService) {
+        this.trackService = trackService;
+    }
+
+    public void setPlayerService(PlayerService playerService) {
+        this.playerService = playerService;
+    }
+
     @FXML
-    private void handleAggiungi(ActionEvent actionEvent) {
+    private void handleAggiungi(ActionEvent event) {
         try {
             FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource("/it/diem/unisa/musicmanager/pages/addSong.fxml"));
+                    getClass().getResource("/it/diem/unisa/musicmanager/pages/addSong.fxml")
+            );
+
             Parent root = loader.load();
+
+            AddSongController controller = loader.getController();
+            controller.setTrackService(trackService);
 
             Stage stage = new Stage();
             stage.setTitle("Add Track");
