@@ -3,6 +3,7 @@ package it.diem.unisa.musicmanager.service;
 import it.diem.unisa.musicmanager.dao.DAO;
 import it.diem.unisa.musicmanager.exception.TrackInfoException;
 import it.diem.unisa.musicmanager.model.Genre;
+import it.diem.unisa.musicmanager.model.Playlist;
 import it.diem.unisa.musicmanager.model.Track;
 import it.diem.unisa.musicmanager.state.SharedState;
 import javafx.collections.ObservableList;
@@ -12,10 +13,12 @@ import java.util.UUID;
 public class TrackService {
 
     private final DAO<Track> trackDAO;  //serve per operazioni CRUD sulle tracce
+    private final DAO<Playlist> playlistDAO;
     private final SharedState sharedState;  //serve per lo stato condiviso delle tracce
 
-    public TrackService(DAO<Track> trackDAO, SharedState sharedState) {
+    public TrackService(DAO<Track> trackDAO, DAO<Playlist> playlistDAO, SharedState sharedState) {
         this.trackDAO = trackDAO;
+        this.playlistDAO = playlistDAO;
         this.sharedState = sharedState;
     }
 
@@ -23,9 +26,8 @@ public class TrackService {
         return sharedState.getALlTracks();  //compito delegato dallo stato condiviso, caricato dal Persistance Service
     }
 
-
-    public Optional<Track> getTrackById(UUID id){
-        return null;
+    public Optional<Track> searchTrackById(UUID trackId) {
+        return trackDAO.searchById(trackId);
     }
 
     public Optional<String> addTrack(String title, String author, Genre genre, String songPath, int songLength, String year){
@@ -90,16 +92,34 @@ public class TrackService {
 
     }
 
-    public Optional<String> deleteTrack(Track track){
-        return null;
+    public void deleteTrack(UUID trackId){
+
+        trackDAO.delete(trackId);   //eliminazione traccia dall'archivio
+
+        sharedState.getALlTracks().removeIf(t -> t.getId().equals(trackId));    //eliminazione visiva della traccia
+
+        for (Playlist playlist: sharedState.getALlPlaylists()) {    //scorriamo playlist, vogliamo togliere la traccia eliminata da tutte le playlist
+
+            if (playlist.containsTrack(trackId)) {
+                playlist.removeTrack(trackId);
+                playlistDAO.update(playlist);   //aggiornamento in archivio della playlist
+            }
+
+        }
+
     }
 
+    //si occupa dell'update della traccia nell'interfaccia grafica
     private void updateInState(Track track){
 
+        ObservableList<Track> tracks = sharedState.getALlTracks();
+
+        java.util.stream.IntStream.range(0, tracks.size()) //scorre gli indici
+                .filter(index -> tracks.get(index).getId().equals(track.getId())) //prende la traccia da aggiornare
+                .findFirst()    //prima occorrenza, così da non dover scorrere dopo aver trovato la traccia giusta
+                .ifPresent(index -> tracks.set(index, track));  //se c'è, allora si aggiorna
+
     }
 
-    public Optional<String> verify(Track track){
-        return null;
-    }
 
 }

@@ -1,11 +1,9 @@
 package it.diem.unisa.musicmanager.controller;
 
-//import it.diem.unisa.musicmanager.service.PlaylistService;
 import it.diem.unisa.musicmanager.service.PlaylistService;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
@@ -14,21 +12,58 @@ import java.util.Optional;
 
 /**
  * Controller della finestra modale "Crea Playlist" (addPlaylist.fxml).
- * Per ora gestisce SOLO la parte di interfaccia: legge il nome e chiude la
- * finestra. Il salvataggio (service) verra' aggiunto dopo.
+ * Legge il nome inserito e chiede al PlaylistService di creare la playlist.
+ * Il service comunica gli errori tramite Optional<String>: vuoto = successo,
+ * presente = messaggio di errore da mostrare.
  */
 public class AddPlaylistController {
 
-    // --- Campi dell'interfaccia, collegati agli fx:id presenti in addPlaylist.fxml ---
+    // --- Campi dell'interfaccia, collegati agli fx:id in addPlaylist.fxml ---
     @FXML private TextField fieldName;
     @FXML private Label lblError;
 
-    // Service condiviso per la gestione delle playlist (passato da chi apre il popup).
+    // Service per la gestione delle playlist (passato da chi apre il popup).
     private PlaylistService playlistService;
 
-
+    /**
+     * Imposta il service da usare per creare la playlist.
+     *
+     * @param playlistService il service condiviso delle playlist
+     */
     public void setPlaylistService(PlaylistService playlistService) {
         this.playlistService = playlistService;
+    }
+
+    /**
+     * Gestisce il click su "Crea": valida il nome, chiede al service di creare
+     * la playlist e chiude la finestra se l'operazione va a buon fine.
+     *
+     * @param e evento generato dal click sul pulsante "Crea"
+     */
+    @FXML
+    private void onCreate(ActionEvent e) {
+        lblError.setText("");
+
+        // Se il service non e' stato iniettato, non possiamo procedere.
+        if (playlistService == null) {
+            lblError.setText("Playlist Service not available.");
+            return;
+        }
+
+        // Leggiamo il nome inserito.
+        String name = fieldName.getText() == null ? "" : fieldName.getText().trim();
+        if (name.isEmpty()) {
+            lblError.setText("You must enter a name.");
+            return;
+        }
+
+        // Il service crea la playlist: Optional vuoto = ok, presente = errore.
+        Optional<String> error = playlistService.createPlaylist(name);
+        if (error.isPresent()) {
+            lblError.setText(error.get());
+        } else {
+            close(e);
+        }
     }
 
     /**
@@ -41,29 +76,6 @@ public class AddPlaylistController {
         close(e);
     }
 
-    @FXML
-    public void onCreate(ActionEvent actionEvent) {
-        lblError.setText("");
-
-        if (playlistService == null) {
-            lblError.setText("Playlist Service not available.");
-
-        }
-        //mi prendo il testo inserito
-        String name = fieldName.getText() == null ? "" : fieldName.getText().trim();
-
-        if (name.isEmpty()) {
-            lblError.setText("You must enter a name.");
-        }
-
-        Optional<String> optional = playlistService.createPlaylist(name); //chiamo il service per crare la playlist
-        if(optional.isPresent()){
-            lblError.setText(optional.get());
-        }else{
-            close(actionEvent);
-        }
-    }
-
     /**
      * Chiude la finestra modale, ricavando lo Stage dal bottone che ha generato l'evento.
      *
@@ -73,7 +85,4 @@ public class AddPlaylistController {
         Stage stage = (Stage) ((Node) e.getSource()).getScene().getWindow();
         stage.close();
     }
-
-
-
 }
