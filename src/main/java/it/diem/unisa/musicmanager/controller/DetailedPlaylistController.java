@@ -2,7 +2,7 @@ package it.diem.unisa.musicmanager.controller;
 
 import it.diem.unisa.musicmanager.model.Playlist;
 import it.diem.unisa.musicmanager.model.Track;
-//import it.diem.unisa.musicmanager.service.PlaylistService;
+import it.diem.unisa.musicmanager.service.PlaylistService;
 //import it.diem.unisa.musicmanager.service.TrackService;
 import it.diem.unisa.musicmanager.service.PlaylistService;
 import javafx.event.ActionEvent;
@@ -37,7 +37,6 @@ public class DetailedPlaylistController {
     // La playlist mostrata.
     private Playlist playlist;
 
-    // Service (da collegare quando disponibili).
     // private TrackService trackService;
     private PlaylistService playlistService;
 

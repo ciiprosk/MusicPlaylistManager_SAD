@@ -1,8 +1,9 @@
 package it.diem.unisa.musicmanager.controller;
 
+import it.diem.unisa.musicmanager.exception.TrackInfoException;
 import it.diem.unisa.musicmanager.model.Genre;
 import it.diem.unisa.musicmanager.model.Track;
-//import it.diem.unisa.musicmanager.service.TrackService;
+import it.diem.unisa.musicmanager.service.TrackService;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -19,6 +20,7 @@ import javafx.util.Duration;
 import java.io.File;
 import java.time.Year;
 import java.util.Arrays;
+import java.util.Optional;
 
 /**
  * Controller della finestra modale "Crea Brano" (addSong.fxml).
@@ -45,7 +47,7 @@ public class AddSongController {
     @FXML private Button btnCrea;
 
     // Service per la gestione dei brani. Viene passato da chi apre il popup (TracksController).
-    // private TrackService trackService;
+    private TrackService trackService;
 
     // Percorso del file audio scelto dall'utente. Salviamo solo il riferimento, non il file.
     private String audioPath;
@@ -59,11 +61,12 @@ public class AddSongController {
      * prima che la finestra venga mostrata.
      *
      * @param trackService il service condiviso per la gestione dei brani
+     *                     */
 
     public void setTrackService(TrackService trackService) {
         this.trackService = trackService;
     }
-*/
+
     /**
      * Metodo chiamato automaticamente da JavaFX appena la finestra e' pronta.
      * Lo usiamo per riempire la tendina dei generi.
@@ -175,58 +178,52 @@ public class AddSongController {
      * Se qualcosa non va, mostra un messaggio e non chiude.
      *
      * @param e evento generato dal click sul pulsante "Crea"
-
+     */
     @FXML
     private void onSave(ActionEvent e) {
-        // Puliamo eventuali messaggi di errore precedenti.
+
         lblError.setText("");
 
-        // Leggiamo i campi di testo (gestendo il caso in cui siano vuoti/null).
         String titolo = fieldTitolo.getText() == null ? "" : fieldTitolo.getText().trim();
         String autore = fieldAutore.getText() == null ? "" : fieldAutore.getText().trim();
         String anno   = fieldAnno.getText() == null ? "" : fieldAnno.getText().trim();
 
-        // 1) Il titolo e' obbligatorio.
-        if (titolo.isEmpty()) {
-            lblError.setText("Il titolo è obbligatorio.");
-            return;
-        }
-        // 2) Serve un file audio valido (da cui abbiamo letto una durata > 0).
+        // UI check minimali
         if (audioPath == null || songLengthSeconds <= 0) {
             lblError.setText("Carica un file audio valido.");
             return;
         }
-        // 3) L'anno: se vuoto diventa UNKNOWN, altrimenti deve essere 4 cifre e non futuro.
-        if (anno.isEmpty()) {
-            anno = "UNKNOWN";
-        } else {
-            if (!anno.matches("\\d{4}")) {
-                lblError.setText("L'anno deve essere di 4 cifre.");
-                return;
-            }
-            if (Integer.parseInt(anno) > Year.now().getValue()) {
-                lblError.setText("L'anno non può essere nel futuro.");
-                return;
-            }
+
+        Genre genre = comboGenere.getValue();
+        if (genre == null) {
+            genre = Genre.UNKNOWN;
         }
 
-        // Tutti i controlli "lato utente" sono passati: creiamo il brano.
-        Track nuovo = new Track(titolo, autore, getGenereSelezionato(), audioPath, songLengthSeconds, anno);
-
-        // Il service applica le regole di dominio (validazione + duplicati) e salva.
-        // Se qualcosa non va, lancia un'eccezione che mostriamo all'utente.
         try {
-            trackService.addTrack(nuovo);
-        } catch (IllegalArgumentException | IllegalStateException ex) {
-            lblError.setText(ex.getMessage());
-            return;
-        }
 
-        // Salvataggio riuscito: chiudiamo la finestra.
-        // La lista in Tracks si aggiorna da sola (ObservableList dello SharedState).
-        chiudi(e);
+            // Validazione lasciata al costruttore
+            Optional<String> result = trackService.addTrack(
+                    titolo,
+                    autore,
+                    genre,
+                    audioPath,
+                    songLengthSeconds,
+                    anno
+            );
+
+            if (result.isPresent()) {
+                lblError.setText(result.get());
+                return;
+            }
+
+            close(e);
+
+        } catch (TrackInfoException ex) {
+            // errori del MODEL (Track)
+            lblError.setText(ex.getMessage());
+        }
     }
-*/
+
     /**
      * Gestisce il click su "Annulla": chiude la finestra senza salvare nulla.
      *
