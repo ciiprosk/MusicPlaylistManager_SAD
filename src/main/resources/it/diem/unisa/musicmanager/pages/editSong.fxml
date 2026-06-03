@@ -17,7 +17,7 @@
 
         <!-- ===== TITOLO ===== -->
         <HBox alignment="CENTER_LEFT" spacing="12.0">
-            <Label styleClass="menu-title" text="Modifica Brano" textFill="#a0a0a0" />
+            <Label styleClass="menu-title" text="Modify Track" textFill="#a0a0a0" />
         </HBox>
 
         <!-- ===== FILE AUDIO (sola lettura, solo informativo) ===== -->
@@ -30,25 +30,25 @@
         <VBox spacing="14.0">
 
             <HBox alignment="CENTER_LEFT" spacing="15.0">
-                <Label minWidth="160.0" styleClass="sottotitolo" text="Titolo" textFill="#cccccc" />
+                <Label minWidth="160.0" styleClass="sottotitolo" text="Title" textFill="#cccccc" />
                 <TextField fx:id="fieldTitle" styleClass="form-field" HBox.hgrow="ALWAYS" />
             </HBox>
 
             <HBox alignment="CENTER_LEFT" spacing="15.0">
-                <Label minWidth="160.0" styleClass="sottotitolo" text="Autore" textFill="#cccccc" />
+                <Label minWidth="160.0" styleClass="sottotitolo" text="Author" textFill="#cccccc" />
                 <TextField fx:id="fieldAuthor" styleClass="form-field" HBox.hgrow="ALWAYS" />
             </HBox>
 
             <HBox alignment="CENTER_LEFT" spacing="15.0">
-                <Label minWidth="160.0" styleClass="sottotitolo" text="Genere" textFill="#cccccc" />
+                <Label minWidth="160.0" styleClass="sottotitolo" text="Genre" textFill="#cccccc" />
                 <ComboBox fx:id="comboGenre" maxWidth="Infinity" styleClass="form-field" HBox.hgrow="ALWAYS" />
             </HBox>
 
             <!-- Anno (modificabile) + Durata (sola lettura) sulla stessa riga -->
             <HBox alignment="CENTER_LEFT" spacing="15.0">
-                <Label minWidth="160.0" styleClass="sottotitolo" text="Anno di pubblicazione" textFill="#cccccc" />
+                <Label minWidth="160.0" styleClass="sottotitolo" text="Release Year" textFill="#cccccc" />
                 <TextField fx:id="fieldYear" maxWidth="90.0" promptText="aaaa" styleClass="form-field" />
-                <Label styleClass="sottotitolo" text="Durata" textFill="#cccccc">
+                <Label styleClass="sottotitolo" text="Track Duration" textFill="#cccccc">
                     <HBox.margin>
                         <Insets left="20.0" />
                     </HBox.margin>
@@ -61,8 +61,8 @@
         <!-- ===== ERRORE + AZIONI (Annulla / Salva) ===== -->
         <HBox alignment="CENTER_RIGHT" spacing="12.0">
             <Label fx:id="lblError" maxWidth="Infinity" textFill="#ff5555" HBox.hgrow="ALWAYS" />
-            <Button onAction="#onCancel" styleClass="button-grigio" text="Annulla" textFill="WHITE" />
-            <Button fx:id="btnSave"  styleClass="button-verde" text="Salva" textFill="WHITE" onAction="#onSave"/>
+            <Button onAction="#onCancel" styleClass="button-grigio" text="Cancel" textFill="WHITE" />
+            <Button fx:id="btnSave"  styleClass="button-verde" text="Save" textFill="WHITE" onAction="#onSave"/>
         </HBox>
 
     </children>

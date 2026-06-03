@@ -21,7 +21,7 @@
 
         <!-- ===== PULSANTE CARICA TRACCIA (azzurro) ===== -->
         <HBox alignment="CENTER_LEFT" spacing="15.0">
-            <Button fx:id="btnCarica" onAction="#onLoadAudio" styleClass="button-blu" text="Carica traccia Audio" textFill="WHITE" />
+            <Button fx:id="btnCarica" onAction="#onLoadAudio" styleClass="button-blu" text="Upload Audio Track" textFill="WHITE" />
             <Region HBox.hgrow="ALWAYS" />
             <Label fx:id="lblFilePath" managed="false" text="" textFill="WHITE" visible="false" />
             <Region HBox.hgrow="ALWAYS" />
@@ -31,25 +31,25 @@
         <VBox spacing="14.0">
 
             <HBox alignment="CENTER_LEFT" spacing="15.0">
-                <Label minWidth="160.0" styleClass="sottotitolo" text="Titolo" textFill="#cccccc" />
+                <Label minWidth="160.0" styleClass="sottotitolo" text="Title" textFill="#cccccc" />
                 <TextField fx:id="fieldTitolo" styleClass="form-field" HBox.hgrow="ALWAYS" />
             </HBox>
 
             <HBox alignment="CENTER_LEFT" spacing="15.0">
-                <Label minWidth="160.0" styleClass="sottotitolo" text="Autore" textFill="#cccccc" />
+                <Label minWidth="160.0" styleClass="sottotitolo" text="Author" textFill="#cccccc" />
                 <TextField fx:id="fieldAutore" styleClass="form-field" HBox.hgrow="ALWAYS" />
             </HBox>
 
             <HBox alignment="CENTER_LEFT" spacing="15.0">
-                <Label minWidth="160.0" styleClass="sottotitolo" text="Genere" textFill="#cccccc" />
+                <Label minWidth="160.0" styleClass="sottotitolo" text="Genre" textFill="#cccccc" />
                 <ComboBox fx:id="comboGenere" maxWidth="Infinity" styleClass="form-field" HBox.hgrow="ALWAYS" />
             </HBox>
 
             <!-- Anno + Durata sulla stessa riga -->
             <HBox alignment="CENTER_LEFT" spacing="15.0">
-                <Label minWidth="160.0" styleClass="sottotitolo" text="Anno di pubblicazione" textFill="#cccccc" />
+                <Label minWidth="160.0" styleClass="sottotitolo" text="Release Year" textFill="#cccccc" />
                 <TextField fx:id="fieldAnno" maxWidth="90.0" promptText="aaaa" styleClass="form-field" />
-                <Label styleClass="sottotitolo" text="Durata" textFill="#cccccc">
+                <Label styleClass="sottotitolo" text="Track Duration" textFill="#cccccc">
                     <HBox.margin>
                         <Insets left="20.0" />
                     </HBox.margin>
@@ -65,15 +65,15 @@
                 <Insets left="60.0" />
             </padding>
             <ToggleButton mnemonicParsing="false" styleClass="tag-toggle" text="Explicit" textFill="WHITE" />
-            <ToggleButton mnemonicParsing="false" styleClass="tag-toggle" text="Preferito" textFill="WHITE" />
-            <ToggleButton mnemonicParsing="false" styleClass="tag-toggle" text="Nuova uscita" textFill="WHITE" />
+            <ToggleButton mnemonicParsing="false" styleClass="tag-toggle" text="Favorite" textFill="WHITE" />
+            <ToggleButton mnemonicParsing="false" styleClass="tag-toggle" text="New Release" textFill="WHITE" />
         </HBox>
 
         <!-- ===== ERRORE + AZIONI (Annulla / Crea) ===== -->
         <HBox alignment="CENTER_RIGHT" spacing="12.0">
             <Label fx:id="lblError" maxWidth="Infinity" textFill="#ff5555" HBox.hgrow="ALWAYS" />
-            <Button onAction="#onCancel" styleClass="button-grigio" text="Annulla" textFill="WHITE" />
-            <Button fx:id="btnCrea" onAction="#onSave" styleClass="button-verde" text="Crea" textFill="WHITE"  />
+            <Button onAction="#onCancel" styleClass="button-grigio" text="Cancel" textFill="WHITE" />
+            <Button fx:id="btnCrea" onAction="#onSave" styleClass="button-verde" text="Create" textFill="WHITE"  />
         </HBox>
 
     </children>

@@ -18,6 +18,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.scene.control.Label;
 
 import java.io.IOException;
 
@@ -57,14 +58,17 @@ public class TracksController {
     public void loadTracks() throws IOException {
         trackList.getChildren().clear();
 
-        for(Track track : trackService.getAllTracks()){
-
-
+        for (Track track : trackService.getAllTracks()) {
             trackList.getChildren().add(createTrackRow(track));
         }
 
+        // Archivio vuoto: invitiamo l'utente ad aggiungere un brano.
+        if (trackList.getChildren().isEmpty()) {
+            Label emptyLabel = new Label("Your library is empty. Add a track!");
+            emptyLabel.setStyle("-fx-text-fill: white; -fx-font-size: 16px;");  // bianco e leggermente piu' grande
+            trackList.getChildren().add(emptyLabel);
+        }
     }
-
     private Node createTrackRow(Track track) throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/it/diem/unisa/musicmanager/components/trackRow.fxml"));
 
