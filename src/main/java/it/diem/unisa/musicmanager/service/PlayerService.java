@@ -4,14 +4,14 @@ import it.diem.unisa.musicmanager.model.Track;
 import javafx.application.Platform;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
-
+import it.diem.unisa.musicmanager.state.SharedState;
 import java.io.File;
 
 /**
  * Service per la riproduzione dei brani.
- * Incapsula il MediaPlayer di JavaFX e aggiorna lo SharedState
- * (brano corrente, stato play/pausa, avanzamento), cosi' la player bar e le
- * altre viste si aggiornano da sole tramite le proprieta' osservabili (Observer).
+ * Incapsula il MediaPlayer di JavaFX e aggiorna lo SharedState (brano corrente,
+ * stato play/pausa, avanzamento) accedendo alle sue Property. Cosi' la player
+ * bar e le altre viste si aggiornano da sole (pattern Observer).
  */
 public class PlayerService {
 
@@ -42,13 +42,13 @@ public class PlayerService {
             return;
         }
 
-        // Se e' lo stesso brano gia' caricato, basta riprendere.
+        // Stesso brano gia' caricato: basta riprendere.
         if (track.equals(loadedTrack) && mediaPlayer != null) {
             resume();
             return;
         }
 
-        // Nuovo brano: fermiamo il precedente e ne carichiamo uno nuovo.
+        // Nuovo brano: fermiamo il precedente e carichiamo questo.
         stopCurrent();
 
         try {
@@ -57,32 +57,31 @@ public class PlayerService {
             mediaPlayer = new MediaPlayer(media);
             loadedTrack = track;
 
-            sharedState.setCurrentTrack(track);
+            // Brano corrente -> SharedState (la player bar si aggiorna da sola).
+            sharedState.getCurrentTrack().set(track);
 
             // Avanzamento (0..1) -> SharedState, sul thread UI.
-            //mentre il brano suona, il tempo corrente avanza, e a ogni scatto calcola la percentuale di avanzamento
-            // (tempo trascorso ÷ durata totale, un numero tra 0 e 1) e la scrive nello SharedState.
             mediaPlayer.currentTimeProperty().addListener((obs, oldV, newV) -> {
                 double total = media.getDuration().toSeconds();
                 if (total > 0) {
                     double p = newV.toSeconds() / total;
-                    Platform.runLater(() -> sharedState.setProgress(p));
+                    Platform.runLater(() -> sharedState.getProgress().set(p));
                 }
             });
 
-            // Fine brano: azzeriamo stato (non stiamo riproducendo niente) e avanzamento settato a 0.
+            // Fine brano: azzeriamo stato e avanzamento.
             mediaPlayer.setOnEndOfMedia(() -> {
-                sharedState.setPlaying(false);
-                sharedState.setProgress(0.0);
+                sharedState.getIsPlaying().set(false);
+                sharedState.getProgress().set(0.0);
             });
 
             mediaPlayer.play();
-            sharedState.setPlaying(true);
+            sharedState.getIsPlaying().set(true);
 
         } catch (Exception e) {
-            // Percorso non valido o file non riproducibile: non blocchiamo l'app.
+            // File non valido o non riproducibile: non blocchiamo l'app.
             e.printStackTrace();
-            sharedState.setPlaying(false);
+            sharedState.getIsPlaying().set(false);
         }
     }
 
@@ -92,7 +91,7 @@ public class PlayerService {
     public void pause() {
         if (mediaPlayer != null) {
             mediaPlayer.pause();
-            sharedState.setPlaying(false);
+            sharedState.getIsPlaying().set(false);
         }
     }
 
@@ -102,12 +101,12 @@ public class PlayerService {
     public void resume() {
         if (mediaPlayer != null) {
             mediaPlayer.play();
-            sharedState.setPlaying(true);
+            sharedState.getIsPlaying().set(true);
         }
     }
 
     /**
-     * Ferma e libera il player corrente (se presente). Non possiamo riprodurre 2 brani insieme
+     * Ferma e libera il player corrente (se presente).
      */
     private void stopCurrent() {
         if (mediaPlayer != null) {
@@ -116,5 +115,6 @@ public class PlayerService {
             mediaPlayer = null;
         }
     }
+
     // TODO: next() - DA FARE DOPO (richiede una coda di riproduzione)
 }
