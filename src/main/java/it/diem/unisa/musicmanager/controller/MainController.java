@@ -13,6 +13,7 @@ public class MainController {
 
     @FXML private PlaylistController playlistsPageController;
     @FXML private TracksController tracksPageController;
+    @FXML private PlayerBarController playerController;
 
 
     @FXML
@@ -54,4 +55,8 @@ public class MainController {
     {
         return tracksPageController;
     }
+
+
+
+    public PlayerBarController getPlayerBarController() { return playerController;}
 }

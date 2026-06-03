@@ -49,6 +49,9 @@ public class MusicPlaylistManager extends Application {
         controller.getTracksPageController().setTrackService(trackService);
         controller.getTracksPageController().loadTracks();
 
+        controller.getPlayerBarController().setPlayerService(playerService);
+
+
         stage.setMinWidth(900);
         stage.setMinHeight(650);
 
