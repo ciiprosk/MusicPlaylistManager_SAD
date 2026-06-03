@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox spacing="15.0" styleClass="sfondo-principale" stylesheets="@../../css/style.css"
+      xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="it.diem.unisa.musicmanager.controller.AddTrackPlaylisController">
+
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+    </padding>
+
+    <HBox alignment="CENTER_LEFT">
+        <Label styleClass="sottotitolo" text="Seleziona i brani da aggiungere" textFill="WHITE" />
+    </HBox>
+
+    <ScrollPane fitToWidth="true" styleClass="scroll-trasparente" VBox.vgrow="ALWAYS">
+        <content>
+            <VBox fx:id="trackList" spacing="5.0" />
+        </content>
+    </ScrollPane>
+
+    <HBox alignment="CENTER_RIGHT" spacing="10.0">
+        <Region HBox.hgrow="ALWAYS" />
+        <Button text="Cancel" styleClass="btn-secondary" />
+        <Button text="Save" styleClass="btn-primario" onAction="#onSave" />
+    </HBox>
+
+</VBox>
