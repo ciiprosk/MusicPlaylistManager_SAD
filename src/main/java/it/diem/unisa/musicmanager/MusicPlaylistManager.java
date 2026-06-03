@@ -30,7 +30,7 @@ public class MusicPlaylistManager extends Application {
         PersistenceService persistenceService = new PersistenceService(trackDAO, playlistDAO, sharedState);
         persistenceService.load();
         PlaylistService playlistService = new PlaylistService(playlistDAO, sharedState);
-        TrackService trackService = new TrackService(trackDAO, playlistDAO, sharedState);
+        TrackService trackService = new TrackService(trackDAO, sharedState);
 //        PlayerService playerService = new PlayerService(sharedState);
 
         FXMLLoader fxmlLoader = new FXMLLoader(MusicPlaylistManager.class.getResource("MusicPlaylistManagerGUI.fxml"));
