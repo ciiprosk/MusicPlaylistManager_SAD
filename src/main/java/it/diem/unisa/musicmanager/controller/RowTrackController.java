@@ -104,9 +104,12 @@ public class RowTrackController {
 
     @FXML
     public void handleModify(ActionEvent actionEvent) throws IOException {
-        FXMLLoader loader = WindowUtil.openWindow("/it/diem/unisa/resources//musicmanager/pages/editSong.fxml", "", Modality.WINDOW_MODAL);
-        AddSongController controller = loader.getController();
-        //creo i set dei service nei controller
+        FXMLLoader loader = WindowUtil.openWindow(
+                "/it/diem/unisa/musicmanager/pages/editSong.fxml",
+                track.getTitle(), Modality.WINDOW_MODAL);
+        EditSongController controller = loader.getController();
+        controller.setTrackService(trackService);
+        controller.setTrack(track);
     }
     @FXML
     public void handlePlay(ActionEvent actionEvent) {
@@ -154,14 +157,18 @@ public class RowTrackController {
 
     }
 
-    private void openDetail()  {
+    /** Apre la finestra di dettaglio passandole la traccia. */
+    private void openDetail() {
         try {
-            FXMLLoader loader = WindowUtil.openWindow("/it/diem/unisa/musicmanager/pages/detailSong.fxml", track.getTitle(), Modality.WINDOW_MODAL);
+            FXMLLoader loader = WindowUtil.openWindow(
+                    "/it/diem/unisa/musicmanager/pages/detailSong.fxml",
+                    track.getTitle(), Modality.WINDOW_MODAL);
             DetailSongController controller = loader.getController();
-        }catch(IOException e){
+            controller.setTrack(track);
+            controller.setTrackService(trackService);
+        } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
     //metodo per evidenziare qual è la traccia in ascolto

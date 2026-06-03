@@ -59,11 +59,11 @@
         <HBox alignment="CENTER_RIGHT" spacing="12.0">
             <Region HBox.hgrow="ALWAYS" />
 
-            <Button styleClass="button-grigio" text="Chiudi" textFill="WHITE" /> <!-- =====onAction="#onClose" ===== -->
+            <Button styleClass="button-grigio" text="Chiudi" textFill="WHITE"  onAction="#onClose"/>
 
-            <Button fx:id="btnEdit"  styleClass="button-verde" text="Modifica" textFill="WHITE" /> <!-- ===== onAction="#onEdit" ===== -->
+            <Button fx:id="btnEdit"  styleClass="button-verde" text="Modifica" textFill="WHITE" onAction="#handleEdit" />
 
-            <Button fx:id="btnDelete" text="Elimina" textFill="WHITE"> <!-- ===== onAction=#onDelete ===== -->
+            <Button fx:id="btnDelete" text="Elimina" textFill="WHITE" onAction="#handleDelete">
             <styleClass>
                <String fx:value="button-rosso" />
                <String fx:value="button-grigio" />

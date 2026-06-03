@@ -121,10 +121,25 @@ public class PlayerService {
         }
     }
 
+    /**
+     * Salta a una posizione del brano corrente.
+     * Riceve una frazione 0..1 (la posizione dello slider) e la traduce
+     * nel tempo corrispondente del brano, poi sposta lì la riproduzione.
+     *
+     * @param fraction posizione 0..1 (0 = inizio, 1 = fine del brano)
+     */
     public void seek(double fraction) {
+        // Nessun brano caricato: niente da fare.
         if (mediaPlayer != null) {
+            // Durata totale del brano (potrebbe non essere ancora nota).
             javafx.util.Duration total = mediaPlayer.getTotalDuration();
+
+            // Salta solo se la durata e' davvero disponibile:
+            // se il media non e' ancora pronto, total e' UNKNOWN e il calcolo
+            // darebbe un tempo senza senso.
             if (total != null && !total.isUnknown()) {
+                // Posizione = durata totale * frazione.
+                // Es. fraction = 0.5 su un brano di 3:00 -> salta a 1:30.
                 mediaPlayer.seek(total.multiply(fraction));
             }
         }
