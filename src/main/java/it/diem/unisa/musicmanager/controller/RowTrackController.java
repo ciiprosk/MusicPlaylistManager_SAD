@@ -155,6 +155,7 @@ public class RowTrackController {
             FXMLLoader loader = WindowUtil.openWindow("/it/diem/unisa/musicmanager/pages/editSong.fxml", "Modify Track", Modality.WINDOW_MODAL);
             EditSongController controller = loader.getController();
             controller.setTrackService(trackService);
+            controller.setTrack(track);
         } catch (IOException e) {
             e.printStackTrace();
         }
