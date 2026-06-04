@@ -27,7 +27,7 @@
     <HBox alignment="CENTER_LEFT" spacing="10.0">
         <Button styleClass="btn-secondary" text="SPRINT2" />
         <Button onAction="#onModify" styleClass="btn-secondary" text="Modify Playlist" />
-        <Button onAction="#onAddTrack" styleClass="btn-primario" text="Add Track" />
+        <Button onAction="#onAddTrack" styleClass="btn-primario" text="Add/Remove Track" />
         <Button onAction="#onDelete" styleClass="btn-danger" text="Delete Playlist" />
     </HBox>
 
