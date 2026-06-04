@@ -3,13 +3,16 @@ package it.diem.unisa.musicmanager.controller;
 import it.diem.unisa.musicmanager.model.Track;
 import it.diem.unisa.musicmanager.service.PlayerService;
 import it.diem.unisa.musicmanager.service.TrackService;
+import it.diem.unisa.musicmanager.util.AlertUtil;
 import it.diem.unisa.musicmanager.util.WindowUtil;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Side;
 import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
+
 
 import java.io.IOException;
 
@@ -32,6 +35,7 @@ public class RowTrackController {
     @FXML private Button btnPlay;
 
     @FXML private CheckBox checkkSelect;
+    @FXML private HBox rootContainer;
 
     private boolean isListenerAttached = false;
     private Runnable onDeleteAction;
@@ -70,7 +74,10 @@ public class RowTrackController {
 
         if (!isListenerAttached) {
             // Reagisce ai cambiamenti del servizio per aggiornare l'icona
-            playerService.currentTrackProperty().addListener((o, ov, nv) -> updateButtonState());
+            playerService.currentTrackProperty().addListener((o, ov, nv) ->{
+                updateCurrentTrackStyke();
+                updateButtonState();
+            });
             playerService.isPlayingProperty().addListener((o, ov, nv) -> updateButtonState());
             isListenerAttached = true;
         }
@@ -106,7 +113,15 @@ public class RowTrackController {
 
     @FXML
     public void handleDelete(ActionEvent actionEvent) {
-        deleteTrackAction();
+        if (trackService != null && track != null) {
+
+            boolean isConfirmed = AlertUtil.showConfirmation("Confirm Delete", "Are you sure you want to delete this track?");
+
+            if (isConfirmed && onDeleteAction != null) {
+                onDeleteAction.run();
+            }
+        }
+
     }
 
     @FXML
@@ -121,7 +136,7 @@ public class RowTrackController {
         modifyItem.setOnAction(e -> openEditTrack());
 
         MenuItem deleteItem = new MenuItem("Delete Track");
-        deleteItem.setOnAction(e -> deleteTrackAction());
+        deleteItem.setOnAction(e -> handleDelete(null));
 
         menu.getItems().addAll(detailItem, modifyItem, deleteItem);
         menu.show(buttonMenu, Side.BOTTOM, 0, 0);
@@ -156,6 +171,17 @@ public class RowTrackController {
     }
 
     public void setOnDeleteAction(Runnable onDeleteAction) {
+        //AlertUtil.showConfirmation("Confirm Delete", "Are you sure you want to delete this track?");
         this.onDeleteAction = onDeleteAction;
     }
+
+    private  void updateCurrentTrackStyke(){
+        //reset della traccai corrente
+        rootContainer.getStyleClass().remove("brano-row-playing");
+
+        if(track != null && track.equals(playerService.currentTrackProperty().get())){
+            rootContainer.getStyleClass().add("brano-row-playing");
+        }
+    }
+
 }
