@@ -1,5 +1,12 @@
 package it.diem.unisa.musicmanager.controller;
 
+import it.diem.unisa.musicmanager.model.Track;
+import it.diem.unisa.musicmanager.service.TrackService;
+import javafx.fxml.FXML;
+import javafx.scene.control.Label;
+import javafx.scene.layout.VBox;
+
+import java.util.List;
 /**
  * Controller responsible for managing the behavior of the Home view.
  *
@@ -14,11 +21,51 @@ package it.diem.unisa.musicmanager.controller;
  * the Home section, enabling dynamic updates and handling user interactions.
  */
 public class HomeController {
+    @FXML
+    private VBox topTracksContainer;
+
+    private TrackService trackService;
+
+    public void setTrackService(TrackService trackService) {
+        this.trackService = trackService;
+        loadTopTracks();
+    }
+
+    public void loadTopTracks() {
+        if (trackService == null || topTracksContainer == null) {
+            return;
+        }
+
+        topTracksContainer.getChildren().clear();
+
+        List<Track> topTracks = trackService.getTop5MostPlayedTracks();
+
+        if (topTracks.isEmpty()) {
+            Label emptyLabel = new Label("Nessuna traccia ascoltata.");
+            emptyLabel.setStyle("-fx-text-fill: #cccccc;");
+            topTracksContainer.getChildren().add(emptyLabel);
+            return;
+        }
+
+        for (Track track : topTracks) {
+            Label label = new Label(
+                    track.getTitle()
+                            + " - "
+                            + track.getAuthor()
+                            + " | Ascolti: "
+                            + track.getPlayCount()
+            );
+
+            label.setStyle("-fx-text-fill: white; -fx-font-size: 14px;");
+            topTracksContainer.getChildren().add(label);
+        }
+    }
     // è semplicissimo caricare sia le card che la row dei brani, metto il codice di esempio:
     /*
     // Dentro TracksController.java, dove avete una VBox o una griglia per ospitare le tracce
 @FXML
 private VBox tracksContainer;
+
 
 public void loadTracks(ObservableList<Track> allTracks) {
     tracksContainer.getChildren().clear(); // Pulisce la lista visiva

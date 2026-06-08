@@ -24,6 +24,10 @@
         <VBox fx:id="recentTracksContainer" spacing="10.0">
         </VBox>
 
+        <Label styleClass="sottotitolo" text="Most Played Tracks" textFill="#cccccc" />
+        <VBox fx:id="topTracksContainer" spacing="10.0">
+        </VBox>
+
         <Label styleClass="sottotitolo" text="Playlists" textFill="#cccccc" />
         <VBox fx:id="recentPlaylistsContainer" spacing="10.0">
         </VBox>
