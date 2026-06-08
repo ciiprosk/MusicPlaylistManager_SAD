@@ -64,20 +64,11 @@ public class PlaylistController {
     @FXML
     private void handleAdd(ActionEvent actionEvent) {
         try {
-            FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource("/it/diem/unisa/musicmanager/pages/addPlaylist.fxml"));
-            Parent root = loader.load();
+            FXMLLoader loader = WindowUtil.openWindow("/it/diem/unisa/musicmanager/pages/addPlaylist.fxml", "Add Playlist", Modality.APPLICATION_MODAL);
 
             // gli passiamo il service qui
             AddPlaylistController controller = loader.getController();
             controller.setPlaylistService(playlistService);
-
-            Stage stage = new Stage();
-            stage.setTitle("Add Playlist");
-            stage.initModality(Modality.APPLICATION_MODAL);
-            stage.setScene(new Scene(root));
-            stage.showAndWait();
-
         } catch (Exception e) {
             e.printStackTrace();
         }
