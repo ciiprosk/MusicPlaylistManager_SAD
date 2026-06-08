@@ -15,7 +15,6 @@
         <Insets bottom="25.0" left="30.0" right="30.0" top="20.0" />
     </padding>
 
-    <!-- Intestazione: titolo a sinistra, bottone Genera a destra -->
     <HBox alignment="CENTER_LEFT" spacing="12.0">
         <Label styleClass="menu-title" text="Genera Playlist" textFill="WHITE" />
         <Region HBox.hgrow="ALWAYS" />
@@ -23,22 +22,18 @@
                 styleClass="button-verde" text="Genera Playlist" textFill="WHITE" />
     </HBox>
 
-    <!-- Le tre colonne di filtri -->
     <HBox spacing="40.0">
 
-        <!-- Colonna ANNO -->
         <VBox spacing="10.0">
             <Label styleClass="sottotitolo" text="Anno Pubblicazione" textFill="#cccccc" />
             <VBox fx:id="yearBox" spacing="8.0" />
         </VBox>
 
-        <!-- Colonna GENERE -->
         <VBox spacing="10.0">
             <Label styleClass="sottotitolo" text="Genere" textFill="#cccccc" />
             <VBox fx:id="genreBox" spacing="8.0" />
         </VBox>
 
-        <!-- Colonna TAG -->
         <VBox spacing="10.0">
             <Label styleClass="sottotitolo" text="Tag" textFill="#cccccc" />
             <VBox fx:id="tagBox" spacing="8.0" />

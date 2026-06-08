@@ -7,9 +7,6 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<!-- Contenuto della finestra modale "Crea Playlist" (aperta come Stage separato).
-     L'utente inserisce solo il nome. "Annulla" chiude senza salvare. -->
-
 <VBox spacing="18.0" styleClass="sfondo-principale" stylesheets="@../../css/style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.diem.unisa.musicmanager.controller.AddPlaylistController">
 
     <padding>
@@ -18,18 +15,15 @@
 
     <children>
 
-        <!-- ===== TITOLO ===== -->
         <HBox alignment="CENTER_LEFT" spacing="12.0">
             <Label styleClass="menu-title" text="Create Playlist" textFill="#a0a0a0" />
         </HBox>
 
-        <!-- ===== NOME (unico campo) ===== -->
         <HBox alignment="CENTER_LEFT" spacing="15.0">
             <Label minWidth="160.0" styleClass="sottotitolo" text="Name" textFill="#cccccc" />
             <TextField fx:id="fieldName" styleClass="form-field" HBox.hgrow="ALWAYS" />
         </HBox>
 
-        <!-- ===== ERRORE + AZIONI (Annulla / Crea) ===== -->
         <HBox alignment="CENTER_RIGHT" spacing="12.0">
             <Label fx:id="lblError" maxWidth="Infinity" textFill="#ff5555" HBox.hgrow="ALWAYS" />
             <Button fx:id="buttonCancel" onAction="#onCancel" styleClass="button-grigio" text="Cancel" textFill="WHITE" />

@@ -14,19 +14,15 @@
         <Insets bottom="0.0" left="0.0" right="0.0" top="0.0" />
     </padding>
 
-    <!-- Cover area -->
     <StackPane prefHeight="140.0" prefWidth="140.0">
         <Rectangle arcHeight="8.0" arcWidth="8.0" fill="#333333" height="140.0" width="140.0" />
         <Label fx:id="lblPlaylistIcon" styleClass="playlist-icon" text="🎵" />
     </StackPane>
 
-    <!-- Nome playlist -->
     <Label fx:id="labelName" styleClass="playlist-nome" text="Name" textAlignment="CENTER" wrapText="true" />
 
-    <!-- Numero tracce -->
     <Label fx:id="labelTracks" styleClass="playlist-tracce" text="0 tracks" />
 
-    <!-- Bottoni azioni -->
     <HBox alignment="CENTER" spacing="8.0" styleClass="playlist-actions">
         <Button fx:id="btnPlay" onAction="#handlePlay" styleClass="btn-playlist-play" text="▶" />
         <Button fx:id="btnModify" onAction="#handleModify" styleClass="btn-playlist-menu" text="✎" />

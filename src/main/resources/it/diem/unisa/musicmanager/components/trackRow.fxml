@@ -7,9 +7,6 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<!-- Una singola riga della lista dei brani.
-     Testo a sinistra, durata e pulsanti (Play / Modifica / Elimina) a destra. -->
-
 <?import javafx.scene.control.CheckBox?>
 <HBox fx:id="rootContainer" alignment="CENTER_LEFT" maxWidth="Infinity" minHeight="56.0" prefHeight="56.0" spacing="12.0" styleClass="brano-row" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.diem.unisa.musicmanager.controller.RowTrackController">
    <padding>
@@ -18,22 +15,18 @@
 
    <children>
       <CheckBox fx:id="checkkSelect" visible="false" managed="false" />
-      <!-- Titolo + autore impilati -->
+      
       <VBox spacing="2.0">
          <Label fx:id="lblTitle" styleClass="brano-titolo" text="Title" />
          <Label fx:id="lblAuthor" styleClass="brano-artista" text="Author" />
       </VBox>
 
-      <!-- Spazio elastico che spinge il resto a destra -->
       <Region HBox.hgrow="ALWAYS" />
 
-      <!-- Ascolti -->
       <Label fx:id="lblPlayCount" styleClass="brano-durata" text="0 Plays" />
 
-      <!-- Durata -->
       <Label fx:id="lblDuration" styleClass="brano-durata" text="0:00" />
 
-      <!-- Azioni sulla riga -->
       <Button fx:id="btnPlay" mnemonicParsing="false" onAction="#handlePlay" styleClass="btn-azioni" text="▶" />
       <Button fx:id="btnModify" mnemonicParsing="false" onAction="#handleModify" styleClass="btn-azioni" text="✎" />
       <Button fx:id="buttonMenu" mnemonicParsing="false" onAction="#handleMenu" styleClass="btn-azioni" text="..." />

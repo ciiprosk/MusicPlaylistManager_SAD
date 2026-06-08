@@ -19,8 +19,6 @@
             </font>
         </Label>
 
-
-
         <Label styleClass="sottotitolo" text="Most Played Tracks" textFill="#cccccc" />
         <VBox fx:id="topTracksContainer" spacing="10.0">
         </VBox>
