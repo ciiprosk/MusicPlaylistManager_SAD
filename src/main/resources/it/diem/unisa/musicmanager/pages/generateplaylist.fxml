@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox spacing="20.0" styleClass="sfondo-principale" stylesheets="@../../css/style.css"
+<VBox spacing="20.0" prefWidth="700" prefHeight="500" styleClass="sfondo-principale" stylesheets="@../../css/style.css"
       xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="it.diem.unisa.musicmanager.controller.GeneratePlaylistController">
 
@@ -19,7 +19,7 @@
         <Label styleClass="menu-title" text="Genera Playlist" textFill="WHITE" />
         <Region HBox.hgrow="ALWAYS" />
         <Button fx:id="btnGenerate"
-                styleClass="button-verde" text="Genera Playlist" textFill="WHITE" />
+                styleClass="button-verde" text="Genera Playlist" textFill="WHITE" onAction="#onGenerate" />
     </HBox>
 
     <HBox spacing="40.0">

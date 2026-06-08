@@ -3,8 +3,13 @@ package it.diem.unisa.musicmanager.controller;
 import it.diem.unisa.musicmanager.model.Track;
 import it.diem.unisa.musicmanager.service.TrackService;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
+import it.diem.unisa.musicmanager.util.WindowUtil;
+import javafx.stage.Modality;
+import javafx.fxml.FXML;
+import java.io.IOException;
 
 import java.util.List;
 /**
@@ -26,6 +31,7 @@ public class HomeController {
 
     private TrackService trackService;
     private it.diem.unisa.musicmanager.service.PlayerService playerService;
+    private it.diem.unisa.musicmanager.service.PlaylistService playlistService;
 
     @FXML
     public void initialize() {
@@ -43,6 +49,10 @@ public class HomeController {
         if (this.trackService != null) {
             loadTopTracks();
         }
+    }
+
+    public void setPlaylistService(it.diem.unisa.musicmanager.service.PlaylistService playlistService) {
+        this.playlistService = playlistService;
     }
 
     public void loadTopTracks() {
@@ -81,6 +91,23 @@ public class HomeController {
             }
         }
     }
+
+    @FXML
+    private void goToGeneratePlaylist() {
+        try {
+            FXMLLoader loader = WindowUtil.openWindow(
+                    "/it/diem/unisa/musicmanager/pages/generateplaylist.fxml",
+                    "Genera playlist",
+                    Modality.APPLICATION_MODAL);
+
+            GeneratePlaylistController ctrl = loader.getController();
+            ctrl.init(trackService, playlistService);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     // è semplicissimo caricare sia le card che la row dei brani, metto il codice di esempio:
     /*
     // Dentro TracksController.java, dove avete una VBox o una griglia per ospitare le tracce

@@ -9,9 +9,10 @@ import javafx.collections.ObservableList;
 
 import it.diem.unisa.musicmanager.model.Genre;
 import it.diem.unisa.musicmanager.model.Tag;
-import it.diem.unisa.musicmanager.generator.PlaylistGenerator;
-import it.diem.unisa.musicmanager.generator.PlaylistGeneratorFactory;
+import it.diem.unisa.musicmanager.specification.Specification;
 
+
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -35,6 +36,8 @@ public class PlaylistService implements TrackObserver{
 
     private final SharedState sharedState;
 
+
+
     /**
      * Costruttore della classe PlaylistService.
      * @param playlistDAO: è l'oggetto DAO che gestisce le operazioni CRUD sulle playlist.
@@ -43,6 +46,7 @@ public class PlaylistService implements TrackObserver{
     public PlaylistService(DAO<Playlist> playlistDAO, SharedState sharedState) {
         this.playlistDAO = playlistDAO;
         this.sharedState = sharedState;
+
     }
 
     @Override
@@ -237,49 +241,34 @@ public class PlaylistService implements TrackObserver{
         return playlist.getTracksList();
     }
 
-    // --- Generazione automatica di playlist (filtro singolo, via Factory) ---
-
-    /**
-     * Genera e salva una playlist con tutte le tracce di un genere.
-     * @param genre il genere scelto
-     * @return Optional vuoto se ok, altrimenti il messaggio d'errore
-     */
-    public Optional<String> generatePlaylistByGenre(Genre genre) {
-        return saveGenerated(PlaylistGeneratorFactory.byGenre(genre));
+    // --- Generazione automatica di playlist ---
+    public Playlist generate(String name, Collection<Track> tracks, Specification<Track> criteria) {
+        Playlist playlist = new Playlist(name);
+        tracks.stream()
+                .filter(criteria::isSatisfiedBy)
+                .forEach(playlist::addTrack);
+        return playlist;
     }
 
     /**
-     * Genera e salva una playlist con tutte le tracce di un anno.
-     * @param year l'anno scelto (es. "2020")
+     * Genera la playlist e la salva, riusando lo stesso percorso delle altre.
+     * @return Optional.empty() se ok, Optional con messaggio d'errore se il nome
+     *         e' duplicato (stessa convenzione di addTrack).
      */
-    public Optional<String> generatePlaylistByYear(String year) {
-        return saveGenerated(PlaylistGeneratorFactory.byYear(year));
-    }
+    public Optional<String> generateAndSave(String name, Collection<Track> tracks, Specification<Track> criteria) {
 
-    /**
-     * Genera e salva una playlist con tutte le tracce che hanno un tag.
-     * @param tag il tag scelto
-     */
-    public Optional<String> generatePlaylistByTag(Tag tag) {
-        return saveGenerated(PlaylistGeneratorFactory.byTag(tag));
-    }
+        Playlist playlist = generate(name, tracks, criteria);   // il metodo puro di prima
 
-    /**
-     * Logica comune: esegue il generatore, controlla i duplicati e salva.
-     * Il service non conosce la classe concreta del generatore: la crea la Factory.
-     * @param generator il generatore da usare
-     * @return Optional vuoto se ok, altrimenti il messaggio d'errore
-     */
-    private Optional<String> saveGenerated(PlaylistGenerator generator) {
-        Playlist playlist = generator.generate(sharedState);
+        if (playlistDAO.isDuplicated(playlist)) {
+            return Optional.of("Error: A playlist with this name already exists!");
+        }
 
-        if (playlistDAO.isDuplicated(playlist))
-            return Optional.of("Playlist name already exists");
-
-        playlistDAO.insert(playlist);
-        sharedState.getALlPlaylists().add(playlist);
+        playlistDAO.insert(playlist);                        // persistenza su JSON
+        sharedState.getALlPlaylists().add(playlist);         // <-- VERIFICA il nome di questo getter
         return Optional.empty();
     }
+
+
 
     private Track searchTrackById(UUID trackId) {
         return sharedState.getALlTracks().stream().filter(t -> t.getId().equals(trackId)).findFirst().orElseThrow(()-> new PlaylistInfoException("Track not found"));

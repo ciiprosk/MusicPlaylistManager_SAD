@@ -1,133 +1,158 @@
 package it.diem.unisa.musicmanager.controller;
 
 import it.diem.unisa.musicmanager.model.Genre;
+import it.diem.unisa.musicmanager.model.Playlist;
 import it.diem.unisa.musicmanager.model.Tag;
 import it.diem.unisa.musicmanager.model.Track;
 import it.diem.unisa.musicmanager.service.PlaylistService;
 import it.diem.unisa.musicmanager.service.TrackService;
+import it.diem.unisa.musicmanager.specification.GenreSpecification;
+import it.diem.unisa.musicmanager.specification.Specification;
+import it.diem.unisa.musicmanager.specification.YearSpecification;
 import it.diem.unisa.musicmanager.util.AlertUtil;
+import it.diem.unisa.musicmanager.util.WindowUtil;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.VBox;
+import java.util.Optional;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.Comparator;
 
 /**
  * Controller della schermata "Genera Playlist".
- * Mostra una scelta tra anni, generi e tag disponibili. Si puo' selezionare
- * UN SOLO criterio alla volta (tutte le opzioni condividono un ToggleGroup).
- * Al click su "Genera" crea la playlist per il criterio selezionato.
+ * Popola le tre colonne con RadioButton (anni, generi, tag) ricavati dalle
+ * tracce effettivamente presenti nel catalogo. Tutte le opzioni condividono
+ * un unico ToggleGroup: si seleziona UN SOLO criterio alla volta.
  */
 public class GeneratePlaylistController {
 
-    @FXML private VBox yearBox;
-    @FXML private VBox genreBox;
-    @FXML private VBox tagBox;
+    @FXML
+    private VBox yearBox;
+    @FXML
+    private VBox genreBox;
+    @FXML
+    private VBox tagBox;
+    @FXML
+    private Button btnGenerate;
 
-    private PlaylistService playlistService;
+    private final ToggleGroup toggleGroup = new ToggleGroup();
+
     private TrackService trackService;
+    private PlaylistService playlistService;
 
-    // Un solo gruppo per tutte le opzioni: garantisce una sola selezione.
-    private final ToggleGroup group = new ToggleGroup();
-
-    public void setPlaylistService(PlaylistService playlistService) {
-        this.playlistService = playlistService;
-        tryPopulate();
-    }
-
-    public void setTrackService(TrackService trackService) {
+    // ───────────────────────────────────────────────────────────────────────
+    //  Chiamato dal controller della Home DOPO aver aperto la finestra:
+    //
+    //  FXMLLoader loader = WindowUtil.openWindow(...);
+    //  GeneratePlaylistController ctrl = loader.getController();
+    //  ctrl.init(trackService, playlistService);
+    // ───────────────────────────────────────────────────────────────────────
+    public void init(TrackService trackService, PlaylistService playlistService) {
         this.trackService = trackService;
-        tryPopulate();
-    }
-
-    private void tryPopulate() {
-        if (trackService == null) return;
+        this.playlistService = playlistService;
         populateYears();
         populateGenres();
         populateTags();
     }
 
-    /** Un radio per ogni anno presente tra le tracce. */
+    // Popola le colonne
+
     private void populateYears() {
-        yearBox.getChildren().clear();
-        Set<String> years = new TreeSet<>();
-        for (Track t : trackService.getAllTracks()) {
-            years.add(t.getYear());
-        }
-        for (String year : years) {
-            RadioButton rb = new RadioButton(year);
-            rb.setToggleGroup(group);
-            rb.setUserData(new Criterion(CriterionType.YEAR, year));
-            yearBox.getChildren().add(rb);
-        }
+        trackService.getAllTracks().stream()
+                .map(Track::getYear)
+                .filter(y -> y != null && y.matches("\\d{4}"))
+                .distinct()
+                .sorted()
+                .forEach(year -> {
+                    RadioButton rb = createRadio(year, Integer.parseInt(year));
+                    yearBox.getChildren().add(rb);
+                });
     }
 
-    /** Un radio per ogni genere presente tra le tracce. */
     private void populateGenres() {
-        genreBox.getChildren().clear();
-        Set<Genre> genres = new LinkedHashSet<>();
-        for (Track t : trackService.getAllTracks()) {
-            genres.add(t.getGenre());
-        }
-        for (Genre g : genres) {
-            RadioButton rb = new RadioButton(g.toString());
-            rb.setToggleGroup(group);
-            rb.setUserData(new Criterion(CriterionType.GENRE, g));
-            genreBox.getChildren().add(rb);
-        }
+        trackService.getAllTracks().stream()
+                .map(Track::getGenre)
+                .filter(g -> g != Genre.UNKNOWN)
+                .distinct()
+                .sorted(Comparator.comparing(Enum::name))
+                .forEach(genre -> {
+                    RadioButton rb = createRadio(genre.name(), genre);
+                    genreBox.getChildren().add(rb);
+                });
     }
 
-    /** Un radio per ogni tag esistente. */
     private void populateTags() {
-        tagBox.getChildren().clear();
+        // Popola da enum. TagSpecification funzionera' solo quando
+        // Track avra' un Set<Tag> con getTags().
         for (Tag tag : Tag.values()) {
-            RadioButton rb = new RadioButton(tag.toString());
-            rb.setToggleGroup(group);
-            rb.setUserData(new Criterion(CriterionType.TAG, tag));
+            RadioButton rb = createRadio(tag.name(), tag);
             tagBox.getChildren().add(rb);
         }
     }
 
-    /** Genera la playlist per il criterio selezionato. */
-    @FXML
-    private void handleGenerate(ActionEvent e) {
-        if (playlistService == null) return;
+    private RadioButton createRadio(String label, Object userData) {
+        RadioButton rb = new RadioButton(label);
+        rb.setToggleGroup(toggleGroup);
+        rb.setUserData(userData);
+        rb.setStyle("-fx-text-fill: white;");
+        return rb;
+    }
 
-        Toggle selected = group.getSelectedToggle();
+    // ── Genera Playlist ───────────────────────────────────────────────────
+
+    @FXML
+    private void onGenerate(ActionEvent event) {
+
+        Toggle selected = toggleGroup.getSelectedToggle();
         if (selected == null) {
-            AlertUtil.showError("Nothing selected", "Select one filter.");
+            AlertUtil.showError("Attenzione", "Seleziona un criterio prima di generare.");
             return;
         }
 
-        Criterion criterion = (Criterion) selected.getUserData();
+        Object value = selected.getUserData();
+        Specification<Track> criteria;
+        String playlistName;
 
-        // In base al tipo, chiamo il generatore giusto.
-        switch (criterion.type) {
-            case YEAR  -> playlistService.generatePlaylistByYear((String) criterion.value)
-                    .ifPresent(msg -> AlertUtil.showError("Error", msg));
-            case GENRE -> playlistService.generatePlaylistByGenre((Genre) criterion.value)
-                    .ifPresent(msg -> AlertUtil.showError("Error", msg));
-            case TAG   -> playlistService.generatePlaylistByTag((Tag) criterion.value)
-                    .ifPresent(msg -> AlertUtil.showError("Error", msg));
+        if (value instanceof Integer) {
+            int year = (Integer) value;
+            criteria = new YearSpecification(year);
+            playlistName = "Playlist " + year;
+
+        } else if (value instanceof Genre) {
+            Genre genre = (Genre) value;
+            criteria = new GenreSpecification(genre);
+            playlistName = "Playlist " + genre.name();
+
+        } else if (value instanceof Tag) {
+            // Tag tag = (Tag) value;
+            // criteria = new TagSpecification(tag);
+            // playlistName = "Playlist " + tag.name();
+            AlertUtil.showError("Non disponibile", "Generazione per tag non ancora disponibile.");
+            return;
+
+        } else {
+            return;
         }
-    }
 
-    // Tipi di criterio possibili.
-    private enum CriterionType { YEAR, GENRE, TAG }
+        Optional<String> error = playlistService.generateAndSave(
+                playlistName,
+                trackService.getAllTracks(),
+                criteria);
 
-    // Piccola struttura per ricordare cosa rappresenta ogni radio:
-    // il tipo (anno/genere/tag) e il valore vero (String, Genre o Tag).
-    private static class Criterion {
-        final CriterionType type;
-        final Object value;
-        Criterion(CriterionType type, Object value) {
-            this.type = type;
-            this.value = value;
+        if (error.isPresent()) {
+            AlertUtil.showError("Errore", error.get());
+        } else {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Playlist generata");
+            alert.setHeaderText(null);
+            alert.setContentText("Playlist \"" + playlistName + "\" creata!");
+            alert.showAndWait();
+            WindowUtil.close(btnGenerate);
         }
     }
 }
