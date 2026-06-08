@@ -48,7 +48,7 @@ public class PlaylistCardController {
     public void setPlaylist(Playlist playlist) {
         this.playlist = playlist;
         labelName.setText(playlist.getName());
-        int n = playlist.getTracks().size();
+        int n = playlist.getTracksList().size();
         labelTracks.setText(n + (n == 1 ? " Track" : " Tracks"));
     }
 

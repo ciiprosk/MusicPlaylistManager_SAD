@@ -5,6 +5,8 @@ import it.diem.unisa.musicmanager.model.Playlist;
 import it.diem.unisa.musicmanager.model.Track;
 import it.diem.unisa.musicmanager.state.SharedState;
 
+import java.util.List;
+
 public class PersistenceService {
     //tutti i service hanno questa struttura iniziale
     private final DAO<Track> trackDAO;
@@ -30,6 +32,10 @@ public class PersistenceService {
     public void load(){
         sharedState.getALlTracks().setAll(trackDAO.selectAll()); // aggiunge tutte le tracce al set di tutte le tracce
         sharedState.getALlPlaylists().setAll(playlistDAO.selectAll()); // aggiunge tutte le playlist al set di tutte le playlist
+        List<Track> allTracks= sharedState.getALlTracks();
+        for (Playlist playlist : sharedState.getALlPlaylists()) {
+            playlist.resolveTracks(allTracks);
+        }
     }
 
 

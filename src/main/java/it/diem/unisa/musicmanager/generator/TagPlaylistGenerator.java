@@ -22,7 +22,7 @@ public class TagPlaylistGenerator implements PlaylistGenerator {
         for (Track t : state.getALlTracks()) {
             // una traccia puo' avere piu' tag: la prendo se contiene questo
             //if (t.getTags() != null && t.getTags().contains(tag)) {
-              //  playlist.addTrack(t.getId());
+              //  playlist.addTrack(t);
             }
         //}
         return playlist;

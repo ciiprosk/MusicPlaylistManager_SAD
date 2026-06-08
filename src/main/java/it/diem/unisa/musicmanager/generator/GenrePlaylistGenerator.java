@@ -24,7 +24,7 @@ public class GenrePlaylistGenerator implements PlaylistGenerator{
         // Aggiungo solo le tracce di quel genere.
         for (Track t : state.getALlTracks()) {
             if (t.getGenre() == genre) {
-                playlist.addTrack(t.getId());
+                playlist.addTrack(t);
             }
         }
         return playlist;

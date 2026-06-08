@@ -479,8 +479,8 @@ class TrackServiceTest {
         Playlist playlist1 = new Playlist("Playlist 1");
         Playlist playlist2 = new Playlist("Playlist 2");
 
-        playlist1.addTrack(track.getId());
-        playlist2.addTrack(track.getId());
+        playlist1.addTrack(track);
+        playlist2.addTrack(track);
 
         sharedState.getALlPlaylists().add(playlist1);
         sharedState.getALlPlaylists().add(playlist2);
@@ -488,7 +488,10 @@ class TrackServiceTest {
         // --- FIX OBSERVER: Simuliamo che qualcuno stia ascoltando la notifica ---
         service.addObserver(deletedId -> {
             for (Playlist p : sharedState.getALlPlaylists()) {
-                p.removeTrack(deletedId);
+                p.getTracksList().stream()
+                 .filter(t -> t.getId().equals(deletedId))
+                 .findFirst()
+                 .ifPresent(p::removeTrack);
             }
         });
         // -----------------------------------------------------------------------
@@ -523,11 +526,11 @@ class TrackServiceTest {
         Playlist playlist =
                 new Playlist("Rock");
 
-        playlist.addTrack(track.getId());
+        playlist.addTrack(track);
 
         sharedState.getALlPlaylists().add(playlist);
 
-        playlist.removeTrack(track.getId());
+        playlist.removeTrack(track);
 
         assertFalse(playlist.containsTrack(track.getId()));
 

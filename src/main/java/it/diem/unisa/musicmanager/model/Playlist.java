@@ -8,48 +8,58 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Rappresenta una playlist che contiene una raccolta di tracce identificate dai UUID.
- * Permette di gestire gli attributi di una playlist (nome e tracce) e fornisce funzionalità per modificare le tracce associate e convalidare le regole di business.
- *
+ * Rappresenta una playlist che contiene una raccolta di tracce.
+ * Permette di gestire gli attributi di una playlist (nome e tracce) e fornisce funzionalità
+ * per modificare le tracce associate e convalidare le regole di business.
+ * Questa classe mantiene sia una lista di UUID per la persistenza su file (trackIDs),
+ * sia una lista di oggetti Track risolti a runtime (tracksList).
  */
 public class Playlist {
-    /**
-     * Gli attributi di una playlist sono:
-     * Il nome della playlist;
-     * Un identificatore univoco (UUID) per la playlist;
-     * Una raccolta di tracce identificate dai UUID.
-     */
+
     private String name;
     private UUID id;
-    private List<UUID> tracks;
+    
+    /** Lista degli UUID delle tracce per il salvataggio nel file JSON. */
+    private List<UUID> trackIDs;
+    
+    /** Lista in memoria degli oggetti Track. Non viene serializzata nel JSON. */
+    private transient List<Track> tracksList;
 
     /**
      * Costruttore della playlist.
-     * @param name: il nome della playlist.
-     * Viene inizializzata la raccolta di tracce vuota.
+     * @param name il nome della playlist.
      */
     public Playlist(String name) {
-        if (checkRulesName(name.trim()))  this.name = name.trim();
-        this.id= UUID.randomUUID();
-        this.tracks = new ArrayList<>();
+        if (checkRulesName(name.trim())) this.name = name.trim();
+        this.id = UUID.randomUUID();
+        this.trackIDs = new ArrayList<>();
+        this.tracksList = new ArrayList<>();
     }
 
     /**
      * Costruttore della playlist utilizzato per il recupero di una playlist dal file JSON.
-     * @param id: l'identificatore univoco della playlist.
-     * @param name: il nome della playlist.
-     * @param tracks: una lista di tracce identificate dai UUID.
+     * @param id l'identificatore univoco della playlist.
+     * @param name il nome della playlist.
+     * @param trackIDs una lista di tracce identificate dai UUID.
      */
-    public Playlist(UUID id, String name, List<UUID> tracks) {
-        if (checkRulesName(name.trim()))  this.name = name.trim();
+    public Playlist(UUID id, String name, List<UUID> trackIDs) {
+        if (checkRulesName(name.trim())) this.name = name.trim();
         this.id = id;
-        this.tracks = tracks;
+        this.trackIDs = trackIDs != null ? new ArrayList<>(trackIDs) : new ArrayList<>();
+        this.tracksList = new ArrayList<>();
     }
 
+    /**
+     * Costruttore della playlist utilizzato per creare temporaneamente una copia
+     * per operazioni come l'aggiornamento del nome.
+     * @param playlistID l'identificatore univoco della playlist.
+     * @param name il nuovo nome della playlist.
+     */
     public Playlist(UUID playlistID, String name) {
-        if (checkRulesName(name.trim()))  this.name = name.trim();
+        if (checkRulesName(name.trim())) this.name = name.trim();
         this.id = playlistID;
-        this.tracks = new ArrayList<>();
+        this.trackIDs = new ArrayList<>();
+        this.tracksList = new ArrayList<>();
     }
 
     /**
@@ -72,57 +82,115 @@ public class Playlist {
      * Setter per il nome della playlist.
      * @param name il nuovo nome della playlist.
      */
-
     public void setName(String name) {
         if(checkRulesName(name.trim())) this.name = name.trim();
     }
 
-    /**
-     * Metodo che aggiunge le tracce all'interno della playlist.
-     * @param trackID: l'identificatore univoco della traccia da aggiungere.
-     */
+    /*
+
+     * Metodo legacy per l'aggiunta di una traccia tramite UUID.
+     * @param trackID l'identificatore univoco della traccia da aggiungere.
+
     public void addTrack(UUID trackID){
-        tracks.add(trackID);
+        if(!trackIDs.contains(trackID)){
+            trackIDs.add(trackID);
+        }
     }
 
-    /**
-     * Metodo che rimuove le tracce dalla playlist.
-     * @param trackID: l'identificatore univoco della traccia da rimuovere.
-     */
+
+     * Metodo legacy per la rimozione di una traccia tramite UUID.
+     * @param trackID l'identificatore univoco della traccia da rimuovere.
+
     public void removeTrack(UUID trackID){
-        tracks.remove(trackID);
+        trackIDs.remove(trackID);
     }
 
+    */
     /**
-     * Metodo che ritorna una copia della lista delle tracce presenti nella playlist.
-     * @return una lista di tracce presenti nella playlist.
+     * Metodo che ritorna una copia della lista degli UUID delle tracce presenti.
+     * @return una lista non modificabile di UUID delle tracce.
      */
     public List<UUID> getTracks() {
-        return Collections.unmodifiableList(tracks);
+        return Collections.unmodifiableList(trackIDs);
     }
-     public boolean containsTrack(UUID trackID){
-        return tracks.contains(trackID);
-     }
 
-     public int numberOfTrakcs(){
-        return tracks.size();
-     }
+    /**
+     * Verifica se la playlist contiene una determinata traccia tramite il suo ID.
+     * @param trackID l'identificatore univoco della traccia da cercare.
+     * @return true se la playlist contiene la traccia, false altrimenti.
+     */
+    public boolean containsTrack(UUID trackID){
+        return trackIDs.contains(trackID);
+    }
+
+    /**
+     * Ritorna il numero di tracce contenute nella playlist.
+     * @return il numero di tracce presenti.
+     */
+    public int numberOfTracks(){
+        return trackIDs.size();
+    }
+
     /**
      * Valida le business rules per il nome della playlist.
      * Si assicura che il nome non sia vuoto e che non superi i 50 caratteri.
      *
      * @param name il nome della playlist da verificare
-     * @return true se il nome soddisfa le business rules, un'eccezione altrimenti.
+     * @return true se il nome soddisfa le business rules.
      * @throws PlaylistInfoException se il nome non soddisfa le business rules.
      */
-     // metodo per la verifica delle business rules
     private boolean checkRulesName(String name) throws PlaylistInfoException {
-        boolean check = false;
-        if(name.isEmpty()) throw new PlaylistInfoException("The name cannot be empty");
+        if(name == null || name.isEmpty()) throw new PlaylistInfoException("The name cannot be empty");
         if(name.length() > 50) throw new PlaylistInfoException("The name cannot be longer than 50 characters");
+        return true;
+    }
 
-        check = true;
-        return check;
+    /**
+     * Aggiunge una traccia alla playlist, aggiornando sia la lista in memoria che la lista per il salvataggio JSON.
+     * @param track l'oggetto Track da aggiungere.
+     */
+    public void addTrack(Track track) {
+        if (track != null && !trackIDs.contains(track.getId())) {
+            trackIDs.add(track.getId());
+            tracksList.add(track);
+        }
+    }
+
+    /**
+     * Rimuove una traccia dalla playlist, aggiornando sia la lista in memoria che la lista per il salvataggio JSON.
+     * @param track l'oggetto Track da rimuovere.
+     */
+    public void removeTrack(Track track) {
+        if (track != null) {
+            trackIDs.remove(track.getId());
+            tracksList.remove(track);
+        }
+    }
+
+    /**
+     * Ritorna la lista degli oggetti Track reali contenuti nella playlist.
+     * Questa lista è popolata in fase di caricamento dal PersistenceService.
+     * @return una lista non modificabile degli oggetti Track presenti nella playlist.
+     */
+    public List<Track> getTracksList() {
+        return Collections.unmodifiableList(tracksList);
+    }
+
+    /**
+     * Risolve gli UUID caricati dal JSON e popola la lista degli oggetti Track in memoria.
+     * Da chiamare all'avvio dopo il caricamento dal PersistenceService.
+     * @param allTracks la lista di tutte le tracce presenti nel sistema.
+     */
+    public void resolveTracks(List<Track> allTracks) {
+        this.tracksList = new ArrayList<>();
+        if (this.trackIDs != null && allTracks != null) {
+            for (UUID id : this.trackIDs) {
+                allTracks.stream()
+                        .filter(t -> t.getId().equals(id))
+                        .findFirst()
+                        .ifPresent(this.tracksList::add);
+            }
+        }
     }
 
     @Override
@@ -132,6 +200,7 @@ public class Playlist {
         Playlist other = (Playlist) o;
         return name != null && name.equalsIgnoreCase(other.name);
     }
+
     @Override
     public int hashCode() {
         return name != null ? name.hashCode() : 0;

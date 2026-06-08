@@ -1,6 +1,8 @@
 package it.diem.unisa.musicmanager.dao;
 
 import it.diem.unisa.musicmanager.model.Playlist;
+import it.diem.unisa.musicmanager.model.Track;
+import it.diem.unisa.musicmanager.model.Genre;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import java.io.File;
@@ -58,9 +60,8 @@ class JSONPlaylistDAOTest {
 
         playlistDAO.insert(playlist);
 
-        UUID trackId = UUID.randomUUID();
-
-        playlist.addTrack(trackId);
+        Track dummyTrack = new Track("Test", "Author", it.diem.unisa.musicmanager.model.Genre.POP, "path", 100, "2020");
+        playlist.addTrack(dummyTrack);
 
         playlistDAO.update(playlist);
 
@@ -76,7 +77,7 @@ class JSONPlaylistDAOTest {
         assertTrue(result.isPresent());
         assertEquals("Pop", result.get().getName());
         assertEquals(1, result.get().getTracks().size());
-        assertTrue(result.get().containsTrack(trackId));
+        assertTrue(result.get().containsTrack(dummyTrack.getId()));
     }
 
     //TEST RICERCA PLAYLIST PER ID FUNZIONANTE
@@ -102,13 +103,13 @@ class JSONPlaylistDAOTest {
 
         Playlist playlist = new Playlist("Rock");
 
-        UUID trackId = UUID.randomUUID();
+        Track dummyTrack = new Track("Test", "Author", it.diem.unisa.musicmanager.model.Genre.POP, "path", 100, "2020");
 
-        playlist.addTrack(trackId);
+        playlist.addTrack(dummyTrack);
 
         playlistDAO.insert(playlist);
 
-        playlist.removeTrack(trackId);
+        playlist.removeTrack(dummyTrack);
 
         playlistDAO.update(playlist);
 
@@ -122,7 +123,7 @@ class JSONPlaylistDAOTest {
                 newPlaylistDAO.searchById(playlist.getId());
 
         assertTrue(result.isPresent());
-        assertFalse(result.get().containsTrack(trackId));
+        assertFalse(result.get().containsTrack(dummyTrack.getId()));
         assertTrue(result.get().getTracks().isEmpty());
     }
 }

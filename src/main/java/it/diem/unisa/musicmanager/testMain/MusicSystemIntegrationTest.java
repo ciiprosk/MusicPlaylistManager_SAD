@@ -29,12 +29,12 @@ public class MusicSystemIntegrationTest {
             System.out.println("\n--- 2. Creazione Playlist con riferimenti alle tracce ---");
             Playlist p1 = new Playlist("I Miei Classici");
 
-            // Aggiungiamo i riferimenti (UUID) delle tracce alla playlist
-            p1.addTrack(t1.getId());
-            p1.addTrack(t2.getId());
+            // Aggiungiamo le tracce alla playlist
+            p1.addTrack(t1);
+            p1.addTrack(t2);
 
             playlistDAO.insert(p1);
-            System.out.println("Playlist '" + p1.getName() + "' creata con " + p1.numberOfTrakcs() + " tracce.");
+            System.out.println("Playlist '" + p1.getName() + "' creata con " + p1.numberOfTracks() + " tracce.");
 
             System.out.println("\n--- 3. Verifica Integrazione (Recupero Playlist e traccia) ---");
             Optional<Playlist> savedPlaylist = playlistDAO.searchById(p1.getId());
@@ -53,9 +53,9 @@ public class MusicSystemIntegrationTest {
             }
 
             System.out.println("\n--- 4. Test Rimozione Traccia da Playlist ---");
-            p1.removeTrack(t1.getId());
+            p1.removeTrack(t1);
             playlistDAO.update(p1);
-            System.out.println("Traccia rimossa. Nuova dimensione: " + playlistDAO.searchById(p1.getId()).get().numberOfTrakcs());
+            System.out.println("Traccia rimossa. Nuova dimensione: " + playlistDAO.searchById(p1.getId()).get().numberOfTracks());
 
         } catch (Exception e) {
             e.printStackTrace();

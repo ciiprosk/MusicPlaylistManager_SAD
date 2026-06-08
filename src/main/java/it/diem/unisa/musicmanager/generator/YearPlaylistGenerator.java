@@ -23,7 +23,7 @@ public class YearPlaylistGenerator implements PlaylistGenerator{
 
         for (Track t : state.getALlTracks()) {
             if (t.getYear().equals(year)) {
-                playlist.addTrack(t.getId());
+                playlist.addTrack(t);
             }
         }
         return playlist;
