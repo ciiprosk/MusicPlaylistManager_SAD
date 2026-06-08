@@ -6,6 +6,11 @@ import it.diem.unisa.musicmanager.model.Playlist;
 import it.diem.unisa.musicmanager.state.SharedState;
 import javafx.collections.ObservableList;
 
+import it.diem.unisa.musicmanager.model.Genre;
+import it.diem.unisa.musicmanager.model.Tag;
+import it.diem.unisa.musicmanager.generator.PlaylistGenerator;
+import it.diem.unisa.musicmanager.generator.PlaylistGeneratorFactory;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -208,5 +213,49 @@ public class PlaylistService implements TrackObserver{
                 .orElseThrow(() -> new PlaylistInfoException("Playlist not found"));
 
         return playlist.getTracks();
+    }
+
+    // --- Generazione automatica di playlist (filtro singolo, via Factory) ---
+
+    /**
+     * Genera e salva una playlist con tutte le tracce di un genere.
+     * @param genre il genere scelto
+     * @return Optional vuoto se ok, altrimenti il messaggio d'errore
+     */
+    public Optional<String> generatePlaylistByGenre(Genre genre) {
+        return saveGenerated(PlaylistGeneratorFactory.byGenre(genre));
+    }
+
+    /**
+     * Genera e salva una playlist con tutte le tracce di un anno.
+     * @param year l'anno scelto (es. "2020")
+     */
+    public Optional<String> generatePlaylistByYear(String year) {
+        return saveGenerated(PlaylistGeneratorFactory.byYear(year));
+    }
+
+    /**
+     * Genera e salva una playlist con tutte le tracce che hanno un tag.
+     * @param tag il tag scelto
+     */
+    public Optional<String> generatePlaylistByTag(Tag tag) {
+        return saveGenerated(PlaylistGeneratorFactory.byTag(tag));
+    }
+
+    /**
+     * Logica comune: esegue il generatore, controlla i duplicati e salva.
+     * Il service non conosce la classe concreta del generatore: la crea la Factory.
+     * @param generator il generatore da usare
+     * @return Optional vuoto se ok, altrimenti il messaggio d'errore
+     */
+    private Optional<String> saveGenerated(PlaylistGenerator generator) {
+        Playlist playlist = generator.generate(sharedState);
+
+        if (playlistDAO.isDuplicated(playlist))
+            return Optional.of("Playlist name already exists");
+
+        playlistDAO.insert(playlist);
+        sharedState.getALlPlaylists().add(playlist);
+        return Optional.empty();
     }
 }
