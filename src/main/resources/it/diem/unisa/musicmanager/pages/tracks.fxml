@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.layout.StackPane?>
 
-<VBox spacing="15.0" styleClass="sfondo-principale" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.diem.unisa.musicmanager.controller.TracksController">
+<VBox spacing="15.0" styleClass="sfondo-principale" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.diem.unisa.musicmanager.controller.TracksController">
     <padding>
         <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
     </padding>

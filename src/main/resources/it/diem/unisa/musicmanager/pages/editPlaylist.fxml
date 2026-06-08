@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox spacing="18.0" styleClass="sfondo-principale" stylesheets="@../../css/style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.diem.unisa.musicmanager.controller.EditPlaylistController">
+<VBox spacing="18.0" styleClass="sfondo-principale" stylesheets="@../../css/style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.diem.unisa.musicmanager.controller.EditPlaylistController">
 
     <padding>
         <Insets bottom="25.0" left="30.0" right="30.0" top="20.0" />
