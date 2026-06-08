@@ -20,6 +20,8 @@ public class Track {
 
     private String year;    //4 cifre, non nel futuro. di default è 'UNKNOWN'
 
+    private int playCount;  //conteggio ascolto traccia
+
 
     public Track(String title, String author, Genre genre, String songPath, int songLength, String year) {
 
@@ -36,6 +38,8 @@ public class Track {
         this.songLength = validateSongLength(songLength);
 
         this.year = validateYear(year);
+
+        this.playCount = 0;
 
     }
 
@@ -68,6 +72,7 @@ public class Track {
         this.songPath = ""; // Obbligatorio inizializzarlo perché è final
         this.songLength = 1; // Obbligatorio inizializzarlo perché è final, e deve essere >0
         this.year = "UNKNOWN";
+        this.playCount = 0;
     }
 
     public UUID getId() {
@@ -176,7 +181,12 @@ private String validateTitle(String title) {
 
         return finalYear;
     }
+    public int getPlayCount() {
+        return playCount;
+    }
 
-
+    public void incrementPlayCount() {
+        this.playCount++;
+    }
 
 }

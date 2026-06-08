@@ -16,6 +16,7 @@ import java.io.File;
  */
 public class PlayerService {
 
+    private TrackService trackService;
 
     private final ObjectProperty<Track> currentTrack = new SimpleObjectProperty<>(null);
     private final BooleanProperty isPlaying = new SimpleBooleanProperty(false);
@@ -37,6 +38,10 @@ public class PlayerService {
 
     public ReadOnlyDoubleProperty progressProperty() {
         return progress;
+    }
+
+    public void setTrackService(TrackService trackService) {
+        this.trackService = trackService;
     }
 
     public void play(Track track) {
@@ -75,6 +80,10 @@ public class PlayerService {
 
             mediaPlayer.play();
             isPlaying.set(true); // Aggiorna isPlaying
+
+            if (trackService != null) {
+                trackService.incrementPlayCount(track.getId());
+            }
 
         } catch (Exception e) {
             e.printStackTrace();

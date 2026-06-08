@@ -13,6 +13,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
@@ -21,6 +22,7 @@ import javafx.stage.Stage;
 import javafx.scene.control.Label;
 
 import java.io.IOException;
+import java.util.Optional;
 
 public class TracksController {
 
@@ -35,7 +37,6 @@ public class TracksController {
     private boolean isListenerAttached = false;
 
     @FXML private VBox trackList;
-
 
     public void setTrackService(TrackService trackService) {
 
@@ -81,6 +82,7 @@ public class TracksController {
         controller.setOnDeleteAction(() -> trackService.deleteTrack(track.getId()));    //elimina dall'archivio la traccia
         controller.setTrackService(trackService); //i serviceeeee
         controller.setPlayerService(playerService);
+        card.setOnMouseClicked(event -> openTrackDetails(track));
         return card;
     }
 
@@ -103,5 +105,26 @@ public class TracksController {
 
     public void setPlayerService(PlayerService playerService) {
         this.playerService = playerService;
+    }
+
+    private void openTrackDetails(Track track) {
+        if (track == null) {
+            return;
+        }
+
+        try {
+            FXMLLoader loader = WindowUtil.openWindow(
+                    "/it/diem/unisa/musicmanager/pages/detailSong.fxml",
+                    "Track Details",
+                    Modality.WINDOW_MODAL
+            );
+
+            DetailSongController controller = loader.getController();
+            controller.setTrackService(trackService);
+            controller.setTrack(track);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
