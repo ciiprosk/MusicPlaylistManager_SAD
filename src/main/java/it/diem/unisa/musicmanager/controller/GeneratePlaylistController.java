@@ -110,7 +110,7 @@ public class GeneratePlaylistController {
 
         Toggle selected = toggleGroup.getSelectedToggle();
         if (selected == null) {
-            AlertUtil.showError("Attenzione", "Seleziona un criterio prima di generare.");
+            AlertUtil.showError("Warning", "Please select a criterion before generating.");
             return;
         }
 
@@ -132,7 +132,7 @@ public class GeneratePlaylistController {
             // Tag tag = (Tag) value;
             // criteria = new TagSpecification(tag);
             // playlistName = "Playlist " + tag.name();
-            AlertUtil.showError("Non disponibile", "Generazione per tag non ancora disponibile.");
+            AlertUtil.showError("Not Available", "Generation by tag is not yet available.");
             return;
 
         } else {
@@ -145,12 +145,12 @@ public class GeneratePlaylistController {
                 criteria);
 
         if (error.isPresent()) {
-            AlertUtil.showError("Errore", error.get());
+            AlertUtil.showError("Error", error.get());
         } else {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Playlist generata");
+            alert.setTitle("Playlist Generated");
             alert.setHeaderText(null);
-            alert.setContentText("Playlist \"" + playlistName + "\" creata!");
+            alert.setContentText("Playlist \"" + playlistName + "\" created!");
             alert.showAndWait();
             WindowUtil.close(btnGenerate);
         }

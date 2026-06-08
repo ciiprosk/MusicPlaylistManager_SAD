@@ -19,7 +19,7 @@
         <Label styleClass="menu-title" text="Genera Playlist" textFill="WHITE" />
         <Region HBox.hgrow="ALWAYS" />
         <Button fx:id="btnGenerate"
-                styleClass="button-verde" text="Genera Playlist" textFill="WHITE" onAction="#onGenerate" />
+                styleClass="button-verde" text="Generate Playlist" textFill="WHITE" onAction="#onGenerate" />
     </HBox>
 
     <HBox spacing="40.0">

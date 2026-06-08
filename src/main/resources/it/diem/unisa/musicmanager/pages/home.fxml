@@ -26,7 +26,7 @@
             <Region HBox.hgrow="ALWAYS" />
             <Button fx:id="btnGenerate" onAction="#goToGeneratePlaylist"  minWidth="150.0" mnemonicParsing="false"
                      styleClass="btn-primario"
-                    text="Genera Playlist" />
+                    text="Generate Playlist" />
         </HBox>
 
         <Label styleClass="sottotitolo" text="Most Played Tracks" textFill="#cccccc" />
