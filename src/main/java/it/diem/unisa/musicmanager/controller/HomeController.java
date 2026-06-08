@@ -21,6 +21,7 @@ import java.util.List;
  * the Home section, enabling dynamic updates and handling user interactions.
  */
 public class HomeController {
+    public VBox recentPlaylistsContainer;
     @FXML
     private VBox topTracksContainer;
 

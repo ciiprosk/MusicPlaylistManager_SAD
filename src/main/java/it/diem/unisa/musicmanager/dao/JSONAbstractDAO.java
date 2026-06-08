@@ -3,9 +3,6 @@ package it.diem.unisa.musicmanager.dao;
 import it.diem.unisa.musicmanager.exception.FilePathException;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
 
 
 public abstract class JSONAbstractDAO {

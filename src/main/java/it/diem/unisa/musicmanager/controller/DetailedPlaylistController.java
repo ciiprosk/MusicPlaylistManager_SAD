@@ -18,7 +18,6 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 
 import java.io.IOException;
-import java.util.UUID;
 
 /**
  * Controller della schermata di dettaglio playlist (detailedPlaylist.fxml).

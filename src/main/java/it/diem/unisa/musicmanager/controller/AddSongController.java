@@ -2,7 +2,6 @@ package it.diem.unisa.musicmanager.controller;
 
 import it.diem.unisa.musicmanager.exception.TrackInfoException;
 import it.diem.unisa.musicmanager.model.Genre;
-import it.diem.unisa.musicmanager.model.Track;
 import it.diem.unisa.musicmanager.service.TrackService;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -18,7 +17,6 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.io.File;
-import java.time.Year;
 import java.util.Arrays;
 import java.util.Optional;
 
