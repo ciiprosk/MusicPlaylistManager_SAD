@@ -27,6 +27,9 @@
       <!-- Spazio elastico che spinge il resto a destra -->
       <Region HBox.hgrow="ALWAYS" />
 
+      <!-- Ascolti -->
+      <Label fx:id="lblPlayCount" styleClass="brano-durata" text="0 Plays" />
+
       <!-- Durata -->
       <Label fx:id="lblDuration" styleClass="brano-durata" text="0:00" />
 

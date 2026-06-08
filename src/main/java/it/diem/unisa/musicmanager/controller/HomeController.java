@@ -24,40 +24,82 @@ public class HomeController {
     @FXML
     private VBox topTracksContainer;
 
+    @FXML
+    private javafx.scene.control.TextField searchBar;
+    @FXML
+    private javafx.scene.control.Button btnClearSearch;
+
     private TrackService trackService;
+    private it.diem.unisa.musicmanager.service.PlayerService playerService;
+
+    @FXML
+    public void initialize() {
+        if (searchBar != null) {
+            searchBar.textProperty().addListener((observable, oldValue, newValue) -> {
+                if (btnClearSearch != null) {
+                    btnClearSearch.setVisible(!newValue.isEmpty());
+                }
+                loadTopTracks();
+            });
+        }
+        if (btnClearSearch != null) {
+            btnClearSearch.setOnAction(e -> searchBar.clear());
+        }
+    }
 
     public void setTrackService(TrackService trackService) {
         this.trackService = trackService;
-        loadTopTracks();
+        if (this.playerService != null) {
+            loadTopTracks();
+        }
+    }
+
+    public void setPlayerService(it.diem.unisa.musicmanager.service.PlayerService playerService) {
+        this.playerService = playerService;
+        if (this.trackService != null) {
+            loadTopTracks();
+        }
     }
 
     public void loadTopTracks() {
-        if (trackService == null || topTracksContainer == null) {
+        if (trackService == null || playerService == null || topTracksContainer == null) {
             return;
         }
 
         topTracksContainer.getChildren().clear();
 
-        List<Track> topTracks = trackService.getTop5MostPlayedTracks();
+        List<Track> topTracks = trackService.searchTopTracks(searchBar != null ? searchBar.getText() : "");
 
         if (topTracks.isEmpty()) {
-            Label emptyLabel = new Label("Nessuna traccia ascoltata.");
+            javafx.scene.control.Label emptyLabel;
+            if (searchBar != null && !searchBar.getText().isBlank()) {
+                emptyLabel = new javafx.scene.control.Label("No tracks found for '" + searchBar.getText() + "'.");
+            } else {
+                emptyLabel = new javafx.scene.control.Label("No tracks played yet.");
+            }
             emptyLabel.setStyle("-fx-text-fill: #cccccc;");
             topTracksContainer.getChildren().add(emptyLabel);
             return;
         }
 
         for (Track track : topTracks) {
-            Label label = new Label(
-                    track.getTitle()
-                            + " - "
-                            + track.getAuthor()
-                            + " | Ascolti: "
-                            + track.getPlayCount()
-            );
+            try {
+                javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource("/it/diem/unisa/musicmanager/components/trackRow.fxml"));
+                javafx.scene.Node row = loader.load();
 
-            label.setStyle("-fx-text-fill: white; -fx-font-size: 14px;");
-            topTracksContainer.getChildren().add(label);
+                RowTrackController controller = loader.getController();
+                controller.setTrack(track);
+                controller.setTrackService(trackService);
+                controller.setPlayerService(playerService);
+                controller.setOnDeleteAction(() -> {
+                    trackService.deleteTrack(track.getId());
+                    loadTopTracks();
+                });
+
+                topTracksContainer.getChildren().add(row);
+            } catch (java.io.IOException e) {
+                e.printStackTrace();
+            }
         }
     }
     // è semplicissimo caricare sia le card che la row dei brani, metto il codice di esempio:

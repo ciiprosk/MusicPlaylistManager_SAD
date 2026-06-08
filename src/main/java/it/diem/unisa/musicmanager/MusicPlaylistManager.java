@@ -42,6 +42,7 @@ public class MusicPlaylistManager extends Application {
 
         MainController controller = fxmlLoader.getController();
         controller.getHomePageController().setTrackService(trackService);
+        controller.getHomePageController().setPlayerService(playerService);
         // Playlists page
 
         controller.getPlaylistsPageController().setTrackService(trackService);

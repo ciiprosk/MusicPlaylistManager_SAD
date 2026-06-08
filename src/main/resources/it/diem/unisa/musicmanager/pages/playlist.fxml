@@ -8,6 +8,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.StackPane?>
 
 <VBox spacing="15.0" styleClass="sfondo-principale" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.diem.unisa.musicmanager.controller.PlaylistController">
     <padding>
@@ -21,7 +22,10 @@
             <Button minWidth="120.0" maxWidth="150.0" mnemonicParsing="false" onAction="#handleAdd" styleClass="btn-primario" text="Add Playlist" />
         </HBox>
 
-        <TextField fx:id="searchBar" minWidth="250.0" maxWidth="600.0" prefWidth="400.0" promptText="Search" styleClass="search-bar" />
+        <javafx.scene.layout.StackPane alignment="CENTER_RIGHT" maxWidth="600.0" minWidth="250.0" prefWidth="400.0">
+            <TextField fx:id="searchBar" promptText="Search" styleClass="search-bar" />
+            <javafx.scene.control.Button fx:id="btnClearSearch" text="✕" style="-fx-background-color: transparent; -fx-text-fill: #cccccc; -fx-cursor: hand; -fx-font-weight: bold; -fx-padding: 0 10 0 0;" visible="false" />
+        </javafx.scene.layout.StackPane>
 
         <FlowPane fx:id="playlistsGrid" hgap="20.0" vgap="20.0" VBox.vgrow="ALWAYS">
         </FlowPane>

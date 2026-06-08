@@ -183,11 +183,20 @@ public class PlaylistService implements TrackObserver{
         }
     }
 
+    public List<Playlist> searchPlaylists(String keyword) {
+        if (keyword == null || keyword.isBlank()) {
+            return new java.util.ArrayList<>(sharedState.getALlPlaylists());
+        }
+        String lowerKeyword = keyword.toLowerCase();
+        return sharedState.getALlPlaylists().stream()
+                .filter(p -> p.getName().toLowerCase().contains(lowerKeyword))
+                .toList();
+    }
+
     /**
      * Metodo che aggiorna l'elenco di playlist nello stato globale.
      * @param playlist è la playlist da aggiornare nello stato globale.
      */
-
     private void updateInState(Playlist playlist) {
         ObservableList<Playlist> playlists = sharedState.getALlPlaylists();
 

@@ -31,6 +31,8 @@ public class TracksController {
     private ListView<Track> tracksList;
     @FXML
     private TextField searchBar;
+    @FXML
+    private Button btnClearSearch;
 
     private TrackService trackService;
     private PlayerService playerService;
@@ -58,16 +60,43 @@ public class TracksController {
     }
 
 
+    @FXML
+    public void initialize() {
+        if (searchBar != null) {
+            searchBar.textProperty().addListener((observable, oldValue, newValue) -> {
+                if (btnClearSearch != null) {
+                    btnClearSearch.setVisible(!newValue.isEmpty());
+                }
+                try {
+                    loadTracks();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
+        }
+        if (btnClearSearch != null) {
+            btnClearSearch.setOnAction(e -> searchBar.clear());
+        }
+    }
+
     public void loadTracks() throws IOException {
         trackList.getChildren().clear();
 
-        for (Track track : trackService.getAllTracks()) {
+        String keyword = searchBar != null ? searchBar.getText() : "";
+        java.util.List<Track> tracksToShow = trackService.searchTracks(keyword);
+
+        for (Track track : tracksToShow) {
             trackList.getChildren().add(createTrackRow(track));
         }
 
-        // Archivio vuoto: invitiamo l'utente ad aggiungere un brano.
+        // Archivio vuoto: invitiamo l'utente ad aggiungere un brano o avvisiamo che la ricerca non ha prodotto risultati.
         if (trackList.getChildren().isEmpty()) {
-            Label emptyLabel = new Label("Your library is empty. Add a track!");
+            Label emptyLabel;
+            if (keyword != null && !keyword.isBlank()) {
+                emptyLabel = new Label("No tracks found for '" + keyword + "'.");
+            } else {
+                emptyLabel = new Label("Your library is empty. Add a track!");
+            }
             emptyLabel.setStyle("-fx-text-fill: white; -fx-font-size: 16px;");  // bianco e leggermente piu' grande
             trackList.getChildren().add(emptyLabel);
         }
