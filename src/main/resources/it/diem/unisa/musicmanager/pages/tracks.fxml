@@ -21,10 +21,10 @@
             <Button maxWidth="150.0" minWidth="120.0" mnemonicParsing="false" onAction="#handleAdd" styleClass="btn-primario" text="Add Track" />
         </HBox>
 
-        <javafx.scene.layout.StackPane alignment="CENTER_RIGHT" maxWidth="600.0" minWidth="250.0" prefWidth="400.0">
+        <StackPane alignment="CENTER_RIGHT" maxWidth="600.0" minWidth="250.0" prefWidth="400.0">
             <TextField fx:id="searchBar" promptText="Search" styleClass="search-bar" />
             <Button fx:id="btnClearSearch" style="-fx-background-color: transparent; -fx-text-fill: #cccccc; -fx-cursor: hand; -fx-font-weight: bold; -fx-padding: 0 10 0 0;" text="✕" visible="false" />
-        </javafx.scene.layout.StackPane>
+        </StackPane>
       <VBox fx:id="trackList" prefHeight="200.0" prefWidth="100.0" />
     </children>
 </VBox>

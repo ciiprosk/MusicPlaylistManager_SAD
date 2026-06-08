@@ -22,10 +22,10 @@
             <Button minWidth="120.0" maxWidth="150.0" mnemonicParsing="false" onAction="#handleAdd" styleClass="btn-primario" text="Add Playlist" />
         </HBox>
 
-        <javafx.scene.layout.StackPane alignment="CENTER_RIGHT" maxWidth="600.0" minWidth="250.0" prefWidth="400.0">
+        <StackPane alignment="CENTER_RIGHT" maxWidth="600.0" minWidth="250.0" prefWidth="400.0">
             <TextField fx:id="searchBar" promptText="Search" styleClass="search-bar" />
-            <javafx.scene.control.Button fx:id="btnClearSearch" text="✕" style="-fx-background-color: transparent; -fx-text-fill: #cccccc; -fx-cursor: hand; -fx-font-weight: bold; -fx-padding: 0 10 0 0;" visible="false" />
-        </javafx.scene.layout.StackPane>
+            <Button fx:id="btnClearSearch" text="✕" style="-fx-background-color: transparent; -fx-text-fill: #cccccc; -fx-cursor: hand; -fx-font-weight: bold; -fx-padding: 0 10 0 0;" visible="false" />
+        </StackPane>
 
         <FlowPane fx:id="playlistsGrid" hgap="20.0" vgap="20.0" VBox.vgrow="ALWAYS">
         </FlowPane>
