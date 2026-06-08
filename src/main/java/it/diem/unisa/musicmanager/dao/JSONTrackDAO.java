@@ -3,6 +3,7 @@ package it.diem.unisa.musicmanager.dao;
 import com.google.gson.Gson;
 import it.diem.unisa.musicmanager.exception.FilePathException;
 import it.diem.unisa.musicmanager.exception.JSONFileException;
+import it.diem.unisa.musicmanager.model.Playlist;
 import it.diem.unisa.musicmanager.model.Track;
 
 import java.io.*;

@@ -3,6 +3,7 @@ package it.diem.unisa.musicmanager.service;
 import it.diem.unisa.musicmanager.dao.DAO;
 import it.diem.unisa.musicmanager.exception.TrackInfoException;
 import it.diem.unisa.musicmanager.model.Genre;
+import it.diem.unisa.musicmanager.model.Playlist;
 import it.diem.unisa.musicmanager.model.Track;
 import it.diem.unisa.musicmanager.state.SharedState;
 import javafx.collections.ObservableList;

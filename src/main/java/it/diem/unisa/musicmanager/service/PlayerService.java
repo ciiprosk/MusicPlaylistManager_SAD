@@ -5,6 +5,7 @@ import javafx.application.Platform;
 import javafx.beans.property.*;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
+import it.diem.unisa.musicmanager.state.SharedState;
 import java.io.File;
 
 /**

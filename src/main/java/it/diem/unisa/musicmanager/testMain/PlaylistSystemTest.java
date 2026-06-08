@@ -9,6 +9,7 @@ import it.diem.unisa.musicmanager.model.Genre;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public class PlaylistSystemTest {
     public static void main(String[] args) {
