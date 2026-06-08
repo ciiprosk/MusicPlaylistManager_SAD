@@ -19,10 +19,7 @@
             </font>
         </Label>
 
-        <javafx.scene.layout.StackPane alignment="CENTER_RIGHT" maxWidth="600.0" minWidth="250.0" prefWidth="400.0">
-            <TextField fx:id="searchBar" promptText="Search" styleClass="search-bar" />
-            <javafx.scene.control.Button fx:id="btnClearSearch" text="✕" style="-fx-background-color: transparent; -fx-text-fill: #cccccc; -fx-cursor: hand; -fx-font-weight: bold; -fx-padding: 0 10 0 0;" visible="false" />
-        </javafx.scene.layout.StackPane>
+
 
         <Label styleClass="sottotitolo" text="Most Played Tracks" textFill="#cccccc" />
         <VBox fx:id="topTracksContainer" spacing="10.0">

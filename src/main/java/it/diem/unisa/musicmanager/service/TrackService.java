@@ -106,17 +106,6 @@ public class TrackService {
                 .toList();
     }
 
-    public List<Track> searchTopTracks(String keyword) {
-        List<Track> top = getTop5MostPlayedTracks();
-        if (keyword == null || keyword.isBlank()) {
-            return top;
-        }
-        String lowerKeyword = keyword.toLowerCase();
-        return top.stream()
-                .filter(t -> t.getTitle().toLowerCase().contains(lowerKeyword) || 
-                             t.getAuthor().toLowerCase().contains(lowerKeyword))
-                .toList();
-    }
 
     public void addObserver(TrackObserver observer) {
 

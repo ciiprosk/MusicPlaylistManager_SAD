@@ -24,27 +24,11 @@ public class HomeController {
     @FXML
     private VBox topTracksContainer;
 
-    @FXML
-    private javafx.scene.control.TextField searchBar;
-    @FXML
-    private javafx.scene.control.Button btnClearSearch;
-
     private TrackService trackService;
     private it.diem.unisa.musicmanager.service.PlayerService playerService;
 
     @FXML
     public void initialize() {
-        if (searchBar != null) {
-            searchBar.textProperty().addListener((observable, oldValue, newValue) -> {
-                if (btnClearSearch != null) {
-                    btnClearSearch.setVisible(!newValue.isEmpty());
-                }
-                loadTopTracks();
-            });
-        }
-        if (btnClearSearch != null) {
-            btnClearSearch.setOnAction(e -> searchBar.clear());
-        }
     }
 
     public void setTrackService(TrackService trackService) {
@@ -68,15 +52,10 @@ public class HomeController {
 
         topTracksContainer.getChildren().clear();
 
-        List<Track> topTracks = trackService.searchTopTracks(searchBar != null ? searchBar.getText() : "");
+        List<Track> topTracks = trackService.getTop5MostPlayedTracks();
 
         if (topTracks.isEmpty()) {
-            javafx.scene.control.Label emptyLabel;
-            if (searchBar != null && !searchBar.getText().isBlank()) {
-                emptyLabel = new javafx.scene.control.Label("No tracks found for '" + searchBar.getText() + "'.");
-            } else {
-                emptyLabel = new javafx.scene.control.Label("No tracks played yet.");
-            }
+            javafx.scene.control.Label emptyLabel = new javafx.scene.control.Label("No tracks played yet.");
             emptyLabel.setStyle("-fx-text-fill: #cccccc;");
             topTracksContainer.getChildren().add(emptyLabel);
             return;
