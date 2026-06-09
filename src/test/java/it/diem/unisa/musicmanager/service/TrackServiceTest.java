@@ -47,7 +47,8 @@ class TrackServiceTest {
                 Genre.ROCK,
                 "songs/test.mp3",
                 180,
-                "2020"
+                "2020",
+                null
         );
 
         assertTrue(result.isPresent());
@@ -63,7 +64,8 @@ class TrackServiceTest {
                 Genre.ROCK,
                 "songs/test.mp3",
                 180,
-                "2020"
+                "2020",
+                null
         );
 
         assertTrue(result.isPresent());
@@ -81,7 +83,8 @@ class TrackServiceTest {
                 Genre.ROCK,
                 "songs/test.mp3",
                 180,
-                "2020"
+                "2020",
+                null
         );
 
         assertTrue(result.isPresent());
@@ -99,7 +102,8 @@ class TrackServiceTest {
                 Genre.ROCK,
                 "songs/test.mp3",
                 180,
-                "2020"
+                "2020",
+                null
         );
 
         assertTrue(result.isPresent());
@@ -115,7 +119,8 @@ class TrackServiceTest {
                 Genre.ROCK,
                 "songs/test.mp3",
                 0,
-                "2020"
+                "2020",
+                null
         );
 
         assertTrue(result.isPresent());
@@ -131,7 +136,8 @@ class TrackServiceTest {
                 Genre.ROCK,
                 "songs/test.mp3",
                 -10,
-                "2020"
+                "2020",
+                null
         );
 
         assertTrue(result.isPresent());
@@ -147,7 +153,8 @@ class TrackServiceTest {
                 Genre.ROCK,
                 "songs/test.mp3",
                 180,
-                "123"
+                "123",
+                null
         );
 
         assertTrue(result.isPresent());
@@ -165,7 +172,8 @@ class TrackServiceTest {
                 Genre.ROCK,
                 "songs/test.mp3",
                 180,
-                futureYear
+                futureYear,
+                null
         );
 
         assertTrue(result.isPresent());
@@ -181,7 +189,8 @@ class TrackServiceTest {
                 Genre.ROCK,
                 "songs/numb.mp3",
                 185,
-                "2003"
+                "2003",
+                null
         );
 
         Optional<String> result = service.addTrack(
@@ -190,7 +199,8 @@ class TrackServiceTest {
                 Genre.ROCK,
                 "songs/numb-copy.mp3",
                 190,
-                "2003"
+                "2003",
+                null
         );
 
         assertTrue(result.isPresent());
@@ -206,7 +216,8 @@ class TrackServiceTest {
                 Genre.ROCK,
                 "songs/numb.mp3",
                 185,
-                "2003"
+                "2003",
+                null
         );
 
         assertTrue(result.isEmpty());
@@ -223,7 +234,8 @@ class TrackServiceTest {
                 Genre.ROCK,
                 "songs/test.mp3",
                 180,
-                "2020"
+                "2020",
+                null
         );
 
         assertTrue(result.isEmpty());
@@ -240,7 +252,8 @@ class TrackServiceTest {
                 null,
                 "songs/test.mp3",
                 180,
-                "2020"
+                "2020",
+                null
         );
 
         assertTrue(result.isEmpty());
@@ -257,7 +270,8 @@ class TrackServiceTest {
                 Genre.ROCK,
                 "songs/test.mp3",
                 180,
-                ""
+                "",
+                null
         );
 
         assertTrue(result.isEmpty());
@@ -274,7 +288,8 @@ class TrackServiceTest {
                 Genre.ROCK,
                 "songs/test.mp3",
                 180,
-                "2020"
+                "2020",
+                null
         );
 
         Track track = sharedState.getALlTracks().get(0);
@@ -284,7 +299,8 @@ class TrackServiceTest {
                 "",
                 "Author",
                 Genre.ROCK,
-                "2020"
+                "2020",
+                null
         );
 
         assertTrue(result.isPresent());
@@ -300,7 +316,8 @@ class TrackServiceTest {
                 Genre.ROCK,
                 "songs/test.mp3",
                 180,
-                "2020"
+                "2020",
+                null
         );
 
         Track track = sharedState.getALlTracks().get(0);
@@ -311,7 +328,8 @@ class TrackServiceTest {
                 longTitle,
                 "Author",
                 Genre.ROCK,
-                "2020"
+                "2020",
+                null
         );
 
         assertTrue(result.isPresent());
@@ -327,7 +345,8 @@ class TrackServiceTest {
                 Genre.ROCK,
                 "songs/test.mp3",
                 180,
-                "2020"
+                "2020",
+                null
         );
 
         Track track = sharedState.getALlTracks().get(0);
@@ -338,7 +357,8 @@ class TrackServiceTest {
                 "Valid Title",
                 longAuthor,
                 Genre.ROCK,
-                "2020"
+                "2020",
+                null
         );
 
         assertTrue(result.isPresent());
@@ -354,7 +374,8 @@ class TrackServiceTest {
                 Genre.ROCK,
                 "songs/test.mp3",
                 180,
-                "2020"
+                "2020",
+                null
         );
 
         Track track = sharedState.getALlTracks().get(0);
@@ -364,7 +385,8 @@ class TrackServiceTest {
                 "Valid Title",
                 "Author",
                 Genre.ROCK,
-                "12"
+                "12",
+                null
         );
 
         assertTrue(result.isPresent());
@@ -380,7 +402,8 @@ class TrackServiceTest {
                 Genre.ROCK,
                 "songs/test.mp3",
                 180,
-                "2020"
+                "2020",
+                null
         );
 
         Track track = sharedState.getALlTracks().get(0);
@@ -391,7 +414,8 @@ class TrackServiceTest {
                 "Valid Title",
                 "Author",
                 Genre.ROCK,
-                futureYear
+                futureYear,
+                null
         );
 
         assertTrue(result.isPresent());
@@ -407,7 +431,8 @@ class TrackServiceTest {
                 Genre.ROCK,
                 "songs/numb.mp3",
                 185,
-                "2003"
+                "2003",
+                null
         );
 
         service.addTrack(
@@ -416,7 +441,8 @@ class TrackServiceTest {
                 Genre.ROCK,
                 "songs/faint.mp3",
                 160,
-                "2003"
+                "2003",
+                null
         );
 
         Track faint = sharedState.getALlTracks().get(1);
@@ -426,7 +452,8 @@ class TrackServiceTest {
                 "Numb",
                 "Linkin Park",
                 Genre.ROCK,
-                "2003"
+                "2003",
+                null
         );
 
         assertTrue(result.isPresent());
@@ -442,7 +469,8 @@ class TrackServiceTest {
                 Genre.ROCK,
                 "songs/test.mp3",
                 180,
-                "2020"
+                "2020",
+                null
         );
 
         Track track = sharedState.getALlTracks().get(0);
@@ -452,7 +480,8 @@ class TrackServiceTest {
                 "New Title",
                 "New Author",
                 Genre.POP,
-                "2021"
+                "2021",
+                null
         );
 
         assertTrue(result.isEmpty());
@@ -472,7 +501,8 @@ class TrackServiceTest {
                 Genre.ROCK,
                 "songs/numb.mp3",
                 185,
-                "2003"
+                "2003",
+                null
         );
 
         Track track = sharedState.getALlTracks().get(0);
@@ -516,7 +546,8 @@ class TrackServiceTest {
                         Genre.ROCK,
                         "songs/numb.mp3",
                         185,
-                        "2003"
+                        "2003",
+                        null
                 );
 
         assertTrue(result.isEmpty());
@@ -554,7 +585,8 @@ class TrackServiceTest {
                     Genre.ROCK,
                     "songs/track" + i + ".mp3",
                     180,
-                    "2020"
+                    "2020",
+                    null
             );
 
             for (int j = 0; j < i; j++) {
@@ -581,7 +613,8 @@ class TrackServiceTest {
                 Genre.ROCK,
                 "songs/low.mp3",
                 180,
-                "2020"
+                "2020",
+                null
         );
 
         Track high = new Track(
@@ -590,7 +623,8 @@ class TrackServiceTest {
                 Genre.ROCK,
                 "songs/high.mp3",
                 180,
-                "2020"
+                "2020",
+                null
         );
 
         low.incrementPlayCount();
@@ -620,7 +654,8 @@ class TrackServiceTest {
                 Genre.ROCK,
                 "songs/numb.mp3",
                 185,
-                "2003"
+                "2003",
+                null
         );
 
         Track track =
@@ -648,7 +683,8 @@ class TrackServiceTest {
                 Genre.ROCK,
                 "songs/numb.mp3",
                 185,
-                "2003"
+                "2003",
+                null
         );
 
         Track track =
@@ -679,7 +715,8 @@ class TrackServiceTest {
                 Genre.ROCK,
                 "songs/numb.mp3",
                 185,
-                "2003"
+                "2003",
+                null
         );
 
         assertTrue(creationResult.isEmpty());

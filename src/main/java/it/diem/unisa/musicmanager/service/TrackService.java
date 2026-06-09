@@ -7,6 +7,9 @@ import it.diem.unisa.musicmanager.model.Playlist;
 import it.diem.unisa.musicmanager.model.Track;
 import it.diem.unisa.musicmanager.state.SharedState;
 import javafx.collections.ObservableList;
+import it.diem.unisa.musicmanager.model.Tag;
+import java.util.EnumSet;
+import java.util.Set;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,25 +36,42 @@ public class TrackService {
         return trackDAO.searchById(trackId);
     }
 
-    public Optional<String> addTrack(String title, String author, Genre genre, String songPath, int songLength, String year){
-        try{
 
-            Track track = new Track(title, author, genre, songPath, songLength, year);
 
-            if(trackDAO.isDuplicated(track))
+    public Optional<String> addTrack(String title, String author, Genre genre, String songPath, int songLength, String year,
+                                     Set<Tag> tags) {
+        try {
+
+            EnumSet<Tag> safeTags =
+                    (tags == null || tags.isEmpty())
+                            ? EnumSet.noneOf(Tag.class)
+                            : EnumSet.copyOf(tags);
+
+            Track track = new Track(
+                    title,
+                    author,
+                    genre,
+                    songPath,
+                    songLength,
+                    year,
+                    safeTags
+            );
+
+            if (trackDAO.isDuplicated(track)) {
                 return Optional.of("Error: A track with this title and author already exists!");
+            }
 
-            // inserisco traccia nel Json
             trackDAO.insert(track);
             sharedState.getALlTracks().add(track);
+
             return Optional.empty();
 
-        } catch (TrackInfoException e){     //Se sono qui, ho avuto errore validazione dati track
+        } catch (TrackInfoException e) {
             return Optional.of(e.getMessage());
         }
     }
 
-    public Optional<String> updateTrack(UUID trackId, String newTitle, String newAuthor, Genre newGenre, String newYear){
+    public Optional<String> updateTrack(UUID trackId, String newTitle, String newAuthor, Genre newGenre, String newYear,  Set<Tag> newTags){
         //come parametri del metodo, tutte le info che possono cambiare di una traccia + Id perché ci serve per cercare nel DAO
         Optional<Track> optionalTrack = trackDAO.searchById(trackId);
 
@@ -65,7 +85,8 @@ public class TrackService {
 
             //creo una traccia temporanea
             //così avviene anche validazione dei nuovi campi
-            Track tempTrack = new Track(newTitle, newAuthor, newGenre, track.getSongPath(), track.getSongLength(), newYear);
+            Track tempTrack = new Track(newTitle, newAuthor, newGenre, track.getSongPath(), track.getSongLength(), newYear,
+                    newTags != null ? EnumSet.copyOf(newTags) : EnumSet.noneOf(Tag.class));
 
             //verifica duplicato: id diversi, stesso titolo e stesso autore
             boolean isDuplicate = sharedState.getALlTracks().stream()
@@ -80,6 +101,7 @@ public class TrackService {
             track.setAuthor(newAuthor);
             track.setGenre(newGenre);
             track.setYear(newYear);
+            track.setTags(newTags);
 
             //update della traccia con DAO
             trackDAO.update(track);
@@ -125,7 +147,7 @@ public class TrackService {
     }
 
     //si occupa dell'update della traccia nell'interfaccia grafica
-    private void updateInState(Track track){
+    private void updateInState(Track track) {
 
         ObservableList<Track> tracks = sharedState.getALlTracks();
 

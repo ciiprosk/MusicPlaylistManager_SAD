@@ -149,7 +149,8 @@ class PlaylistServiceTest {
                 Genre.ROCK,
                 "songs/numb.mp3",
                 185,
-                "2003"
+                "2003",
+                null
         );
 
         sharedState.getALlTracks().add(track);
@@ -227,7 +228,8 @@ class PlaylistServiceTest {
                 Genre.ROCK,
                 "songs/numb.mp3",
                 185,
-                "2003"
+                "2003",
+                null
         );
 
         sharedState.getALlTracks().add(track);
@@ -867,7 +869,8 @@ class PlaylistServiceTest {
                 Genre.ROCK,
                 "songs/" + title + ".mp3",
                 180,
-                "2020"
+                "2020",
+                null
         );
 
         sharedState.getALlTracks().add(track);

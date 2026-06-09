@@ -111,7 +111,6 @@ public class TracksController {
         controller.setOnDeleteAction(() -> trackService.deleteTrack(track.getId()));    //elimina dall'archivio la traccia
         controller.setTrackService(trackService); //i serviceeeee
         controller.setPlayerService(playerService);
-        card.setOnMouseClicked(event -> openTrackDetails(track));
         return card;
     }
 

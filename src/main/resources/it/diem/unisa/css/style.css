@@ -926,3 +926,31 @@
 .tracce-container {
     -fx-background-color: transparent;
 }
+
+.tag {
+    -fx-font-size: 9px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+    -fx-padding: 2 8 2 8;
+    -fx-background-radius: 10;
+    -fx-alignment: center;
+    -fx-min-height: 16px;
+}
+
+/* "E" come pastiglia tonda tipo Spotify */
+.tag-explicit {
+    -fx-background-color: #E53935;
+    -fx-min-width: 16px;
+    -fx-padding: 2 0 2 0;
+    -fx-background-radius: 4;   /* quadratino arrotondato invece che cerchio */
+}
+
+.tag-favourite {
+    -fx-background-color: #FBC02D;
+    -fx-text-fill: #1a1a1a;
+}
+
+.tag-newrelease {
+    -fx-background-color: #2196F3;
+    -fx-letter-spacing: 0.5;
+}
