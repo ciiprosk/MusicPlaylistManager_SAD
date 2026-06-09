@@ -15,10 +15,6 @@ public class SharedState {
     private final ObservableList<Playlist> allPlaylists = FXCollections.observableArrayList();
     private final ObservableList<QueueItem> queue = FXCollections.observableArrayList();
 
-    private final ObjectProperty<Track> currentTrack = new SimpleObjectProperty<>();
-    private final BooleanProperty isPlaying = new SimpleBooleanProperty();
-    private final DoubleProperty progress = new SimpleDoubleProperty();
-
     //uso il costruttore di default
 
     public ObservableList<Track> getALlTracks(){
@@ -27,17 +23,8 @@ public class SharedState {
     public ObservableList<Playlist> getALlPlaylists(){
         return allPlaylists;
     }
-    public ObjectProperty<Track> getCurrentTrack(){
-        return currentTrack;
-    }
-    public BooleanProperty getIsPlaying(){
-        return isPlaying;
-    }
-    public DoubleProperty getProgress(){
-        return progress;
-    }
     public ObservableList<QueueItem> getQueue(){
-        return queue;
-    }
+            return queue;
+        }
 
 }

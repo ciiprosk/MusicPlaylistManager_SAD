@@ -9,28 +9,20 @@ import java.util.UUID;
  */
 public class QueueItem {
     private final Playable playable;
-    private int queueIndex;
     private final UUID belongsToPlaylist;
 
 
-    public QueueItem(Playable playable, int queueIndex, UUID belongsToPlaylist) {
+    public QueueItem(Playable playable, UUID belongsToPlaylist) {
         this.playable = playable;
-        this.queueIndex = queueIndex;
+
         this.belongsToPlaylist = belongsToPlaylist;
     }
 
     public Playable getPlayable() {
         return playable;
     }
-    public int getQueueIndex() {
-        return queueIndex;
-    }
     public UUID getBelongsToPlaylist() {
         return belongsToPlaylist;
-    }
-
-    public void setQueueIndex(int queueIndex) {
-        this.queueIndex = queueIndex;
     }
 
     public boolean isPlaylist(){

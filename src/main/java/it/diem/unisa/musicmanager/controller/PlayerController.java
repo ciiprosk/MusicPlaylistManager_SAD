@@ -1,14 +1,21 @@
 package it.diem.unisa.musicmanager.controller;
 
+import it.diem.unisa.musicmanager.model.QueueItem;
 import it.diem.unisa.musicmanager.model.Track;
+import it.diem.unisa.musicmanager.playmode.LoopMode;
+import it.diem.unisa.musicmanager.playmode.PlayMode;
+import it.diem.unisa.musicmanager.playmode.SequentialMode;
+import it.diem.unisa.musicmanager.playmode.ShuffleMode;
 import it.diem.unisa.musicmanager.service.PlayerService;
-import javafx.beans.property.*;
+import it.diem.unisa.musicmanager.service.QueueService;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
-import javafx.scene.media.MediaPlayer;
+
+import java.util.List;
+import java.util.UUID;
 
 
 /**
@@ -20,9 +27,10 @@ public class PlayerController {
 
     // Service di riproduzione, iniettato da chi carica questo controller.
     private PlayerService playerService;
+    private QueueService queueService;
 
-    private MediaPlayer mediaPlayer;
-    private Track loadedTrack;
+    private final PlayMode[] playModes = {new SequentialMode(), new ShuffleMode(), new LoopMode()};
+    private int currentPlayModeIndex = 0;
 
     @FXML private Button buttonPlay;
     @FXML private Button buttonNext;
@@ -53,6 +61,10 @@ public class PlayerController {
         }
     }
 
+    public void setQueueService(QueueService queueService) {
+        this.queueService = queueService;
+    }
+
     /**
      * Pulsante play/pausa: alterna riproduzione e pausa tramite il service.
      */
@@ -69,15 +81,50 @@ public class PlayerController {
     }
     @FXML
     public void handleNext(ActionEvent actionEvent) {
-        //dopo
+        //chiamo il service
+        playerService.next();
     }
 
+    @FXML
     public void handleSkipPlaylist(ActionEvent actionEvent) {
-        //dopo
+        //la logica è che deve saltare tutti i brani presenti nella coda e saltareli tutti alla porssima traccia
+        if (queueService == null) return;
+
+        QueueItem current = queueService.getCurrentItem();
+        if(current == null) return;
+
+        UUID currentPlaylist = current.getBelongsToPlaylist();
+
+        //se è una traccia sola l'id n di associatìzione è null
+        QueueItem next = queueService.nextItem();
+
+        while(next != null && currentPlaylist.equals(next.getBelongsToPlaylist())){
+            next = queueService.nextItem();
+        }
+
+        if (next != null) {
+            List<Track> tracks = next.getPlayable().getTracksToPlay();
+            if(!tracks.isEmpty()){
+                playerService.play(tracks.get(0));
+            }
+        }
     }
 
+    @FXML
     public void handleChangeMode(ActionEvent actionEvent) {
-            //dopo
+            //cicla tra le modalità e le setta nella queue service
+        currentPlayModeIndex = (currentPlayModeIndex + 1) % playModes.length;
+        queueService.setCurrentPlayMode(playModes[currentPlayModeIndex]);
+        updateModeButton();
+
+    }
+
+    private void updateModeButton(){
+        switch (currentPlayModeIndex){
+            case 0 -> buttonMode.setText("⇢"); //U+21E2
+            case 1 -> buttonMode.setText("⇄"); //\u21C4
+            case 2 -> buttonMode.setText("↻"); //\u21BB
+        }
     }
 
     public void handleQueue(ActionEvent actionEvent) {
@@ -85,9 +132,13 @@ public class PlayerController {
     }
 
     private void bind() {
-        // 1. Ascolta il cambio del brano dal Service
-        playerService.currentTrackProperty().addListener((o, ov, track) -> updateTrackInfo(track));
+        // 1. Ascolta il cambio del brano dal Service e aggiorna info + pulsante skip playlist
+        playerService.currentTrackProperty().addListener((o, ov, track) -> {
+            updateTrackInfo(track);
+            updateSkipPlaylistButton();
+        });
         updateTrackInfo(playerService.currentTrackProperty().get());
+        updateSkipPlaylistButton();
 
         // 2. Ascolta lo stato di play/pausa dal Service
         playerService.isPlayingProperty().addListener((o, ov, playing) -> updatePlayButton(playing));
@@ -118,6 +169,12 @@ public class PlayerController {
         });
     }
 
+    private void updateSkipPlaylistButton() {
+        if (queueService == null) return;
+        QueueItem current = queueService.getCurrentItem();
+        boolean belongsToPlaylist = current != null && current.getBelongsToPlaylist() != null;
+        buttonSkipPlaylist.setVisible(belongsToPlaylist);
+    }
     private void updateTrackInfo(Track track) {
         if (track == null) {
             labelTrack.setText("Track");
