@@ -1,6 +1,8 @@
 package it.diem.unisa.musicmanager.service;
 
 import it.diem.unisa.musicmanager.model.Track;
+import it.diem.unisa.musicmanager.playmode.PlayMode;
+import it.diem.unisa.musicmanager.playmode.SequentialMode;
 import javafx.application.Platform;
 import javafx.beans.property.*;
 import javafx.scene.media.Media;
@@ -22,6 +24,9 @@ public class PlayerService {
     private final BooleanProperty isPlaying = new SimpleBooleanProperty(false);
     private final DoubleProperty progress = new SimpleDoubleProperty(0.0);
 
+    private PlayMode currentPlayMode = new SequentialMode();    //di default
+    private int currentIndex = 0;   //default
+
 
     private MediaPlayer mediaPlayer;
 
@@ -42,6 +47,12 @@ public class PlayerService {
 
     public void setTrackService(TrackService trackService) {
         this.trackService = trackService;
+    }
+
+    public void setCurrentPlayMode(PlayMode playMode) {
+
+        this.currentPlayMode = playMode;
+
     }
 
     public void play(Track track) {
@@ -157,5 +168,13 @@ public class PlayerService {
         }
     }
 
-    // TODO: next() - DA FARE DOPO (richiede una coda di riproduzione)
+    /*
+    //metodo per andare alla prossima traccia, a seconda della Strategy applicata
+    public void next() {
+
+        currentPlayMode.nextItem(queue, currentIndex);     //
+
+    }
+    */
+
 }
