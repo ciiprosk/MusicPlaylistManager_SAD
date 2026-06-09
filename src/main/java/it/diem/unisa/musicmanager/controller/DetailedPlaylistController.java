@@ -16,6 +16,8 @@ import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -41,6 +43,7 @@ public class DetailedPlaylistController {
     private TrackService trackService;
     private PlaylistService playlistService;
     private PlayerService playerService;
+    private boolean isTrackListenerAttached = false;
 
     /**
      * Chiamato automaticamente da JavaFX appena la schermata e' pronta.
@@ -81,6 +84,7 @@ public class DetailedPlaylistController {
     }
     public void setTrackService(TrackService trackService){
         this.trackService = trackService;
+        createTrackListener();
         if (this.playlist != null && this.playerService != null) {
             loadTracks();
         }
@@ -103,17 +107,36 @@ public class DetailedPlaylistController {
         lblTrackCount.setText(n + (n == 1 ? " track" : " tracks"));
     }
 
+    private void createTrackListener() {
+        if (!isTrackListenerAttached && trackService != null) {
+            trackService.getAllTracks().addListener(new InvalidationListener() {
+                @Override
+                public void invalidated(Observable observable) {
+                    if (playlist != null) {
+                        javafx.application.Platform.runLater(() -> loadTracks());
+                    }
+                }
+            });
+
+            isTrackListenerAttached = true;
+        }
+    }
+
     private void loadTracks(){
         trackList.getChildren().clear();
 
         for(Track track : playlist.getTracksList()){
             try{
+                Track updatedTrack = trackService.searchTrackById(track.getId())
+                        .orElse(track);
+
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/it/diem/unisa/musicmanager/components/trackRow.fxml"));
                 HBox row = loader.load();
 
                 RowTrackController controller = loader.getController();
-                controller.setTrack(track);
+                controller.setTrack(updatedTrack);
                 controller.setPlayerService(playerService);
+                controller.setTrackService(trackService);
 
                 //se premo il tasto elimina, rimuovo la traccia dalla playlist
                 controller.setOnDeleteAction(() -> {

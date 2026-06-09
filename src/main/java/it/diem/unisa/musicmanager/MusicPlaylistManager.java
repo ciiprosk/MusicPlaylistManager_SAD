@@ -36,6 +36,17 @@ public class MusicPlaylistManager extends Application {
 
         playerService.setTrackService(trackService);
 
+        trackService.addObserver(deletedTrackId -> {
+            for (Playlist playlist : sharedState.getALlPlaylists()) {
+                if (playlist.containsTrack(deletedTrackId)) {
+                    playlistService.removeTrackFromPlaylist(
+                            playlist.getId(),
+                            deletedTrackId
+                    );
+                }
+            }
+        });
+
         FXMLLoader fxmlLoader = new FXMLLoader(MusicPlaylistManager.class.getResource("MusicPlaylistManagerGUI.fxml"));
 
         Scene scene = new Scene(fxmlLoader.load(), 1080, 720);

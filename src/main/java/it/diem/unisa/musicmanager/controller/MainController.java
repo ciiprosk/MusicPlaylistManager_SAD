@@ -26,6 +26,7 @@ public class MainController {
     private void openHome() {
         if (homePageController != null) {
             homePageController.loadTopTracks();
+            homePageController.loadTopPlaylists();
         }
 
         showPage(homePage);

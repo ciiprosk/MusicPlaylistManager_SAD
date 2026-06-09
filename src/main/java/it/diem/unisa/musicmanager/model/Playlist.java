@@ -24,6 +24,7 @@ public class Playlist implements Playable{
     
     /** Lista in memoria degli oggetti Track. Non viene serializzata nel JSON. */
     private transient List<Track> tracksList;
+    private int playCount;
 
     /**
      * Costruttore della playlist.
@@ -34,6 +35,7 @@ public class Playlist implements Playable{
         this.id = UUID.randomUUID();
         this.trackIDs = new ArrayList<>();
         this.tracksList = new ArrayList<>();
+        this.playCount = 0;
     }
 
     /**
@@ -47,6 +49,7 @@ public class Playlist implements Playable{
         this.id = id;
         this.trackIDs = trackIDs != null ? new ArrayList<>(trackIDs) : new ArrayList<>();
         this.tracksList = new ArrayList<>();
+        this.playCount = 0;
     }
 
     /**
@@ -60,6 +63,7 @@ public class Playlist implements Playable{
         this.id = playlistID;
         this.trackIDs = new ArrayList<>();
         this.tracksList = new ArrayList<>();
+        this.playCount = 0;
     }
 
 
@@ -118,6 +122,37 @@ public class Playlist implements Playable{
     }
 
     */
+    /**
+     * Metodo legacy per l'aggiunta di una traccia tramite UUID.
+     * Aggiorna la lista degli ID usata per la persistenza su file.
+     *
+     * @param trackID l'identificatore univoco della traccia da aggiungere.
+     */
+    public void addTrack(UUID trackID) {
+        if (trackID != null && !trackIDs.contains(trackID)) {
+            trackIDs.add(trackID);
+        }
+
+        if (tracksList == null) {
+            tracksList = new ArrayList<>();
+        }
+    }
+
+    /**
+     * Metodo legacy per la rimozione di una traccia tramite UUID.
+     * Rimuove la traccia sia dalla lista degli ID sia dalla lista degli oggetti Track in memoria.
+     *
+     * @param trackID l'identificatore univoco della traccia da rimuovere.
+     */
+    public void removeTrack(UUID trackID) {
+        if (trackID != null) {
+            trackIDs.remove(trackID);
+
+            if (tracksList != null) {
+                tracksList.removeIf(track -> track.getId().equals(trackID));
+            }
+        }
+    }
     /**
      * Metodo che ritorna una copia della lista degli UUID delle tracce presenti.
      * @return una lista non modificabile di UUID delle tracce.
@@ -218,4 +253,11 @@ public class Playlist implements Playable{
         return name != null ? name.hashCode() : 0;
     }
 
+    public int getPlayCount() {
+        return playCount;
+    }
+
+    public void incrementPlayCount() {
+        this.playCount++;
+    }
 }

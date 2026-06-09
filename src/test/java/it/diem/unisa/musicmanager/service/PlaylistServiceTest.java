@@ -2,7 +2,9 @@ package it.diem.unisa.musicmanager.service;
 
 import it.diem.unisa.musicmanager.dao.DAO;
 import it.diem.unisa.musicmanager.dao.JSONPlaylistDAO;
+import it.diem.unisa.musicmanager.model.Genre;
 import it.diem.unisa.musicmanager.model.Playlist;
+import it.diem.unisa.musicmanager.model.Track;
 import it.diem.unisa.musicmanager.state.SharedState;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -141,23 +143,38 @@ class PlaylistServiceTest {
         Playlist playlist =
                 sharedState.getALlPlaylists().get(0);
 
-        UUID trackId = UUID.randomUUID();
+        Track track = new Track(
+                "Numb",
+                "Linkin Park",
+                Genre.ROCK,
+                "songs/numb.mp3",
+                185,
+                "2003"
+        );
+
+        sharedState.getALlTracks().add(track);
 
         playlistService.addTrackToPlaylist(
                 playlist.getId(),
-                trackId
+                track.getId()
         );
 
         Playlist updatedPlaylist =
                 sharedState.getALlPlaylists().get(0);
 
-        assertTrue(updatedPlaylist.containsTrack(trackId));
+        assertTrue(updatedPlaylist.containsTrack(track.getId()));
 
         assertEquals(
                 1,
                 updatedPlaylist.getTracks().size()
         );
+
+        assertEquals(
+                1,
+                updatedPlaylist.getTracksList().size()
+        );
     }
+
     //TEST CREAZIONE PLAYLIST NEGATA CON NOME PLAYLIST DUPLICATO
 
     @Test
@@ -204,28 +221,42 @@ class PlaylistServiceTest {
         Playlist playlist =
                 sharedState.getALlPlaylists().get(0);
 
-        UUID trackId = UUID.randomUUID();
+        Track track = new Track(
+                "Numb",
+                "Linkin Park",
+                Genre.ROCK,
+                "songs/numb.mp3",
+                185,
+                "2003"
+        );
+
+        sharedState.getALlTracks().add(track);
 
         playlistService.addTrackToPlaylist(
                 playlist.getId(),
-                trackId
+                track.getId()
         );
 
         playlistService.removeTrackFromPlaylist(
                 playlist.getId(),
-                trackId
+                track.getId()
         );
 
         Playlist updatedPlaylist =
                 sharedState.getALlPlaylists().get(0);
 
         assertFalse(
-                updatedPlaylist.containsTrack(trackId)
+                updatedPlaylist.containsTrack(track.getId())
         );
 
         assertEquals(
                 0,
                 updatedPlaylist.getTracks().size()
+        );
+
+        assertEquals(
+                0,
+                updatedPlaylist.getTracksList().size()
         );
     }
 
@@ -483,18 +514,45 @@ class PlaylistServiceTest {
         Playlist playlist =
                 sharedState.getALlPlaylists().get(0);
 
-        UUID track1 = UUID.randomUUID();
-        UUID track2 = UUID.randomUUID();
+        Track track1 = createTrack("Track1");
+        Track track2 = createTrack("Track2");
 
-        playlistService.addTrackToPlaylist(playlist.getId(), track1);
-        playlistService.addTrackToPlaylist(playlist.getId(), track2);
+        playlistService.addTrackToPlaylist(
+                playlist.getId(),
+                track1.getId()
+        );
+
+        playlistService.addTrackToPlaylist(
+                playlist.getId(),
+                track2.getId()
+        );
 
         Playlist updatedPlaylist =
                 sharedState.getALlPlaylists().get(0);
 
         assertEquals(2, updatedPlaylist.getTracks().size());
-        assertEquals(track1, updatedPlaylist.getTracks().get(0));
-        assertEquals(track2, updatedPlaylist.getTracks().get(1));
+
+        assertEquals(
+                track1.getId(),
+                updatedPlaylist.getTracks().get(0)
+        );
+
+        assertEquals(
+                track2.getId(),
+                updatedPlaylist.getTracks().get(1)
+        );
+
+        assertEquals(2, updatedPlaylist.getTracksList().size());
+
+        assertEquals(
+                track1.getId(),
+                updatedPlaylist.getTracksList().get(0).getId()
+        );
+
+        assertEquals(
+                track2.getId(),
+                updatedPlaylist.getTracksList().get(1).getId()
+        );
     }
 
     //TEST AGGIUNGERE UN BRANO ALLA PLAYLIST NOTIFICA OBSERVER
@@ -513,9 +571,12 @@ class PlaylistServiceTest {
         Playlist playlist =
                 sharedState.getALlPlaylists().get(0);
 
-        UUID trackId = UUID.randomUUID();
+        Track track = createTrack("Numb");
 
-        playlistService.addTrackToPlaylist(playlist.getId(), trackId);
+        playlistService.addTrackToPlaylist(
+                playlist.getId(),
+                track.getId()
+        );
 
         assertTrue(notified[0]);
     }
@@ -530,20 +591,39 @@ class PlaylistServiceTest {
         Playlist playlist =
                 sharedState.getALlPlaylists().get(0);
 
-        UUID currentTrackId = UUID.randomUUID();
-        UUID newTrackId = UUID.randomUUID();
+        Track currentTrack = createTrack("CurrentTrack");
+        Track newTrack = createTrack("NewTrack");
 
         sharedState.getIsPlaying().set(true);
 
-        playlistService.addTrackToPlaylist(playlist.getId(), currentTrackId);
-        playlistService.addTrackToPlaylist(playlist.getId(), newTrackId);
+        playlistService.addTrackToPlaylist(
+                playlist.getId(),
+                currentTrack.getId()
+        );
+
+        playlistService.addTrackToPlaylist(
+                playlist.getId(),
+                newTrack.getId()
+        );
 
         Playlist updatedPlaylist =
                 sharedState.getALlPlaylists().get(0);
 
         assertTrue(sharedState.getIsPlaying().get());
-        assertTrue(updatedPlaylist.containsTrack(newTrackId));
-        assertEquals(newTrackId, updatedPlaylist.getTracks().get(1));
+
+        assertTrue(
+                updatedPlaylist.containsTrack(newTrack.getId())
+        );
+
+        assertEquals(
+                newTrack.getId(),
+                updatedPlaylist.getTracks().get(1)
+        );
+
+        assertEquals(
+                newTrack.getId(),
+                updatedPlaylist.getTracksList().get(1).getId()
+        );
     }
 
     //TEST AGGIUNTA BRANO A PLAYLIST NON DEVE PERMETTERE DI AGGIUNGERE BRANI DUPLICATI
@@ -556,15 +636,30 @@ class PlaylistServiceTest {
         Playlist playlist =
                 sharedState.getALlPlaylists().get(0);
 
-        UUID trackId = UUID.randomUUID();
+        Track track = createTrack("Numb");
 
-        playlistService.addTrackToPlaylist(playlist.getId(), trackId);
-        playlistService.addTrackToPlaylist(playlist.getId(), trackId);
+        playlistService.addTrackToPlaylist(
+                playlist.getId(),
+                track.getId()
+        );
+
+        playlistService.addTrackToPlaylist(
+                playlist.getId(),
+                track.getId()
+        );
 
         Playlist updatedPlaylist =
                 sharedState.getALlPlaylists().get(0);
 
-        assertEquals(1, updatedPlaylist.getTracks().size());
+        assertEquals(
+                1,
+                updatedPlaylist.getTracks().size()
+        );
+
+        assertEquals(
+                1,
+                updatedPlaylist.getTracksList().size()
+        );
     }
 
     //TEST PERSISTENZA TRAMITE UPDATE DAO SU AGGIUNTA TRACCIA A PLAYLIST
@@ -577,9 +672,12 @@ class PlaylistServiceTest {
         Playlist playlist =
                 sharedState.getALlPlaylists().get(0);
 
-        UUID trackId = UUID.randomUUID();
+        Track track = createTrack("Numb");
 
-        playlistService.addTrackToPlaylist(playlist.getId(), trackId);
+        playlistService.addTrackToPlaylist(
+                playlist.getId(),
+                track.getId()
+        );
 
         DAO<Playlist> newPlaylistDAO =
                 new JSONPlaylistDAO(
@@ -591,7 +689,15 @@ class PlaylistServiceTest {
                 newPlaylistDAO.searchById(playlist.getId());
 
         assertTrue(result.isPresent());
-        assertTrue(result.get().containsTrack(trackId));
+
+        assertTrue(
+                result.get().containsTrack(track.getId())
+        );
+
+        assertEquals(
+                1,
+                result.get().getTracks().size()
+        );
     }
 
     //TEST VIETATO AGGIUNGERE UN BRANO AD UNA PLAYLIST INESISTENTE
@@ -618,6 +724,8 @@ class PlaylistServiceTest {
         Playlist playlist =
                 sharedState.getALlPlaylists().get(0);
 
+        Track track = createTrack("Numb");
+
         final boolean[] notified = {false};
 
         sharedState.getALlPlaylists().addListener(
@@ -630,11 +738,9 @@ class PlaylistServiceTest {
                 }
         );
 
-        UUID trackId = UUID.randomUUID();
-
         playlistService.addTrackToPlaylist(
                 playlist.getId(),
-                trackId
+                track.getId()
         );
 
         assertTrue(
@@ -650,21 +756,39 @@ class PlaylistServiceTest {
 
         playlistService.createPlaylist("Rock");
 
-        Playlist playlist = sharedState.getALlPlaylists().get(0);
+        Playlist playlist =
+                sharedState.getALlPlaylists().get(0);
 
-        UUID trackId = UUID.randomUUID();
+        Track track = createTrack("Numb");
 
-        playlistService.addTrackToPlaylist(playlist.getId(), trackId);
+        playlistService.addTrackToPlaylist(
+                playlist.getId(),
+                track.getId()
+        );
 
         sharedState.getIsPlaying().set(true);
 
-        playlistService.removeTrackFromPlaylist(playlist.getId(), trackId);
+        playlistService.removeTrackFromPlaylist(
+                playlist.getId(),
+                track.getId()
+        );
 
-        Playlist updatedPlaylist = sharedState.getALlPlaylists().get(0);
+        Playlist updatedPlaylist =
+                sharedState.getALlPlaylists().get(0);
 
         assertTrue(sharedState.getIsPlaying().get());
-        assertFalse(updatedPlaylist.containsTrack(trackId));
-        assertTrue(updatedPlaylist.getTracks().isEmpty());
+
+        assertFalse(
+                updatedPlaylist.containsTrack(track.getId())
+        );
+
+        assertTrue(
+                updatedPlaylist.getTracks().isEmpty()
+        );
+
+        assertTrue(
+                updatedPlaylist.getTracksList().isEmpty()
+        );
     }
 
     //TEST RESTITUISCI PLAYLIST PER ID SELEZIONATO
@@ -705,17 +829,92 @@ class PlaylistServiceTest {
         Playlist playlist =
                 sharedState.getALlPlaylists().get(0);
 
-        UUID track1 = UUID.randomUUID();
-        UUID track2 = UUID.randomUUID();
+        Track track1 = createTrack("Track1");
+        Track track2 = createTrack("Track2");
 
-        playlistService.addTrackToPlaylist(playlist.getId(), track1);
-        playlistService.addTrackToPlaylist(playlist.getId(), track2);
+        playlistService.addTrackToPlaylist(
+                playlist.getId(),
+                track1.getId()
+        );
 
-        List<it.diem.unisa.musicmanager.model.Track> tracks =
+        playlistService.addTrackToPlaylist(
+                playlist.getId(),
+                track2.getId()
+        );
+
+        List<Track> tracks =
                 playlistService.getTracksFromPlaylist(playlist.getId());
 
         assertEquals(2, tracks.size());
-        assertEquals(track1, tracks.get(0).getId());
-        assertEquals(track2, tracks.get(1).getId());
+
+        assertEquals(
+                track1.getId(),
+                tracks.get(0).getId()
+        );
+
+        assertEquals(
+                track2.getId(),
+                tracks.get(1).getId()
+        );
+    }
+
+    //SERVE SOLO PER I TEST
+
+    private Track createTrack(String title) {
+        Track track = new Track(
+                title,
+                "Author",
+                Genre.ROCK,
+                "songs/" + title + ".mp3",
+                180,
+                "2020"
+        );
+
+        sharedState.getALlTracks().add(track);
+
+        return track;
+    }
+
+    //TEST MAX 5 PLAYLIST TRA LE PIù ASCOLTATE
+
+    @Test
+    void getTop5MostPlayedPlaylistsShouldReturnMaximumFivePlaylists() {
+
+        for (int i = 1; i <= 10; i++) {
+            playlistService.createPlaylist("Playlist " + i);
+
+            Playlist playlist =
+                    sharedState.getALlPlaylists().get(i - 1);
+
+            for (int j = 0; j < i; j++) {
+                playlist.incrementPlayCount();
+            }
+        }
+
+        List<Playlist> result =
+                playlistService.getTop5MostPlayedPlaylists();
+
+        assertEquals(5, result.size());
+    }
+
+    //TEST INCREMENTO CORRETTO DEL PLAYLIST PLAY COUNT
+
+    @Test
+    void incrementPlaylistPlayCountShouldIncreasePlayCount() {
+
+        playlistService.createPlaylist("Rock");
+
+        Playlist playlist =
+                sharedState.getALlPlaylists().get(0);
+
+        Optional<String> result =
+                playlistService.incrementPlayCount(playlist.getId());
+
+        assertTrue(result.isEmpty());
+
+        Playlist updatedPlaylist =
+                sharedState.getALlPlaylists().get(0);
+
+        assertEquals(1, updatedPlaylist.getPlayCount());
     }
 }

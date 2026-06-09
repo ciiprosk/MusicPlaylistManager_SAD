@@ -78,14 +78,20 @@ public class RowTrackController {
         this.playerService = playerService;
 
         if (!isListenerAttached) {
-            // Reagisce ai cambiamenti del servizio per aggiornare l'icona
-            playerService.currentTrackProperty().addListener((o, ov, nv) ->{
+            playerService.currentTrackProperty().addListener((o, ov, nv) -> {
                 updateCurrentTrackStyle();
                 updateButtonState();
             });
-            playerService.isPlayingProperty().addListener((o, ov, nv) -> updateButtonState());
+
+            playerService.isPlayingProperty().addListener((o, ov, nv) -> {
+                updateCurrentTrackStyle();
+                updateButtonState();
+            });
+
             isListenerAttached = true;
         }
+
+        updateCurrentTrackStyle();
         updateButtonState();
     }
 
@@ -93,9 +99,13 @@ public class RowTrackController {
      * Aggiorna graficamente l'icona del pulsante basandosi esclusivamente sullo stato del Service.
      */
     private void updateButtonState() {
+        Track currentTrack = playerService != null
+                ? playerService.currentTrackProperty().get()
+                : null;
+
         boolean isCurrentAndPlaying = track != null
-                && playerService != null
-                && track.equals(playerService.currentTrackProperty().get())
+                && currentTrack != null
+                && track.getId().equals(currentTrack.getId())
                 && playerService.isPlayingProperty().get();
 
         btnPlay.setText(isCurrentAndPlaying ? "⏸" : "▶");
@@ -181,11 +191,19 @@ public class RowTrackController {
         this.onDeleteAction = onDeleteAction;
     }
 
-    private  void updateCurrentTrackStyle(){
-        //reset della traccai corrente
+    private void updateCurrentTrackStyle() {
         rootContainer.getStyleClass().remove("brano-row-playing");
 
-        if(track != null && track.equals(playerService.currentTrackProperty().get())){
+        Track currentTrack = playerService != null
+                ? playerService.currentTrackProperty().get()
+                : null;
+
+        boolean isCurrentAndPlaying = track != null
+                && currentTrack != null
+                && track.getId().equals(currentTrack.getId())
+                && playerService.isPlayingProperty().get();
+
+        if (isCurrentAndPlaying) {
             rootContainer.getStyleClass().add("brano-row-playing");
         }
     }
