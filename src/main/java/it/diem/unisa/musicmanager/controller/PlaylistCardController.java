@@ -1,6 +1,7 @@
 package it.diem.unisa.musicmanager.controller;
 
 import it.diem.unisa.musicmanager.model.Playlist;
+import it.diem.unisa.musicmanager.model.Track;
 import it.diem.unisa.musicmanager.service.PlayerService;
 import it.diem.unisa.musicmanager.service.PlaylistService;
 import it.diem.unisa.musicmanager.service.TrackService;
@@ -71,17 +72,32 @@ public class PlaylistCardController {
      */
     @FXML
     private void handlePlay() {
-        if (playlistService != null && playlist != null) {
+        if (playlist == null || playlist.getTracksList().isEmpty()) {
+            return;
+        }
+
+        Track firstTrack = playlist.getTracksList().get(0);
+
+        Track currentTrack = playerService != null
+                ? playerService.currentTrackProperty().get()
+                : null;
+
+        boolean isThisPlaylistAlreadyPlaying =
+                playerService != null
+                        && currentTrack != null
+                        && currentTrack.getId().equals(firstTrack.getId())
+                        && playerService.isPlayingProperty().get();
+
+        if (isThisPlaylistAlreadyPlaying) {
+            return;
+        }
+
+        if (playlistService != null) {
             playlistService.incrementPlayCount(playlist.getId());
         }
 
-        if (playerService != null
-                && playlist != null
-                && !playlist.getTracksList().isEmpty()) {
-
-            playerService.play(
-                    playlist.getTracksList().get(0)
-            );
+        if (playerService != null) {
+            playerService.play(firstTrack);
         }
     }
 

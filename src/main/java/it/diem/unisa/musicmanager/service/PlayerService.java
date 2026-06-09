@@ -154,6 +154,23 @@ public class PlayerService {
     }
 
     /**
+     * Avvia una traccia dall'inizio, anche se era già caricata.
+     * Utile quando si preme Play su una playlist e si vuole ripartire dalla prima traccia.
+     *
+     * @param track traccia da riprodurre dall'inizio.
+     */
+    public void playFromBeginning(Track track) {
+        if (track == null) {
+            return;
+        }
+
+        stopCurrent();
+        loadedTrack = null;
+
+        play(track);
+    }
+
+    /**
      * Gestisce l'alternanza di riproduzione e pausa per una determinata traccia.
      * Se la traccia è già in esecuzione, viene messa in pausa.
      * Se era in pausa, riprende. Se è un brano nuovo, lo fa partire.
