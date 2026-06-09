@@ -71,7 +71,18 @@ public class PlaylistCardController {
      */
     @FXML
     private void handlePlay() {
-        // gestione edl player servcie
+        if (playlistService != null && playlist != null) {
+            playlistService.incrementPlayCount(playlist.getId());
+        }
+
+        if (playerService != null
+                && playlist != null
+                && !playlist.getTracksList().isEmpty()) {
+
+            playerService.play(
+                    playlist.getTracksList().get(0)
+            );
+        }
     }
 
     /**

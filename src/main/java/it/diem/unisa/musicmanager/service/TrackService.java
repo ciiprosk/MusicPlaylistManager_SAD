@@ -115,14 +115,13 @@ public class TrackService {
 
     public void deleteTrack(UUID trackId){
 
-        trackDAO.delete(trackId);   //eliminazione traccia dall'archivio
-
-        sharedState.getALlTracks().removeIf(t -> t.getId().equals(trackId));    //eliminazione visiva della traccia
-
-        for (TrackObserver observer : observers) {  //tutti gli Observer delle tracce vengono avvisati che la traccia è stata eliminata
+        for (TrackObserver observer : observers) {
             observer.onTrackDeleted(trackId);
         }
 
+        trackDAO.delete(trackId);
+
+        sharedState.getALlTracks().removeIf(t -> t.getId().equals(trackId));
     }
 
     //si occupa dell'update della traccia nell'interfaccia grafica

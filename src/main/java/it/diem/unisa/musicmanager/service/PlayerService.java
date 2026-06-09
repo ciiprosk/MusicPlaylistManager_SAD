@@ -58,7 +58,9 @@ public class PlayerService {
     public void play(Track track) {
         if (track == null || track.getSongPath() == null) return;
 
-        if (track.equals(loadedTrack) && mediaPlayer != null) {
+        if (loadedTrack != null
+                && track.getId().equals(loadedTrack.getId())
+                && mediaPlayer != null) {
             resume();
             return;
         }
@@ -160,10 +162,13 @@ public class PlayerService {
         if (track == null) return;
 
         // Se il brano passato è quello corrente e sta già suonando -> Pausa
-        if (track.equals(currentTrack.get()) && isPlaying.get()) {
+        Track current = currentTrack.get();
+
+        if (current != null
+                && track.getId().equals(current.getId())
+                && isPlaying.get()) {
             pause();
         } else {
-            // Altrimenti (è un brano nuovo o era in pausa) -> Riproduci
             play(track);
         }
     }

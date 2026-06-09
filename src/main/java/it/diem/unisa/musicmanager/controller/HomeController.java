@@ -1,5 +1,6 @@
 package it.diem.unisa.musicmanager.controller;
 
+import it.diem.unisa.musicmanager.model.Playlist;
 import it.diem.unisa.musicmanager.model.Track;
 import it.diem.unisa.musicmanager.service.TrackService;
 import javafx.fxml.FXML;
@@ -9,8 +10,8 @@ import javafx.scene.layout.VBox;
 import it.diem.unisa.musicmanager.util.WindowUtil;
 import javafx.stage.Modality;
 import javafx.fxml.FXML;
-import java.io.IOException;
-
+import java.io.IOException;import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import java.util.List;
 /**
  * Controller responsible for managing the behavior of the Home view.
@@ -28,7 +29,9 @@ import java.util.List;
 public class HomeController {
     @FXML
     private VBox topTracksContainer;
-
+    @FXML
+    private VBox topPlaylistsContainer;
+    private boolean isListenerAttached = false;
     private TrackService trackService;
     private it.diem.unisa.musicmanager.service.PlayerService playerService;
     private it.diem.unisa.musicmanager.service.PlaylistService playlistService;
@@ -39,6 +42,7 @@ public class HomeController {
 
     public void setTrackService(TrackService trackService) {
         this.trackService = trackService;
+        createTrackListener();
         if (this.playerService != null) {
             loadTopTracks();
         }
@@ -53,6 +57,20 @@ public class HomeController {
 
     public void setPlaylistService(it.diem.unisa.musicmanager.service.PlaylistService playlistService) {
         this.playlistService = playlistService;
+        loadTopPlaylists();
+    }
+
+    private void createTrackListener() {
+        if (!isListenerAttached && trackService != null) {
+            trackService.getAllTracks().addListener(new InvalidationListener() {
+                @Override
+                public void invalidated(Observable observable) {
+                    loadTopTracks();
+                }
+            });
+
+            isListenerAttached = true;
+        }
     }
 
     public void loadTopTracks() {
@@ -105,6 +123,35 @@ public class HomeController {
 
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void loadTopPlaylists() {
+        if (playlistService == null || topPlaylistsContainer == null) {
+            return;
+        }
+
+        topPlaylistsContainer.getChildren().clear();
+
+        List<Playlist> topPlaylists =
+                playlistService.getTop5MostPlayedPlaylists();
+
+        if (topPlaylists.isEmpty()) {
+            Label emptyLabel = new Label("No playlists played yet.");
+            emptyLabel.setStyle("-fx-text-fill: #cccccc;");
+            topPlaylistsContainer.getChildren().add(emptyLabel);
+            return;
+        }
+
+        for (Playlist playlist : topPlaylists) {
+            Label label = new Label(
+                    playlist.getName()
+                            + " | Plays: "
+                            + playlist.getPlayCount()
+            );
+
+            label.setStyle("-fx-text-fill: white; -fx-font-size: 14px;");
+            topPlaylistsContainer.getChildren().add(label);
         }
     }
 
