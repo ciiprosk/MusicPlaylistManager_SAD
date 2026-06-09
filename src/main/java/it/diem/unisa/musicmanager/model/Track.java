@@ -1,6 +1,8 @@
 package it.diem.unisa.musicmanager.model;
 
 import it.diem.unisa.musicmanager.exception.TrackInfoException;
+import java.util.EnumSet;
+import java.util.Set;
 
 import java.util.List;
 import java.util.UUID;
@@ -23,8 +25,10 @@ public class Track  implements  Playable{
 
     private int playCount;  //conteggio ascolto traccia
 
+    private Set<Tag> tags;
 
-    public Track(String title, String author, Genre genre, String songPath, int songLength, String year) {
+
+    public Track(String title, String author, Genre genre, String songPath, int songLength, String year, Set<Tag> tags) {
 
         this.id = UUID.randomUUID();
 
@@ -42,10 +46,14 @@ public class Track  implements  Playable{
 
         this.playCount = 0;
 
+        this.tags = (tags == null || tags.isEmpty())
+                ? EnumSet.noneOf(Tag.class)
+                : EnumSet.copyOf(tags);
+
     }
 
     //costruttore per recuperare le info già esistenti (persistenza)
-    public Track(UUID id, String title, String author, Genre genre, String songPath, int songLength, String year) {
+    public Track(UUID id, String title, String author, Genre genre, String songPath, int songLength, String year, EnumSet<Tag> tags) {
 
         this.id = id;
 
@@ -61,6 +69,10 @@ public class Track  implements  Playable{
 
         this.year = validateYear(year);
 
+        this.tags = (tags == null || tags.isEmpty())
+                ? EnumSet.noneOf(Tag.class)
+                : EnumSet.copyOf(tags);
+
     }
 
     //costruttore con solo id, ci serve per la delete nel DAO
@@ -74,6 +86,7 @@ public class Track  implements  Playable{
         this.songLength = 1; // Obbligatorio inizializzarlo perché è final, e deve essere >0
         this.year = "UNKNOWN";
         this.playCount = 0;
+        this.tags = EnumSet.noneOf(Tag.class);
     }
 
     /**
@@ -120,6 +133,30 @@ public class Track  implements  Playable{
         return songPath;
     }
 
+    public Set<Tag> getTags() {
+        return tags.isEmpty()
+                ? EnumSet.noneOf(Tag.class)
+                : EnumSet.copyOf(tags);
+    }
+
+    //metodi utili per i tag
+    public void addTag(Tag tag) {
+        tags.add(tag);
+    }
+
+    public void removeTag(Tag tag) {
+        tags.remove(tag);
+    }
+
+    public boolean hasTag(Tag tag) {
+        return tags.contains(tag);
+    }
+
+    public void setTags(Set<Tag> tags) {
+        this.tags = (tags != null)
+                ? EnumSet.copyOf(tags)
+                : EnumSet.noneOf(Tag.class);
+    }
     public void setTitle(String title) {
         this.title = validateTitle(title);
     }
@@ -135,6 +172,8 @@ public class Track  implements  Playable{
     public void setYear(String year) {
         this.year = validateYear(year);
     }
+
+
 
     public boolean isDuplicate(Track track) {
         //tracce duplicate se hanno stesso nome e stesso autore

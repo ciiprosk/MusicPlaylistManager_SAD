@@ -3,14 +3,16 @@ package it.diem.unisa.musicmanager.controller;
 import it.diem.unisa.musicmanager.model.Genre;
 import it.diem.unisa.musicmanager.model.Track;
 import it.diem.unisa.musicmanager.service.TrackService;
+import it.diem.unisa.musicmanager.util.TagUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
+import java.util.EnumSet;
+import java.util.Set;
+
+import it.diem.unisa.musicmanager.model.Tag;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -31,12 +33,18 @@ public class EditSongController {
     @FXML private Label lblFilePath;
     @FXML private Label lblError;
     @FXML private Button btnSave;
+    @FXML private ToggleButton btnExplicit;
+    @FXML private ToggleButton btnFavorite;
+    @FXML private ToggleButton btnNewRelease;
 
     // Service per validare e salvare le modifiche (passato da chi apre il popup).
     private TrackService trackService;
 
     // Il brano in fase di modifica.
     private Track track;
+
+    // callback eseguito dopo un salvataggio riuscito (può essere null)
+    private Runnable onSaved;
 
     public void setTrackService(TrackService trackService) {
         this.trackService = trackService;
@@ -60,6 +68,10 @@ public class EditSongController {
         // Sola lettura: durata e percorso del file.
         fieldDuration.setText(formatDuration(track.getSongLength()));
         lblFilePath.setText(track.getSongPath());
+
+        btnExplicit.setSelected(track.hasTag(Tag.EXPLICIT));
+        btnFavorite.setSelected(track.hasTag(Tag.FAVOURITE));
+        btnNewRelease.setSelected(track.hasTag(Tag.NEWRELEASE));
     }
 
     /** Chiamato da JavaFX all'apertura: riempie la tendina dei generi. */
@@ -101,12 +113,14 @@ public class EditSongController {
         // Il service valida (titolo, anno, duplicati) e salva.
         // Ritorna Optional vuoto se tutto ok, altrimenti il messaggio d'errore.
         Optional<String> error = trackService.updateTrack(
-                track.getId(), title, author, getSelectedGenre(), year);
+                track.getId(), title, author, getSelectedGenre(), year,
+                TagUtils.fromToggles(btnExplicit, btnFavorite, btnNewRelease));
 
         if (error.isPresent()) {
             lblError.setText(error.get());
             return;
         }
+        if (onSaved != null) onSaved.run(); // avvisa chi ha aperto l'editor (es. il dettaglio)
 
         close(e);
     }
@@ -122,4 +136,9 @@ public class EditSongController {
         Stage stage = (Stage) ((Node) e.getSource()).getScene().getWindow();
         stage.close();
     }
+
+    public void setOnSaved(Runnable onSaved) {
+        this.onSaved = onSaved;
+    }
+
 }

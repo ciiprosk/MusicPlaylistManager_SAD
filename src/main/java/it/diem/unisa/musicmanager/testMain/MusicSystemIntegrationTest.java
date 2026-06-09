@@ -6,6 +6,8 @@ import it.diem.unisa.musicmanager.dao.JSONTrackDAO;
 import it.diem.unisa.musicmanager.model.Genre;
 import it.diem.unisa.musicmanager.model.Playlist;
 import it.diem.unisa.musicmanager.model.Track;
+import java.util.EnumSet;
+import it.diem.unisa.musicmanager.model.Tag;
 
 import java.util.Optional;
 
@@ -19,8 +21,8 @@ public class MusicSystemIntegrationTest {
 
         try {
             System.out.println("--- 1. Creazione e Salvataggio Tracce ---");
-            Track t1 = new Track("Bohemian Rhapsody", "Queen", Genre.ROCK, "/path/song1.mp3", 354, "1975");
-            Track t2 = new Track("Hotel California", "Eagles", Genre.ROCK, "/path/song2.mp3", 400, "1976");
+            Track t1 = new Track("Bohemian Rhapsody", "Queen", Genre.ROCK, "/path/song1.mp3", 354, "1975", EnumSet.of(Tag.FAVOURITE));
+            Track t2 = new Track("Hotel California", "Eagles", Genre.ROCK, "/path/song2.mp3", 400, "1976", EnumSet.of(Tag.FAVOURITE));
 
             trackDAO.insert(t1);
             trackDAO.insert(t2);

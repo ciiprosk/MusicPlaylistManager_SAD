@@ -1,5 +1,6 @@
 package it.diem.unisa.musicmanager.controller;
 
+import it.diem.unisa.musicmanager.model.Tag;
 import it.diem.unisa.musicmanager.model.Track;
 import it.diem.unisa.musicmanager.service.PlayerService;
 import it.diem.unisa.musicmanager.service.TrackService;
@@ -38,6 +39,9 @@ public class RowTrackController {
     @FXML private CheckBox checkkSelect;
     @FXML private HBox rootContainer;
 
+    @FXML
+    private HBox tagsContainer;
+
     private boolean isListenerAttached = false;
     private Runnable onDeleteAction;
 
@@ -58,6 +62,7 @@ public class RowTrackController {
 
     public void setTrack(Track track) {
         this.track = track;
+
         lblTitle.setText(track.getTitle());
         lblAuthor.setText(track.getAuthor());
 
@@ -68,7 +73,11 @@ public class RowTrackController {
         if (lblPlayCount != null) {
             lblPlayCount.setText(track.getPlayCount() + " Plays");
         }
+
+        renderTags();
     }
+
+
 
     public void setTrackService(TrackService trackService) {
         this.trackService = trackService;
@@ -159,7 +168,17 @@ public class RowTrackController {
 
     private void openDetail() {
         try {
-            WindowUtil.openWindow("/it/diem/unisa/musicmanager/pages/detailSong.fxml", track.getTitle(), Modality.WINDOW_MODAL);
+            FXMLLoader loader = WindowUtil.openWindow(
+                    "/it/diem/unisa/musicmanager/pages/detailSong.fxml",
+                    track.getTitle(),
+                    Modality.WINDOW_MODAL
+            );
+
+            DetailSongController controller = loader.getController();
+
+            controller.setTrackService(trackService);
+            controller.setTrack(track);
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -208,4 +227,37 @@ public class RowTrackController {
         }
     }
 
+
+    private void renderTags() {
+        if (tagsContainer == null) return;
+
+        tagsContainer.getChildren().clear();
+
+        for (Tag tag : track.getTags()) {
+            tagsContainer.getChildren().add(createTag(tag));
+        }
+    }
+
+    //Creazione dinamica delle label associate ai tag
+    private Label createTag(Tag tag) {
+        Label label = new Label();
+        label.getStyleClass().add("tag");
+
+        switch (tag) {
+            case EXPLICIT -> {
+                label.setText("E");
+                label.getStyleClass().add("tag-explicit");
+            }
+            case FAVOURITE -> {
+                label.setText("♥");
+                label.getStyleClass().add("tag-favourite");
+            }
+            case NEWRELEASE -> {
+                label.setText("NEW");
+                label.getStyleClass().add("tag-newrelease");
+            }
+        }
+
+        return label;
+    }
 }

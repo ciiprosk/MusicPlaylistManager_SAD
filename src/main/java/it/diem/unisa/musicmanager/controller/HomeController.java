@@ -13,6 +13,7 @@ import javafx.fxml.FXML;
 import java.io.IOException;import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import java.util.List;
+import javafx.scene.layout.FlowPane;
 /**
  * Controller responsible for managing the behavior of the Home view.
  *
@@ -30,7 +31,7 @@ public class HomeController {
     @FXML
     private VBox topTracksContainer;
     @FXML
-    private VBox topPlaylistsContainer;
+    private FlowPane topPlaylistsContainer;
     private boolean isListenerAttached = false;
     private TrackService trackService;
     private it.diem.unisa.musicmanager.service.PlayerService playerService;
@@ -43,15 +44,25 @@ public class HomeController {
     public void setTrackService(TrackService trackService) {
         this.trackService = trackService;
         createTrackListener();
+
         if (this.playerService != null) {
             loadTopTracks();
+        }
+
+        if (this.playlistService != null && this.playerService != null) {
+            loadTopPlaylists();
         }
     }
 
     public void setPlayerService(it.diem.unisa.musicmanager.service.PlayerService playerService) {
         this.playerService = playerService;
+
         if (this.trackService != null) {
             loadTopTracks();
+        }
+
+        if (this.playlistService != null && this.trackService != null) {
+            loadTopPlaylists();
         }
     }
 
@@ -127,7 +138,10 @@ public class HomeController {
     }
 
     public void loadTopPlaylists() {
-        if (playlistService == null || topPlaylistsContainer == null) {
+        if (playlistService == null
+                || trackService == null
+                || playerService == null
+                || topPlaylistsContainer == null) {
             return;
         }
 
@@ -144,14 +158,26 @@ public class HomeController {
         }
 
         for (Playlist playlist : topPlaylists) {
-            Label label = new Label(
-                    playlist.getName()
-                            + " | Plays: "
-                            + playlist.getPlayCount()
-            );
+            try {
+                FXMLLoader loader = new FXMLLoader(
+                        getClass().getResource(
+                                "/it/diem/unisa/musicmanager/components/playlistCard.fxml"
+                        )
+                );
 
-            label.setStyle("-fx-text-fill: white; -fx-font-size: 14px;");
-            topPlaylistsContainer.getChildren().add(label);
+                javafx.scene.Node card = loader.load();
+
+                PlaylistCardController controller = loader.getController();
+                controller.setPlaylistService(playlistService);
+                controller.setTrackService(trackService);
+                controller.setPlayerService(playerService);
+                controller.setPlaylist(playlist);
+
+                topPlaylistsContainer.getChildren().add(card);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 

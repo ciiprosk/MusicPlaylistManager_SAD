@@ -13,7 +13,7 @@
     <children>
 
         <HBox alignment="CENTER_LEFT" spacing="12.0">
-            <Label styleClass="menu-title" text="Crea Brano" textFill="#a0a0a0" />
+            <Label styleClass="menu-title" text="Create Track" textFill="#a0a0a0" />
         </HBox>
 
         <HBox alignment="CENTER_LEFT" spacing="15.0">
@@ -57,9 +57,14 @@
             <padding>
                 <Insets left="60.0" />
             </padding>
-            <ToggleButton mnemonicParsing="false" styleClass="tag-toggle" text="Explicit" textFill="WHITE" />
-            <ToggleButton mnemonicParsing="false" styleClass="tag-toggle" text="Favorite" textFill="WHITE" />
-            <ToggleButton mnemonicParsing="false" styleClass="tag-toggle" text="New Release" textFill="WHITE" />
+            <ToggleButton fx:id="btnExplicit" mnemonicParsing="false"
+                          styleClass="tag-toggle" text="Explicit" textFill="WHITE" />
+
+            <ToggleButton fx:id="btnFavorite" mnemonicParsing="false"
+                          styleClass="tag-toggle" text="Favorite" textFill="WHITE" />
+
+            <ToggleButton fx:id="btnNewRelease" mnemonicParsing="false"
+                          styleClass="tag-toggle" text="New Release" textFill="WHITE" />
         </HBox>
 
         <HBox alignment="CENTER_RIGHT" spacing="12.0">

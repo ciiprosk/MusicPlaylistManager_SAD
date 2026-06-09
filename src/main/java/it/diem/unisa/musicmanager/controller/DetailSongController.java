@@ -1,6 +1,7 @@
 package it.diem.unisa.musicmanager.controller;
 
 import it.diem.unisa.musicmanager.model.Track;
+import it.diem.unisa.musicmanager.service.TrackObserver;
 import it.diem.unisa.musicmanager.service.TrackService;
 import it.diem.unisa.musicmanager.util.AlertUtil;
 import it.diem.unisa.musicmanager.util.WindowUtil;
@@ -13,6 +14,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.UUID;
 
 /**
  * Controller della finestra modale "Dettaglio Brano".
@@ -27,6 +29,7 @@ public class DetailSongController {
     @FXML private Label lblYear;
     @FXML private Label lblDuration;
     @FXML private Label lblFilePath;
+    @FXML private Label lblTags;
 
     // Il brano mostrato e il service per modificarlo/eliminarlo.
     private Track track;
@@ -43,11 +46,13 @@ public class DetailSongController {
         lblYear.setText(track.getYear());
         lblDuration.setText(formatDuration(track.getSongLength()));
         lblFilePath.setText(track.getSongPath());
+        lblTags.setText(formatTags(track));
     }
 
     /** Riceve il service usato per modifica ed eliminazione. */
     public void setTrackService(TrackService trackService) {
         this.trackService = trackService;
+
     }
 
     /** Formatta i secondi in mm:ss (es. 95 -> "01:35"). */
@@ -71,14 +76,18 @@ public class DetailSongController {
             EditSongController controller = loader.getController();
             controller.setTrackService(trackService);
             controller.setTrack(track);
+            // a salvataggio riuscito, chiudi il dettaglio
+            controller.setOnSaved(() -> close(e));
         } catch (IOException ex) {
             ex.printStackTrace();
         }
     }
 
+
     /**
      * Elimina: chiede conferma e, se confermato, elimina il brano dall'archivio.
-     * Poi chiude la finestra di dettaglio.
+     * La chiusura della finestra avviene tramite la notifica onTrackDeleted,
+     * così c'è un solo punto di chiusura per l'eliminazione.
      */
     @FXML
     private void handleDelete(ActionEvent e) {
@@ -88,10 +97,11 @@ public class DetailSongController {
                 "Delete Confirm", "Are you sure you wanna delete this track?");
 
         if (isConfirmed) {
-            trackService.deleteTrack(track.getId());
-            close(e);   // brano eliminato: chiudiamo il dettaglio
+            trackService.deleteTrack(track.getId());  // scatena onTrackDeleted -> chiude
         }
     }
+
+
 
     /** Chiudi: chiude la finestra senza fare altro. */
     @FXML
@@ -104,4 +114,16 @@ public class DetailSongController {
         Stage stage = (Stage) ((Node) e.getSource()).getScene().getWindow();
         stage.close();
     }
+
+
+    private String formatTags(Track track) {
+        return track.getTags()
+                .stream()
+                .map(Enum::name)
+                .reduce((a, b) -> a + ", " + b)
+                .orElse("No tags");
+    }
+
+
+
 }

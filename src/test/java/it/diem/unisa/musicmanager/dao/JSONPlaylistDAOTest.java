@@ -60,7 +60,7 @@ class JSONPlaylistDAOTest {
 
         playlistDAO.insert(playlist);
 
-        Track dummyTrack = new Track("Test", "Author", it.diem.unisa.musicmanager.model.Genre.POP, "path", 100, "2020");
+        Track dummyTrack = new Track("Test", "Author", it.diem.unisa.musicmanager.model.Genre.POP, "path", 100, "2020", null);
         playlist.addTrack(dummyTrack);
 
         playlistDAO.update(playlist);
@@ -103,7 +103,7 @@ class JSONPlaylistDAOTest {
 
         Playlist playlist = new Playlist("Rock");
 
-        Track dummyTrack = new Track("Test", "Author", it.diem.unisa.musicmanager.model.Genre.POP, "path", 100, "2020");
+        Track dummyTrack = new Track("Test", "Author", it.diem.unisa.musicmanager.model.Genre.POP, "path", 100, "2020", null);
 
         playlist.addTrack(dummyTrack);
 
