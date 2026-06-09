@@ -10,7 +10,9 @@ public class ShuffleMode implements PlayMode {
     private final Random random = new Random();
 
     @Override
-    public QueueItem nextItem(List<QueueItem> queue, int currentIndex) {
+    public QueueItem nextItem(List<QueueItem> queue, QueueItem currentItem) {
+
+        int currentIndex = queue.indexOf(currentItem);
 
         // Rimuovi il brano corrente dalla coda
         queue.remove(currentIndex);

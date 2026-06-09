@@ -8,7 +8,9 @@ import java.util.Queue;
 public class SequentialMode implements PlayMode {
 
     @Override
-    public QueueItem nextItem(List<QueueItem> queue, int currentIndex) {
+    public QueueItem nextItem(List<QueueItem> queue, QueueItem currentItem) {
+
+        int currentIndex = queue.indexOf(currentItem);
 
         queue.remove(currentIndex);
 
