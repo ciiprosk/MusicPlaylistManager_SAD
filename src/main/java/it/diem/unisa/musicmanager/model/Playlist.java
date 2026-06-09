@@ -14,7 +14,7 @@ import java.util.UUID;
  * Questa classe mantiene sia una lista di UUID per la persistenza su file (trackIDs),
  * sia una lista di oggetti Track risolti a runtime (tracksList).
  */
-public class Playlist {
+public class Playlist implements Playable{
 
     private String name;
     private UUID id;
@@ -62,22 +62,34 @@ public class Playlist {
         this.tracksList = new ArrayList<>();
     }
 
+
     /**
-     * Getter per il nome della playlist.
-     * @return il nome della playlist.
+     * @return
      */
-    public String getName() {
-        return name;
+    @Override
+    public List<Track> getTracksToPlay() {
+        return tracksList;
+    }
+
+    /**
+     * @return
+     */
+    @Override
+    public QueueItemType getType() {
+        return QueueItemType.PLAYLIST;
     }
 
     /**
      * Getter per l'identificatore univoco della playlist.
      * @return l'identificatore univoco della playlist.
      */
+    @Override
     public UUID getId() {
         return id;
     }
-
+    public String getName(){
+        return this.name;
+    }
     /**
      * Setter per il nome della playlist.
      * @param name il nuovo nome della playlist.

@@ -2,9 +2,10 @@ package it.diem.unisa.musicmanager.model;
 
 import it.diem.unisa.musicmanager.exception.TrackInfoException;
 
+import java.util.List;
 import java.util.UUID;
 
-public class Track {
+public class Track  implements  Playable{
 
     private UUID  id;
 
@@ -75,6 +76,22 @@ public class Track {
         this.playCount = 0;
     }
 
+    /**
+     * @return
+     */
+    @Override
+    public List<Track> getTracksToPlay() {
+        return List.of();
+    }
+
+    /**
+     * @return
+     */
+    @Override
+    public QueueItemType getType() {
+        return QueueItemType.TRACK;
+    }
+    @Override
     public UUID getId() {
         return id;
     }

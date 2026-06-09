@@ -28,7 +28,7 @@ public class QueueService {
 
         if(playable.getType() == QueueItemType.PLAYLIST){
             //la traccia apparteiene a una playlist per cui bisgna cambaire il belong tp
-            belongsToPlaylist = playable.getID();
+            belongsToPlaylist = playable.getId();
         }
 
         //convertire l'oggetto in un queueitem

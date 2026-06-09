@@ -1,5 +1,6 @@
 package it.diem.unisa.musicmanager.state;
 import it.diem.unisa.musicmanager.model.Playlist;
+import it.diem.unisa.musicmanager.model.QueueItem;
 import it.diem.unisa.musicmanager.model.Track;
 import javafx.beans.property.*;
 import javafx.collections.ObservableList;
@@ -12,6 +13,7 @@ import javafx.collections.FXCollections;
 public class SharedState {
     private final ObservableList<Track> allTracks = FXCollections.observableArrayList();
     private final ObservableList<Playlist> allPlaylists = FXCollections.observableArrayList();
+    private final ObservableList<QueueItem> queue = FXCollections.observableArrayList();
 
     private final ObjectProperty<Track> currentTrack = new SimpleObjectProperty<>();
     private final BooleanProperty isPlaying = new SimpleBooleanProperty();
@@ -33,6 +35,9 @@ public class SharedState {
     }
     public DoubleProperty getProgress(){
         return progress;
+    }
+    public ObservableList<QueueItem> getQueue(){
+        return queue;
     }
 
 }

@@ -1,6 +1,7 @@
 package it.diem.unisa.musicmanager.model;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * È l'interfaccia comune di Track e Playlist.
@@ -8,5 +9,6 @@ import java.util.List;
  */
 public interface Playable {
     List<Track> getTracksToPlay();
-    String getName();
+    QueueItemType getType();
+    UUID getId();
 }
