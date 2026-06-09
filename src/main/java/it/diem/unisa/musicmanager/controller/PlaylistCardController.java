@@ -102,7 +102,18 @@ public class PlaylistCardController {
             playlistService.incrementPlayCount(playlist.getId());
         }
 
-        if (playerService != null) {
+        if (queueService != null && playerService != null) {
+            // Svuotiamo la coda precedente
+            queueService.getQueueList().clear();
+            
+            // Aggiungiamo l'intera playlist alla coda
+            queueService.addToQueue(playlist);
+            
+            // Facciamo partire la prima canzone usando il metodo next()
+            // In questo modo la prima canzone viene suonata e rimossa dalla coda (se in SequentialMode),
+            // mentre il resto della playlist rimane in coda pronto per essere ascoltato!
+            playerService.next();
+        } else if (playerService != null) {
             playerService.play(firstTrack);
         }
     }

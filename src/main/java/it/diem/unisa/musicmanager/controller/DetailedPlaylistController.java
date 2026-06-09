@@ -8,6 +8,7 @@ import it.diem.unisa.musicmanager.service.PlayerService;
 import it.diem.unisa.musicmanager.service.PlaylistService;
 import it.diem.unisa.musicmanager.service.QueueService;
 import it.diem.unisa.musicmanager.service.TrackService;
+import it.diem.unisa.musicmanager.util.AlertUtil;
 import it.diem.unisa.musicmanager.util.WindowUtil;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -202,6 +203,24 @@ public class DetailedPlaylistController {
         }
     }
 
+    public void onPlay(ActionEvent actionEvent) {
+        if (playlist == null || playlist.getTracksList().isEmpty()) {
+            return;
+        }
+
+        if (playlistService != null) {
+            playlistService.incrementPlayCount(playlist.getId());
+        }
+
+        if (queueService != null && playerService != null) {
+            queueService.getQueueList().clear();
+            queueService.addToQueue(playlist);
+            playerService.next();
+        } else if (playerService != null) {
+            playerService.play(playlist.getTracksList().get(0));
+        }
+    }
+
     public void onAddTrack(ActionEvent actionEvent) {
         //con trackseevice aggiungo una traccia alla playlist ma manca una view
         try {
@@ -261,11 +280,25 @@ public class DetailedPlaylistController {
         });
     }
 
-
+    @FXML
     public void onAddToQueue(ActionEvent actionEvent) {
-        if (queueService != null && playlist !=null){
+        if(queueService !=null && playlist != null) {
+            //vedio se la coda d ascolto è vuota
+            boolean isEmpty = queueService.getQueueList().isEmpty();
+
+            //vedo se c'è un bran oin rispodzione
+            boolean isPlayingTrack = playerService.currentTrackProperty().get() != null;
+
+            //aggingo alla coda
+
             queueService.addToQueue(playlist);
-            it.diem.unisa.musicmanager.util.AlertUtil.showInfo("Coda aggiornata", "Tutti i brani della playlist '" + playlist.getName() + "' sono stati aggiunti alla coda!");
+
+            if(isEmpty && !isPlayingTrack){// se è vuota e nessuna raccia sta suonando allora osso far partire wuesta
+                playerService.next();
+
+            }else{
+                AlertUtil.showInfo("Queue Updated", "All Tracks' Playlist '" + playlist.getName() + "' added to queue!");
+            }
         }
     }
 }

@@ -62,13 +62,17 @@ public class PlayerService {
     }
 
     public void play(Track track) {
-        play(track, true);
+        play(track, true, false);
     }
 
     public void play(Track track, boolean clearQueueItem) {
+        play(track, clearQueueItem, false);
+    }
+
+    public void play(Track track, boolean clearQueueItem, boolean forceRestart) {
         if (track == null || track.getSongPath() == null) return;
 
-        if (track.equals(loadedTrack) && mediaPlayer != null) {
+        if (!forceRestart && track.equals(loadedTrack) && mediaPlayer != null) {
             // Se è lo stesso brano ed è in play, non fare nulla (o metti in pausa se preferisci, 
             // ma di solito togglePlay gestisce questo).
             // Se lo chiamo direttamente, faccio solo resume.
@@ -225,7 +229,7 @@ public class PlayerService {
         if(next !=null){
             List<Track> tracks = next.getPlayable().getTracksToPlay();
             if(!tracks.isEmpty()){
-                play(tracks.get(0), false);
+                play(tracks.get(0), false, true);
             }
         }
     }

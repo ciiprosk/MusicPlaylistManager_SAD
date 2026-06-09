@@ -182,11 +182,8 @@ public class RowTrackController {
 
         MenuItem addQueueItem = new MenuItem("Add to Queue");
         addQueueItem.setOnAction(e -> {
-            if (queueService != null && track != null) {
-                queueService.addToQueue(track);
-                AlertUtil.showInfo("Queue Updated", "Track '" + track.getTitle() + "' added to queue!");
-            }
-        });
+            onAddQueue(e);
+            });
 
         menu.getItems().addAll(detailItem, modifyItem, deleteItem, addQueueItem);
         menu.show(buttonMenu, Side.BOTTOM, 0, 0);
@@ -285,5 +282,25 @@ public class RowTrackController {
         }
 
         return label;
+    }
+    private void onAddQueue(ActionEvent actionEvent) {
+        if(queueService !=null && track != null) {
+            //vedio se la coda d ascolto è vuota
+            boolean isEmpty = queueService.getQueueList().isEmpty();
+
+            //vedo se c'è un bran oin rispodzione
+            boolean isPlayingTrack = playerService.currentTrackProperty().get() != null;
+
+            //aggingo alla coda
+
+            queueService.addToQueue(track);
+
+            if(isEmpty && !isPlayingTrack){// se è vuota e nessuna raccia sta suonando allora osso far partire wuesta
+                playerService.next();
+
+            }else{
+                AlertUtil.showInfo("Queue Updated", "Track '" + track.getTitle() + "' added to queue!");
+            }
+        }
     }
 }
