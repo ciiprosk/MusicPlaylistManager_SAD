@@ -18,15 +18,26 @@ public class SequentialMode implements PlayMode {
      */
     @Override
     public QueueItem nextItem(List<QueueItem> queue, QueueItem currentItem) {
+        if (queue.isEmpty()) {
+            return null;
+        }
 
         int currentIndex = queue.indexOf(currentItem);
 
-        queue.remove(currentIndex);
-
-        if (currentIndex >= queue.size())
-            return null; // era l'ultimo
-
-        return queue.get(currentIndex); // dopo il remove, il prossimo è qui
+        if (currentIndex != -1) {
+            queue.remove(currentIndex);
+            if (currentIndex >= queue.size()) {
+                return null; // era l'ultimo
+            }
+            return queue.get(currentIndex); // dopo il remove, il prossimo è qui
+        } else {
+            // Il brano attuale non è nella coda, peschiamo il primo!
+            QueueItem next = queue.get(0);
+            // Rimuoviamo il primo per "consumarlo"
+            // Wait, se lo rimuoviamo subito sparisce dalla coda prima di finire?
+            // Per ora lasciamolo in coda per vederlo. Lo rimuoveremo quando passerà al successivo!
+            return next;
+        }
     }
 
 }

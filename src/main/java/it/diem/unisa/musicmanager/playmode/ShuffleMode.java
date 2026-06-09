@@ -12,10 +12,15 @@ public class ShuffleMode implements PlayMode {
     @Override
     public QueueItem nextItem(List<QueueItem> queue, QueueItem currentItem) {
 
+        if (queue.isEmpty())
+            return null;
+
         int currentIndex = queue.indexOf(currentItem);
 
-        // Rimuovi il brano corrente dalla coda
-        queue.remove(currentIndex);
+        if (currentIndex != -1) {
+            // Rimuovi il brano corrente dalla coda
+            queue.remove(currentIndex);
+        }
 
         // Se la coda è vuota dopo la rimozione, la riproduzione è finita
         if (queue.isEmpty())

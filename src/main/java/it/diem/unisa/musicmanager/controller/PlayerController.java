@@ -28,6 +28,7 @@ public class PlayerController {
     // Service di riproduzione, iniettato da chi carica questo controller.
     private PlayerService playerService;
     private QueueService queueService;
+    private it.diem.unisa.musicmanager.service.PlaylistService playlistService;
 
     private final PlayMode[] playModes = {new SequentialMode(), new ShuffleMode(), new LoopMode()};
     private int currentPlayModeIndex = 0;
@@ -63,6 +64,10 @@ public class PlayerController {
 
     public void setQueueService(QueueService queueService) {
         this.queueService = queueService;
+    }
+
+    public void setPlaylistService(it.diem.unisa.musicmanager.service.PlaylistService playlistService) {
+        this.playlistService = playlistService;
     }
 
     /**
@@ -105,7 +110,7 @@ public class PlayerController {
         if (next != null) {
             List<Track> tracks = next.getPlayable().getTracksToPlay();
             if(!tracks.isEmpty()){
-                playerService.play(tracks.get(0));
+                playerService.play(tracks.get(0), false);
             }
         }
     }
@@ -128,7 +133,19 @@ public class PlayerController {
     }
 
     public void handleQueue(ActionEvent actionEvent) {
-        //dopo
+        try {
+            javafx.fxml.FXMLLoader loader = it.diem.unisa.musicmanager.util.WindowUtil.openWindow(
+                    "/it/diem/unisa/musicmanager/pages/queueView.fxml",
+                    "Coda di Riproduzione",
+                    javafx.stage.Modality.NONE
+            );
+            QueueViewController ctrl = loader.getController();
+            ctrl.setPlaylistService(playlistService);
+            ctrl.setQueueService(queueService);
+            ctrl.setPlayerService(playerService);
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void bind() {
@@ -139,6 +156,7 @@ public class PlayerController {
         });
         updateTrackInfo(playerService.currentTrackProperty().get());
         updateSkipPlaylistButton();
+        updateModeButton(); // Fix text visibility at startup
 
         // 2. Ascolta lo stato di play/pausa dal Service
         playerService.isPlayingProperty().addListener((o, ov, playing) -> updatePlayButton(playing));
@@ -173,7 +191,7 @@ public class PlayerController {
         if (queueService == null) return;
         QueueItem current = queueService.getCurrentItem();
         boolean belongsToPlaylist = current != null && current.getBelongsToPlaylist() != null;
-        buttonSkipPlaylist.setVisible(belongsToPlaylist);
+        buttonSkipPlaylist.setDisable(!belongsToPlaylist);
     }
     private void updateTrackInfo(Track track) {
         if (track == null) {

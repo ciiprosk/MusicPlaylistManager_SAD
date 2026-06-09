@@ -4,6 +4,7 @@ import it.diem.unisa.musicmanager.model.Playlist;
 import it.diem.unisa.musicmanager.model.Track;
 import it.diem.unisa.musicmanager.service.PlayerService;
 import it.diem.unisa.musicmanager.service.PlaylistService;
+import it.diem.unisa.musicmanager.service.QueueService;
 import it.diem.unisa.musicmanager.service.TrackService;
 import it.diem.unisa.musicmanager.util.WindowUtil;
 import javafx.fxml.FXML;
@@ -30,6 +31,7 @@ public class PlaylistCardController {
     private PlaylistService playlistService; //lo ricevo dal qyeelo che mi chiama
     private PlayerService playerService;
     private TrackService trackService;
+    private QueueService queueService;
 
 
     @FXML private Label labelName;
@@ -63,6 +65,10 @@ public class PlaylistCardController {
     public void setPlayerService(PlayerService playerService) {
         this.playerService = playerService;
 
+    }
+
+    public void setQueueService(QueueService queueService) {
+        this.queueService = queueService;
     }
 
 
@@ -137,6 +143,13 @@ public class PlaylistCardController {
         MenuItem deleteItem = new MenuItem("Delete playlist");
         deleteItem.setOnAction(e -> deletePlaylist());
 
+        MenuItem addQueueItem = new MenuItem("Add to Queue");
+        addQueueItem.setOnAction(e -> {
+            if (queueService != null && playlist != null) {
+                queueService.addToQueue(playlist);
+                it.diem.unisa.musicmanager.util.AlertUtil.showInfo("Coda aggiornata", "La playlist '" + playlist.getName() + "' è stata aggiunta alla coda di riproduzione!");
+            }
+        } );
         menu.getItems().addAll(detailItem, modifyItem, deleteItem);
         menu.show(btnMenu, Side.BOTTOM, 0, 0);
     }
@@ -182,6 +195,7 @@ public class PlaylistCardController {
             ctrl.setPlaylistService(playlistService);
             ctrl.setTrackService(trackService);
             ctrl.setPlayerService(playerService);
+            ctrl.setQueueService(queueService);
             ctrl.setPlaylist(playlist);
             /*
             FXMLLoader loader = new FXMLLoader(

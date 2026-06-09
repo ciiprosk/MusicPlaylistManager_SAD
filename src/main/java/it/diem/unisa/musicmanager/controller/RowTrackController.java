@@ -3,6 +3,7 @@ package it.diem.unisa.musicmanager.controller;
 import it.diem.unisa.musicmanager.model.Tag;
 import it.diem.unisa.musicmanager.model.Track;
 import it.diem.unisa.musicmanager.service.PlayerService;
+import it.diem.unisa.musicmanager.service.QueueService;
 import it.diem.unisa.musicmanager.service.TrackService;
 import it.diem.unisa.musicmanager.util.AlertUtil;
 import it.diem.unisa.musicmanager.util.WindowUtil;
@@ -27,6 +28,7 @@ public class RowTrackController {
     private Track track;
     private TrackService trackService;
     private PlayerService playerService;
+    private QueueService queueService;
 
     @FXML private Label lblTitle;
     @FXML private Label lblAuthor;
@@ -116,6 +118,10 @@ public class RowTrackController {
         updateButtonState();
     }
 
+    public void setQueueService(QueueService queueService) {
+        this.queueService = queueService;
+    }
+
     /**
      * Aggiorna graficamente l'icona del pulsante basandosi esclusivamente sullo stato del Service.
      */
@@ -174,7 +180,15 @@ public class RowTrackController {
         MenuItem deleteItem = new MenuItem("Delete Track");
         deleteItem.setOnAction(e -> handleDelete(null));
 
-        menu.getItems().addAll(detailItem, modifyItem, deleteItem);
+        MenuItem addQueueItem = new MenuItem("Add to Queue");
+        addQueueItem.setOnAction(e -> {
+            if (queueService != null && track != null) {
+                queueService.addToQueue(track);
+                AlertUtil.showInfo("Queue Updated", "Track '" + track.getTitle() + "' added to queue!");
+            }
+        });
+
+        menu.getItems().addAll(detailItem, modifyItem, deleteItem, addQueueItem);
         menu.show(buttonMenu, Side.BOTTOM, 0, 0);
     }
 

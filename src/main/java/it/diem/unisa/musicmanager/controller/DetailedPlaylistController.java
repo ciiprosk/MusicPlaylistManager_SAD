@@ -6,6 +6,7 @@ import it.diem.unisa.musicmanager.model.Playlist;
 import it.diem.unisa.musicmanager.model.Track;
 import it.diem.unisa.musicmanager.service.PlayerService;
 import it.diem.unisa.musicmanager.service.PlaylistService;
+import it.diem.unisa.musicmanager.service.QueueService;
 import it.diem.unisa.musicmanager.service.TrackService;
 import it.diem.unisa.musicmanager.util.WindowUtil;
 import javafx.event.ActionEvent;
@@ -43,6 +44,7 @@ public class DetailedPlaylistController {
     private TrackService trackService;
     private PlaylistService playlistService;
     private PlayerService playerService;
+    private QueueService queueService;
     private boolean isTrackListenerAttached = false;
 
     /**
@@ -66,8 +68,6 @@ public class DetailedPlaylistController {
         if (trackService != null && playerService != null) {
             loadTracks();
         }
-
-
         // Quando il TrackService sara' disponibile, qui risolveremo gli UUID
         // della playlist nei rispettivi Track e riempiremo la lista:
         //
@@ -76,6 +76,10 @@ public class DetailedPlaylistController {
         //         .filter(Objects::nonNull)
         //         .toList();
         // tracksList.getItems().setAll(tracce);
+    }
+
+    public void setQueueService(QueueService queueService){
+        this.queueService = queueService;
     }
 
     public void setPlaylistService(PlaylistService playlistService){
@@ -137,6 +141,7 @@ public class DetailedPlaylistController {
                 controller.setTrack(updatedTrack);
                 controller.setPlayerService(playerService);
                 controller.setTrackService(trackService);
+                controller.setQueueService(queueService);
 
                 //se premo il tasto elimina, rimuovo la traccia dalla playlist
                 controller.setOnDeleteAction(() -> {
@@ -257,4 +262,10 @@ public class DetailedPlaylistController {
     }
 
 
+    public void onAddToQueue(ActionEvent actionEvent) {
+        if (queueService != null && playlist !=null){
+            queueService.addToQueue(playlist);
+            it.diem.unisa.musicmanager.util.AlertUtil.showInfo("Coda aggiornata", "Tutti i brani della playlist '" + playlist.getName() + "' sono stati aggiunti alla coda!");
+        }
+    }
 }

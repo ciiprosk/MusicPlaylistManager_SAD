@@ -2,6 +2,9 @@ package it.diem.unisa.musicmanager.controller;
 
 import it.diem.unisa.musicmanager.model.Playlist;
 import it.diem.unisa.musicmanager.model.Track;
+import it.diem.unisa.musicmanager.service.PlayerService;
+import it.diem.unisa.musicmanager.service.PlaylistService;
+import it.diem.unisa.musicmanager.service.QueueService;
 import it.diem.unisa.musicmanager.service.TrackService;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -34,8 +37,9 @@ public class HomeController {
     private FlowPane topPlaylistsContainer;
     private boolean isListenerAttached = false;
     private TrackService trackService;
-    private it.diem.unisa.musicmanager.service.PlayerService playerService;
-    private it.diem.unisa.musicmanager.service.PlaylistService playlistService;
+    private  PlayerService playerService;
+    private  PlaylistService playlistService;
+    private QueueService queueService;
 
     @FXML
     public void initialize() {
@@ -69,6 +73,10 @@ public class HomeController {
     public void setPlaylistService(it.diem.unisa.musicmanager.service.PlaylistService playlistService) {
         this.playlistService = playlistService;
         loadTopPlaylists();
+    }
+
+    public void setQueueService(QueueService queueService) {
+        this.queueService = queueService;
     }
 
     private void createTrackListener() {
@@ -109,6 +117,7 @@ public class HomeController {
                 controller.setTrack(track);
                 controller.setTrackService(trackService);
                 controller.setPlayerService(playerService);
+                controller.setQueueService(queueService);
                 controller.setOnDeleteAction(() -> {
                     trackService.deleteTrack(track.getId());
                     loadTopTracks();
@@ -171,6 +180,7 @@ public class HomeController {
                 controller.setPlaylistService(playlistService);
                 controller.setTrackService(trackService);
                 controller.setPlayerService(playerService);
+                controller.setQueueService(queueService);
                 controller.setPlaylist(playlist);
 
                 topPlaylistsContainer.getChildren().add(card);
