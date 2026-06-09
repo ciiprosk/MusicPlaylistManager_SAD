@@ -1,9 +1,9 @@
 package it.diem.unisa.musicmanager.controller;
 
 import it.diem.unisa.musicmanager.model.Playlist;
-import it.diem.unisa.musicmanager.model.Track;
 //import it.diem.unisa.musicmanager.service.PlaylistService;
 //import it.diem.unisa.musicmanager.service.TrackService;
+import it.diem.unisa.musicmanager.model.Track;
 import it.diem.unisa.musicmanager.service.PlayerService;
 import it.diem.unisa.musicmanager.service.PlaylistService;
 import it.diem.unisa.musicmanager.service.TrackService;
@@ -12,16 +12,10 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
-import javafx.stage.Stage;
-import javafx.stage.Window;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -35,7 +29,7 @@ import java.util.UUID;
  */
 public class DetailedPlaylistController {
 
-    // --- Campi dell'interfaccia, collegati agli fx:id in detailedPlaylist.fxml ---
+    // Campi dell'interfaccia, collegati agli fx:id in detailedPlaylist.fxml ---
     @FXML private Label labelName;
     @FXML private Label lblTrackCount;
     @FXML private VBox trackList;
@@ -105,41 +99,38 @@ public class DetailedPlaylistController {
 
     private void updateTrackCount() {
         if (playlist == null) return;
-        int n = playlist.numberOfTrakcs();
+        int n = playlist.getTracksList().size();
         lblTrackCount.setText(n + (n == 1 ? " track" : " tracks"));
     }
 
     private void loadTracks(){
-        //devo cricare la lista delle tracce dal serviceeee
         trackList.getChildren().clear();
 
-        for(UUID id : playlist.getTracks()){
-            trackService.searchTrackById(id).ifPresent(track -> {
-                try{
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/it/diem/unisa/musicmanager/components/trackRow.fxml"));
-                    HBox row = loader.load();
+        for(Track track : playlist.getTracksList()){
+            try{
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/it/diem/unisa/musicmanager/components/trackRow.fxml"));
+                HBox row = loader.load();
 
-                    RowTrackController controller = loader.getController();
-                    controller.setTrack(track);
-                    controller.setPlayerService(playerService);
+                RowTrackController controller = loader.getController();
+                controller.setTrack(track);
+                controller.setPlayerService(playerService);
 
-                    //se premo il tasto elimina, rimuovo la traccia dalla playlist
-                    controller.setOnDeleteAction(() -> {
-                        if (playlistService != null) {
-                            playlistService.removeTrackFromPlaylist(playlist.getId(), track.getId());
-                            javafx.application.Platform.runLater(() -> {
-                                updateTrackCount();
-                                loadTracks();
+                //se premo il tasto elimina, rimuovo la traccia dalla playlist
+                controller.setOnDeleteAction(() -> {
+                    if (playlistService != null) {
+                        playlistService.removeTrackFromPlaylist(playlist.getId(), track.getId());
+                        javafx.application.Platform.runLater(() -> {
+                            updateTrackCount();
+                            loadTracks();
                         });
-                        }
-                    });
-                    //controller.setPlayerService(playerService);
-                    trackList.getChildren().add(row);
+                    }
+                });
 
-                }catch(IOException e){
-                    e.printStackTrace();
-                }
-            });
+                trackList.getChildren().add(row);
+
+            }catch(IOException e){
+                e.printStackTrace();
+            }
         }
     }
 
@@ -194,6 +185,12 @@ public class DetailedPlaylistController {
             controller.setPlaylistService(playlistService);
             controller.setTrackService(trackService);
             controller.setPlaylist(playlist);
+            controller.setOnSaveCallback(() -> {
+                javafx.application.Platform.runLater(() -> {
+                    updateTrackCount();
+                    loadTracks();
+                });
+            });
 
         } catch (IOException e) {
             throw new RuntimeException(e);

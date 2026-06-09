@@ -36,8 +36,17 @@ public class AddTrackPlaylisController {
             }else{
                 playlistService.removeTrackFromPlaylist(playlist.getId(), track.getId());
             }
-            WindowUtil.close((Node) actionEvent.getSource());
         }
+        WindowUtil.close((Node) actionEvent.getSource());
+        if (onSaveCallback != null) {
+            onSaveCallback.run();
+        }
+    }
+
+    private Runnable onSaveCallback;
+
+    public void setOnSaveCallback(Runnable onSaveCallback) {
+        this.onSaveCallback = onSaveCallback;
     }
 
     public void setPlaylist(Playlist playlist) {

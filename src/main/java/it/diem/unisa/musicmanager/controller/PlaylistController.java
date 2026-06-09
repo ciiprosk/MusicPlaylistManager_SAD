@@ -28,6 +28,7 @@ import java.io.IOException;
 public class PlaylistController {
 
     @FXML private TextField searchBar;
+    @FXML private javafx.scene.control.Button btnClearSearch;
     @FXML private FlowPane playlistsGrid;
 
     private PlaylistService playlistService;
@@ -37,7 +38,21 @@ public class PlaylistController {
 
     @FXML
     public void initialize() throws IOException {
-        // RICHIO NULLPOINTEECPTION  loadPlaylists();
+        if (searchBar != null) {
+            searchBar.textProperty().addListener((observable, oldValue, newValue) -> {
+                if (btnClearSearch != null) {
+                    btnClearSearch.setVisible(!newValue.isEmpty());
+                }
+                try {
+                    loadPlaylists();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
+        }
+        if (btnClearSearch != null) {
+            btnClearSearch.setOnAction(e -> searchBar.clear());
+        }
     }
 
     /**
@@ -49,20 +64,11 @@ public class PlaylistController {
     @FXML
     private void handleAdd(ActionEvent actionEvent) {
         try {
-            FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource("/it/diem/unisa/musicmanager/pages/addPlaylist.fxml"));
-            Parent root = loader.load();
+            FXMLLoader loader = WindowUtil.openWindow("/it/diem/unisa/musicmanager/pages/addPlaylist.fxml", "Add Playlist", Modality.APPLICATION_MODAL);
 
             // gli passiamo il service qui
             AddPlaylistController controller = loader.getController();
             controller.setPlaylistService(playlistService);
-
-            Stage stage = new Stage();
-            stage.setTitle("Add Playlist");
-            stage.initModality(Modality.APPLICATION_MODAL);
-            stage.setScene(new Scene(root));
-            stage.showAndWait();
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -108,15 +114,22 @@ public class PlaylistController {
     public void loadPlaylists() throws IOException {
         playlistsGrid.getChildren().clear();
 
-        for(Playlist p : playlistService.getPlaylists()){
-            //per fare la ricerca
+        String keyword = searchBar != null ? searchBar.getText() : "";
+        java.util.List<Playlist> playlistsToShow = playlistService.searchPlaylists(keyword);
 
-            if(searchBar != null && !searchBar.getText().isBlank()){
-                if(!p.getName().toLowerCase().contains(searchBar.getText().toLowerCase())){
-                    continue;
-                }
-            }
+        for(Playlist p : playlistsToShow){
             playlistsGrid.getChildren().add(createPlaylistCard(p));
+        }
+
+        if (playlistsGrid.getChildren().isEmpty()) {
+            javafx.scene.control.Label emptyLabel;
+            if (keyword != null && !keyword.isBlank()) {
+                emptyLabel = new javafx.scene.control.Label("No playlists found for '" + keyword + "'.");
+            } else {
+                emptyLabel = new javafx.scene.control.Label("Your library is empty. Add a playlist!");
+            }
+            emptyLabel.setStyle("-fx-text-fill: white; -fx-font-size: 16px;");
+            playlistsGrid.getChildren().add(emptyLabel);
         }
     }
 

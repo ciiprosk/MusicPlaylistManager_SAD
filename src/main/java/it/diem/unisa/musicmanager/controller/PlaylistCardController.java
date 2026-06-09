@@ -48,7 +48,7 @@ public class PlaylistCardController {
     public void setPlaylist(Playlist playlist) {
         this.playlist = playlist;
         labelName.setText(playlist.getName());
-        int n = playlist.getTracks().size();
+        int n = playlist.getTracksList().size();
         labelTracks.setText(n + (n == 1 ? " Track" : " Tracks"));
     }
 
@@ -80,22 +80,12 @@ public class PlaylistCardController {
     @FXML
     private void handleModify() {
         try {
-            FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource("/it/diem/unisa/musicmanager/pages/editPlaylist.fxml"));
-            Parent root = loader.load();
+            FXMLLoader loader = WindowUtil.openWindow("/it/diem/unisa/musicmanager/pages/editPlaylist.fxml", "Modifica Playlist", Modality.APPLICATION_MODAL);
 
             // Passiamo la playlist al controller della modifica.
             EditPlaylistController controller = loader.getController();
             controller.setPlaylist(playlist);
             controller.setPlaylistService(playlistService);
-
-            Stage stage = new Stage();
-            stage.setTitle("Modifica Playlist");
-            stage.setResizable(false);
-            stage.initModality(Modality.APPLICATION_MODAL);
-            stage.setResizable(false);
-            stage.setScene(new Scene(root));
-            stage.showAndWait();
 
         } catch (Exception e) {
             e.printStackTrace();

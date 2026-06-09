@@ -14,6 +14,7 @@ public class MainController {
     @FXML private PlaylistController playlistsPageController;
     @FXML private TracksController tracksPageController;
     @FXML private PlayerController playerController;
+    @FXML private HomeController homePageController;
 
 
     @FXML
@@ -23,6 +24,10 @@ public class MainController {
 
     @FXML
     private void openHome() {
+        if (homePageController != null) {
+            homePageController.loadTopTracks();
+        }
+
         showPage(homePage);
     }
 
@@ -58,5 +63,10 @@ public class MainController {
 
 
 
+
     public PlayerController getPlayerController() { return playerController;}
+
+    public HomeController getHomePageController() {
+        return homePageController;
+    }
 }

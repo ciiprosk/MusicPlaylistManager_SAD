@@ -3,9 +3,16 @@ package it.diem.unisa.musicmanager.service;
 import it.diem.unisa.musicmanager.dao.DAO;
 import it.diem.unisa.musicmanager.exception.PlaylistInfoException;
 import it.diem.unisa.musicmanager.model.Playlist;
+import it.diem.unisa.musicmanager.model.Track;
 import it.diem.unisa.musicmanager.state.SharedState;
 import javafx.collections.ObservableList;
 
+import it.diem.unisa.musicmanager.model.Genre;
+import it.diem.unisa.musicmanager.model.Tag;
+import it.diem.unisa.musicmanager.specification.Specification;
+
+
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -29,6 +36,8 @@ public class PlaylistService implements TrackObserver{
 
     private final SharedState sharedState;
 
+
+
     /**
      * Costruttore della classe PlaylistService.
      * @param playlistDAO: è l'oggetto DAO che gestisce le operazioni CRUD sulle playlist.
@@ -37,6 +46,7 @@ public class PlaylistService implements TrackObserver{
     public PlaylistService(DAO<Playlist> playlistDAO, SharedState sharedState) {
         this.playlistDAO = playlistDAO;
         this.sharedState = sharedState;
+
     }
 
     @Override
@@ -44,7 +54,8 @@ public class PlaylistService implements TrackObserver{
         // la playlist è un observer di tracce: gestisce l'eliminazione delle tracce eliminate nella playlist
         for (Playlist playlist : sharedState.getALlPlaylists()) {
             if (playlist.containsTrack(trackId)) {
-                playlist.removeTrack(trackId);
+                Track track = searchTrackById(trackId);
+                playlist.removeTrack(track);
                 playlistDAO.update(playlist);
             }
         }
@@ -105,20 +116,19 @@ public class PlaylistService implements TrackObserver{
      * @return un Optional<String> contenente un messaggio di errore se la playlist non esiste, altrimenti ritorna Optional.empty().
      */
     public Optional<String> renamePlaylist(UUID playlistID, String newName) {
-        Optional<Playlist> optionalPlaylist = playlistDAO.searchById(playlistID);
-        if (optionalPlaylist.isEmpty())
-            return Optional.of("Playlist not found");
+        Playlist playlist = sharedState.getALlPlaylists().stream()
+                .filter(p -> p.getId().equals(playlistID))
+                .findFirst().orElse(null);
 
-        Playlist newPlaylist = null;
-        // se siamo qui la playlist è stata trovata e posso eseguire l'update
-       Playlist playlist = optionalPlaylist.get(); //mi dewrappo l aplaylist ritornata dal dao
+        if (playlist == null)
+            return Optional.of("Playlist not found");
 
         if (playlist.getName().equals(newName)) {   //se ho salvato la playlist con lo stesso nome, ho finito
             return Optional.empty();
         }
 
        try {
-           newPlaylist = new Playlist(playlistID, newName); //in questo modo faccio verifiche su business rules
+           Playlist newPlaylist = new Playlist(playlistID, newName); //in questo modo faccio verifiche su business rules
 
            //controllo che il nuovo nome sia univoco
            if(playlistDAO.isDuplicated(newPlaylist))
@@ -141,11 +151,16 @@ public class PlaylistService implements TrackObserver{
      * @param trackID è l'identificatore univoco della traccia da aggiungere.
      */
     public void addTrackToPlaylist(UUID playlistID, UUID trackID) {
-        Playlist playlist = playlistDAO.searchById(playlistID).orElseThrow(()-> new PlaylistInfoException("Playlist not found"));
+        Playlist playlist = sharedState.getALlPlaylists().stream()
+                .filter(p -> p.getId().equals(playlistID))
+                .findFirst()
+                .orElseThrow(()-> new PlaylistInfoException("Playlist not found"));
+
 
         if(!playlist.containsTrack(trackID)){
             //se la playlist non contiene la trccia allora la devo inserire con update del dao
-            playlist.addTrack(trackID);
+            Track track = searchTrackById(trackID);
+            playlist.addTrack(track);
             playlistDAO.update(playlist);
             updateInState(playlist);
         }
@@ -158,21 +173,34 @@ public class PlaylistService implements TrackObserver{
      */
 
     public void removeTrackFromPlaylist(UUID playlistID, UUID trackID) {
-        Playlist playlist = playlistDAO.searchById(playlistID).orElseThrow(()-> new PlaylistInfoException("Playlist not found"));
+        Playlist playlist = sharedState.getALlPlaylists().stream()
+                .filter(p -> p.getId().equals(playlistID))
+                .findFirst()
+                .orElseThrow(()-> new PlaylistInfoException("Playlist not found"));
 
         if(playlist.containsTrack(trackID)){ //se la playlist contie la traccia la eliminizmao
-            playlist.removeTrack(trackID);
+            Track track = searchTrackById(trackID);
+            playlist.removeTrack(track);
             playlistDAO.update(playlist);
             updateInState(playlist);
 
         }
     }
 
+    public List<Playlist> searchPlaylists(String keyword) {
+        if (keyword == null || keyword.isBlank()) {
+            return new java.util.ArrayList<>(sharedState.getALlPlaylists());
+        }
+        String lowerKeyword = keyword.toLowerCase();
+        return sharedState.getALlPlaylists().stream()
+                .filter(p -> p.getName().toLowerCase().contains(lowerKeyword))
+                .toList();
+    }
+
     /**
      * Metodo che aggiorna l'elenco di playlist nello stato globale.
      * @param playlist è la playlist da aggiornare nello stato globale.
      */
-
     private void updateInState(Playlist playlist) {
         ObservableList<Playlist> playlists = sharedState.getALlPlaylists();
 
@@ -192,7 +220,9 @@ public class PlaylistService implements TrackObserver{
      */
 
     public Optional<Playlist> getPlaylistById(UUID playlistID) {
-        return playlistDAO.searchById(playlistID);
+        return sharedState.getALlPlaylists().stream()
+                .filter(p -> p.getId().equals(playlistID))
+                .findFirst();
     }
 
     /**
@@ -203,10 +233,44 @@ public class PlaylistService implements TrackObserver{
      * @throws PlaylistInfoException se la playlist richiesta non esiste nel sistema.
      */
 
-    public List<UUID> getTracksFromPlaylist(UUID playlistID) {
-        Playlist playlist = playlistDAO.searchById(playlistID)
+    public List<Track> getTracksFromPlaylist(UUID playlistID) {
+        Playlist playlist = sharedState.getALlPlaylists().stream()
+                .filter(p -> p.getId().equals(playlistID))
+                .findFirst()
                 .orElseThrow(() -> new PlaylistInfoException("Playlist not found"));
+        return playlist.getTracksList();
+    }
 
-        return playlist.getTracks();
+    // --- Generazione automatica di playlist ---
+    public Playlist generate(String name, Collection<Track> tracks, Specification<Track> criteria) {
+        Playlist playlist = new Playlist(name);
+        tracks.stream()
+                .filter(criteria::isSatisfiedBy)
+                .forEach(playlist::addTrack);
+        return playlist;
+    }
+
+    /**
+     * Genera la playlist e la salva, riusando lo stesso percorso delle altre.
+     * @return Optional.empty() se ok, Optional con messaggio d'errore se il nome
+     *         e' duplicato (stessa convenzione di addTrack).
+     */
+    public Optional<String> generateAndSave(String name, Collection<Track> tracks, Specification<Track> criteria) {
+
+        Playlist playlist = generate(name, tracks, criteria);   // il metodo puro di prima
+
+        if (playlistDAO.isDuplicated(playlist)) {
+            return Optional.of("Error: A playlist with this name already exists!");
+        }
+
+        playlistDAO.insert(playlist);                        // persistenza su JSON
+        sharedState.getALlPlaylists().add(playlist);         // <-- VERIFICA il nome di questo getter
+        return Optional.empty();
+    }
+
+
+
+    private Track searchTrackById(UUID trackId) {
+        return sharedState.getALlTracks().stream().filter(t -> t.getId().equals(trackId)).findFirst().orElseThrow(()-> new PlaylistInfoException("Track not found"));
     }
 }

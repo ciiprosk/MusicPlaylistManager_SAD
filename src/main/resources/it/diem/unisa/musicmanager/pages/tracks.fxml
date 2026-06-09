@@ -7,8 +7,9 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.StackPane?>
 
-<VBox spacing="15.0" styleClass="sfondo-principale" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.diem.unisa.musicmanager.controller.TracksController">
+<VBox spacing="15.0" styleClass="sfondo-principale" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.diem.unisa.musicmanager.controller.TracksController">
     <padding>
         <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
     </padding>
@@ -20,7 +21,10 @@
             <Button maxWidth="150.0" minWidth="120.0" mnemonicParsing="false" onAction="#handleAdd" styleClass="btn-primario" text="Add Track" />
         </HBox>
 
-        <TextField fx:id="searchBar" maxWidth="600.0" minWidth="250.0" prefWidth="400.0" promptText="Search" styleClass="search-bar" />
+        <StackPane alignment="CENTER_RIGHT" maxWidth="600.0" minWidth="250.0" prefWidth="400.0">
+            <TextField fx:id="searchBar" promptText="Search" styleClass="search-bar" />
+            <Button fx:id="btnClearSearch" style="-fx-background-color: transparent; -fx-text-fill: #cccccc; -fx-cursor: hand; -fx-font-weight: bold; -fx-padding: 0 10 0 0;" text="✕" visible="false" />
+        </StackPane>
       <VBox fx:id="trackList" prefHeight="200.0" prefWidth="100.0" />
     </children>
 </VBox>

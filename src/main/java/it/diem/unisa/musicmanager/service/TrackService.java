@@ -95,6 +95,18 @@ public class TrackService {
 
     }
 
+    public List<Track> searchTracks(String keyword) {
+        if (keyword == null || keyword.isBlank()) {
+            return new ArrayList<>(sharedState.getALlTracks());
+        }
+        String lowerKeyword = keyword.toLowerCase();
+        return sharedState.getALlTracks().stream()
+                .filter(t -> t.getTitle().toLowerCase().contains(lowerKeyword) || 
+                             t.getAuthor().toLowerCase().contains(lowerKeyword))
+                .toList();
+    }
+
+
     public void addObserver(TrackObserver observer) {
 
         this.observers.add(observer);
@@ -125,5 +137,40 @@ public class TrackService {
 
     }
 
+     // Incrementa il numero di ascolti di una traccia e salva la modifica su file.
+     // @param trackId identificatore UUID della traccia ascoltata.
+     // @return Optional.empty() se l'operazione va a buon fine,
+     // Optional con messaggio di errore se la traccia non viene trovata.
+    public Optional<String> incrementPlayCount(UUID trackId) {
+
+        Optional<Track> optionalTrack = trackDAO.searchById(trackId);
+
+        if (optionalTrack.isEmpty()) {
+            return Optional.of("Error: Track not found.");
+        }
+
+        Track track = optionalTrack.get();
+
+        track.incrementPlayCount();
+
+        trackDAO.update(track);
+
+        updateInState(track);
+
+        return Optional.empty();
+    }
+
+     // Restituisce le 5 tracce più ascoltate presenti nello stato condiviso.
+     // Le tracce vengono ordinate in modo decrescente in base al numero di ascolti.
+     // Se le tracce disponibili sono meno di 5, vengono restituite tutte
+     // @return lista delle tracce più ascoltate, massimo 5 elementi.
+
+    public List<Track> getTop5MostPlayedTracks() {
+        return sharedState.getALlTracks()
+                .stream()
+                .sorted((t1, t2) -> Integer.compare(t2.getPlayCount(), t1.getPlayCount()))
+                .limit(5)
+                .toList();
+    }
 
 }

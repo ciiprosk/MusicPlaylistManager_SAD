@@ -7,10 +7,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<!-- Contenuto della finestra modale "Modifica Playlist" (aperta come Stage separato).
-     L'utente puo' modificare solo il nome. "Annulla" chiude senza salvare. -->
-
-<VBox spacing="18.0" styleClass="sfondo-principale" stylesheets="@../../css/style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.diem.unisa.musicmanager.controller.EditPlaylistController">
+<VBox spacing="18.0" styleClass="sfondo-principale" stylesheets="@../../css/style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.diem.unisa.musicmanager.controller.EditPlaylistController">
 
     <padding>
         <Insets bottom="25.0" left="30.0" right="30.0" top="20.0" />
@@ -18,18 +15,15 @@
 
     <children>
 
-        <!-- ===== TITOLO ===== -->
         <HBox alignment="CENTER_LEFT" spacing="12.0">
             <Label styleClass="menu-title" text="Modify Playlist" textFill="#a0a0a0" />
         </HBox>
 
-        <!-- ===== NOME (unico campo modificabile) ===== -->
         <HBox alignment="CENTER_LEFT" spacing="15.0">
             <Label minWidth="160.0" styleClass="sottotitolo" text="Name" textFill="#cccccc" />
             <TextField fx:id="fieldName" styleClass="form-field" HBox.hgrow="ALWAYS" />
         </HBox>
 
-        <!-- ===== ERRORE + AZIONI (Annulla / Salva) ===== -->
         <HBox alignment="CENTER_RIGHT" spacing="12.0">
             <Label fx:id="lblError" maxWidth="Infinity" textFill="#ff5555" HBox.hgrow="ALWAYS" />
             <Button fx:id="buttonCancel" onAction="#onCancel" styleClass="button-grigio" text="Cancel" textFill="WHITE" />

@@ -13,6 +13,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
@@ -21,6 +22,7 @@ import javafx.stage.Stage;
 import javafx.scene.control.Label;
 
 import java.io.IOException;
+import java.util.Optional;
 
 public class TracksController {
 
@@ -29,13 +31,14 @@ public class TracksController {
     private ListView<Track> tracksList;
     @FXML
     private TextField searchBar;
+    @FXML
+    private Button btnClearSearch;
 
     private TrackService trackService;
     private PlayerService playerService;
     private boolean isListenerAttached = false;
 
     @FXML private VBox trackList;
-
 
     public void setTrackService(TrackService trackService) {
 
@@ -57,16 +60,43 @@ public class TracksController {
     }
 
 
+    @FXML
+    public void initialize() {
+        if (searchBar != null) {
+            searchBar.textProperty().addListener((observable, oldValue, newValue) -> {
+                if (btnClearSearch != null) {
+                    btnClearSearch.setVisible(!newValue.isEmpty());
+                }
+                try {
+                    loadTracks();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
+        }
+        if (btnClearSearch != null) {
+            btnClearSearch.setOnAction(e -> searchBar.clear());
+        }
+    }
+
     public void loadTracks() throws IOException {
         trackList.getChildren().clear();
 
-        for (Track track : trackService.getAllTracks()) {
+        String keyword = searchBar != null ? searchBar.getText() : "";
+        java.util.List<Track> tracksToShow = trackService.searchTracks(keyword);
+
+        for (Track track : tracksToShow) {
             trackList.getChildren().add(createTrackRow(track));
         }
 
-        // Archivio vuoto: invitiamo l'utente ad aggiungere un brano.
+        // Archivio vuoto: invitiamo l'utente ad aggiungere un brano o avvisiamo che la ricerca non ha prodotto risultati.
         if (trackList.getChildren().isEmpty()) {
-            Label emptyLabel = new Label("Your library is empty. Add a track!");
+            Label emptyLabel;
+            if (keyword != null && !keyword.isBlank()) {
+                emptyLabel = new Label("No tracks found for '" + keyword + "'.");
+            } else {
+                emptyLabel = new Label("Your library is empty. Add a track!");
+            }
             emptyLabel.setStyle("-fx-text-fill: white; -fx-font-size: 16px;");  // bianco e leggermente piu' grande
             trackList.getChildren().add(emptyLabel);
         }
@@ -81,6 +111,7 @@ public class TracksController {
         controller.setOnDeleteAction(() -> trackService.deleteTrack(track.getId()));    //elimina dall'archivio la traccia
         controller.setTrackService(trackService); //i serviceeeee
         controller.setPlayerService(playerService);
+        card.setOnMouseClicked(event -> openTrackDetails(track));
         return card;
     }
 
@@ -103,5 +134,26 @@ public class TracksController {
 
     public void setPlayerService(PlayerService playerService) {
         this.playerService = playerService;
+    }
+
+    private void openTrackDetails(Track track) {
+        if (track == null) {
+            return;
+        }
+
+        try {
+            FXMLLoader loader = WindowUtil.openWindow(
+                    "/it/diem/unisa/musicmanager/pages/detailSong.fxml",
+                    "Track Details",
+                    Modality.WINDOW_MODAL
+            );
+
+            DetailSongController controller = loader.getController();
+            controller.setTrackService(trackService);
+            controller.setTrack(track);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

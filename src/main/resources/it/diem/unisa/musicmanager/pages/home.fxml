@@ -4,24 +4,33 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.text.Font?>
 
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.control.Button?>
 <VBox spacing="20.0" styleClass="sfondo-principale" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.diem.unisa.musicmanager.controller.HomeController">
     <padding>
         <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
     </padding>
 
     <children>
-        <Label styleClass="titolo-pagina" text="Home" textFill="WHITE">
-            <font>
-                <Font size="32.0" />
-            </font>
-        </Label>
+        <!-- Titolo a sinistra, bottone Genera a destra -->
+        <HBox alignment="CENTER_LEFT">
+            <Label styleClass="titolo-pagina" text="Home" textFill="WHITE">
+                <font>
+                    <Font size="32.0" />
+                </font>
+            </Label>
+            <Region HBox.hgrow="ALWAYS" />
+            <Button fx:id="btnGenerate" onAction="#goToGeneratePlaylist"  minWidth="150.0" mnemonicParsing="false"
+                     styleClass="btn-primario"
+                    text="Generate Playlist" />
+        </HBox>
 
-        <TextField fx:id="searchBar" minWidth="250.0" maxWidth="600.0" prefWidth="400.0" promptText="Search" styleClass="search-bar" />
-
-        <Label styleClass="sottotitolo" text="Recent Tracks" textFill="#cccccc" />
-        <VBox fx:id="recentTracksContainer" spacing="10.0">
+        <Label styleClass="sottotitolo" text="Most Played Tracks" textFill="#cccccc" />
+        <VBox fx:id="topTracksContainer" spacing="10.0">
         </VBox>
 
         <Label styleClass="sottotitolo" text="Playlists" textFill="#cccccc" />

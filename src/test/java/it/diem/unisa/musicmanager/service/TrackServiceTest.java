@@ -10,9 +10,10 @@ import it.diem.unisa.musicmanager.model.Track;
 import it.diem.unisa.musicmanager.state.SharedState;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
 import java.io.File;
 import java.util.Optional;
+import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -479,8 +480,8 @@ class TrackServiceTest {
         Playlist playlist1 = new Playlist("Playlist 1");
         Playlist playlist2 = new Playlist("Playlist 2");
 
-        playlist1.addTrack(track.getId());
-        playlist2.addTrack(track.getId());
+        playlist1.addTrack(track);
+        playlist2.addTrack(track);
 
         sharedState.getALlPlaylists().add(playlist1);
         sharedState.getALlPlaylists().add(playlist2);
@@ -488,7 +489,10 @@ class TrackServiceTest {
         // --- FIX OBSERVER: Simuliamo che qualcuno stia ascoltando la notifica ---
         service.addObserver(deletedId -> {
             for (Playlist p : sharedState.getALlPlaylists()) {
-                p.removeTrack(deletedId);
+                p.getTracksList().stream()
+                 .filter(t -> t.getId().equals(deletedId))
+                 .findFirst()
+                 .ifPresent(p::removeTrack);
             }
         });
         // -----------------------------------------------------------------------
@@ -523,11 +527,11 @@ class TrackServiceTest {
         Playlist playlist =
                 new Playlist("Rock");
 
-        playlist.addTrack(track.getId());
+        playlist.addTrack(track);
 
         sharedState.getALlPlaylists().add(playlist);
 
-        playlist.removeTrack(track.getId());
+        playlist.removeTrack(track);
 
         assertFalse(playlist.containsTrack(track.getId()));
 
@@ -537,4 +541,169 @@ class TrackServiceTest {
                         .anyMatch(t -> t.getId().equals(track.getId()))
         );
     }
+
+    //TEST MODEL ESTRAE MAX 5 TRACCE PIù ASCOLTATE
+
+    @Test
+    void getTop5MostPlayedTracksShouldReturnMaximumFiveTracks() {
+
+        for (int i = 1; i <= 10; i++) {
+            Track track = new Track(
+                    "Track " + i,
+                    "Author " + i,
+                    Genre.ROCK,
+                    "songs/track" + i + ".mp3",
+                    180,
+                    "2020"
+            );
+
+            for (int j = 0; j < i; j++) {
+                track.incrementPlayCount();
+            }
+
+            sharedState.getALlTracks().add(track);
+        }
+
+        List<Track> result =
+                service.getTop5MostPlayedTracks();
+
+        assertEquals(5, result.size());
+    }
+
+    //TEST LE 5 TRACCE PIù ASCOLTATE SONO ORDINATE PER ORDINE DI NUMERO DI ASCOLTI DECRESCENTE
+
+    @Test
+    void getTop5MostPlayedTracksShouldReturnTracksOrderedByPlayCountDescending() {
+
+        Track low = new Track(
+                "Low",
+                "Author",
+                Genre.ROCK,
+                "songs/low.mp3",
+                180,
+                "2020"
+        );
+
+        Track high = new Track(
+                "High",
+                "Author",
+                Genre.ROCK,
+                "songs/high.mp3",
+                180,
+                "2020"
+        );
+
+        low.incrementPlayCount();
+
+        high.incrementPlayCount();
+        high.incrementPlayCount();
+        high.incrementPlayCount();
+
+        sharedState.getALlTracks().add(low);
+        sharedState.getALlTracks().add(high);
+
+        List<Track> result =
+                service.getTop5MostPlayedTracks();
+
+        assertEquals("High", result.get(0).getTitle());
+        assertEquals("Low", result.get(1).getTitle());
+    }
+
+    //TEST VERIFICA CORRETTA INCREMENTO CONTEGGIO DI ASCOLTO DI UNA TRACCIA
+
+    @Test
+    void incrementPlayCountShouldIncreaseTrackPlayCount() {
+
+        service.addTrack(
+                "Numb",
+                "Linkin Park",
+                Genre.ROCK,
+                "songs/numb.mp3",
+                185,
+                "2003"
+        );
+
+        Track track =
+                sharedState.getALlTracks().get(0);
+
+        Optional<String> result =
+                service.incrementPlayCount(track.getId());
+
+        assertTrue(result.isEmpty());
+
+        Track updatedTrack =
+                sharedState.getALlTracks().get(0);
+
+        assertEquals(1, updatedTrack.getPlayCount());
+    }
+
+    //TEST VERIFICA CORRETTO SALVATAGGIO DEL CONTEGGIO DI ASCOLTO DI UNA TRACCIA
+
+    @Test
+    void incrementPlayCountShouldPersistUpdatedTrackOnFile() {
+
+        service.addTrack(
+                "Numb",
+                "Linkin Park",
+                Genre.ROCK,
+                "songs/numb.mp3",
+                185,
+                "2003"
+        );
+
+        Track track =
+                sharedState.getALlTracks().get(0);
+
+        service.incrementPlayCount(track.getId());
+
+        DAO<Track> newTrackDAO =
+                new JSONTrackDAO(
+                        "test-data",
+                        "tracks-service-test.jsonl"
+                );
+
+        Optional<Track> result =
+                newTrackDAO.searchById(track.getId());
+
+        assertTrue(result.isPresent());
+        assertEquals(1, result.get().getPlayCount());
+    }
+
+    //TEST VISUALIZZAZIONE DETTAGLI TRACCIA
+
+    @Test
+    void searchTrackByIdShouldReturnTrackDetails() {
+        Optional<String> creationResult = service.addTrack(
+                "Numb",
+                "Linkin Park",
+                Genre.ROCK,
+                "songs/numb.mp3",
+                185,
+                "2003"
+        );
+
+        assertTrue(creationResult.isEmpty());
+
+        Track track = sharedState.getALlTracks().get(0);
+
+        Optional<Track> result = service.searchTrackById(track.getId());
+
+        assertTrue(result.isPresent());
+        assertEquals("Numb", result.get().getTitle());
+        assertEquals("Linkin Park", result.get().getAuthor());
+        assertEquals(Genre.ROCK, result.get().getGenre());
+        assertEquals("songs/numb.mp3", result.get().getSongPath());
+        assertEquals(185, result.get().getSongLength());
+        assertEquals("2003", result.get().getYear());
+    }
+
+    //TEST VISUALIZZAZIONE DETTAGLI TRACCIA CON TRACCIA INESISTENTE
+
+    @Test
+    void searchTrackByIdShouldReturnEmptyWhenTrackDoesNotExist() {
+        Optional<Track> result = service.searchTrackById(UUID.randomUUID());
+
+        assertTrue(result.isEmpty());
+    }
+
 }

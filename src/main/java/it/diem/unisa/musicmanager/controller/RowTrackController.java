@@ -28,6 +28,7 @@ public class RowTrackController {
 
     @FXML private Label lblTitle;
     @FXML private Label lblAuthor;
+    @FXML private Label lblPlayCount;
     @FXML private Label lblDuration;
 
     @FXML private Button buttonMenu;
@@ -63,6 +64,10 @@ public class RowTrackController {
         int minutes = (int) (track.getSongLength() / 60);
         int seconds = (int) (track.getSongLength() % 60);
         lblDuration.setText(String.format("%02d:%02d", minutes, seconds));
+
+        if (lblPlayCount != null) {
+            lblPlayCount.setText(track.getPlayCount() + " Plays");
+        }
     }
 
     public void setTrackService(TrackService trackService) {

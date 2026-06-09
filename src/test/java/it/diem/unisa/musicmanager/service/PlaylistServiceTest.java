@@ -711,11 +711,11 @@ class PlaylistServiceTest {
         playlistService.addTrackToPlaylist(playlist.getId(), track1);
         playlistService.addTrackToPlaylist(playlist.getId(), track2);
 
-        List<UUID> tracks =
+        List<it.diem.unisa.musicmanager.model.Track> tracks =
                 playlistService.getTracksFromPlaylist(playlist.getId());
 
         assertEquals(2, tracks.size());
-        assertEquals(track1, tracks.get(0));
-        assertEquals(track2, tracks.get(1));
+        assertEquals(track1, tracks.get(0).getId());
+        assertEquals(track2, tracks.get(1).getId());
     }
 }

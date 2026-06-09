@@ -34,11 +34,16 @@ public class MusicPlaylistManager extends Application {
         TrackService trackService = new TrackService(trackDAO, sharedState);
         PlayerService playerService = new PlayerService();
 
+        playerService.setTrackService(trackService);
+
         FXMLLoader fxmlLoader = new FXMLLoader(MusicPlaylistManager.class.getResource("MusicPlaylistManagerGUI.fxml"));
 
         Scene scene = new Scene(fxmlLoader.load(), 1080, 720);
 
         MainController controller = fxmlLoader.getController();
+        controller.getHomePageController().setTrackService(trackService);
+        controller.getHomePageController().setPlayerService(playerService);
+        controller.getHomePageController().setPlaylistService(playlistService);
         // Playlists page
 
         controller.getPlaylistsPageController().setTrackService(trackService);

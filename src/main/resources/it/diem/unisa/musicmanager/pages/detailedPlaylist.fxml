@@ -7,13 +7,11 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-
-<VBox spacing="20.0" styleClass="sfondo-principale"  stylesheets="@../../css/style.css " xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.diem.unisa.musicmanager.controller.DetailedPlaylistController">
+<VBox spacing="20.0" prefWidth="700" prefHeight="500" styleClass="sfondo-principale"  stylesheets="@../../css/style.css " xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.diem.unisa.musicmanager.controller.DetailedPlaylistController">
     <padding>
         <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
     </padding>
 
-    <!-- Titolo playlist + numero tracce -->
     <HBox alignment="CENTER_LEFT" spacing="12.0">
         <Label fx:id="labelName" styleClass="titolo-pagina" text="Playlist Name" textFill="WHITE">
             <font>
@@ -23,7 +21,6 @@
         <Label fx:id="lblTrackCount" styleClass="menu-title" text="# 0 tracks" textFill="#7a7a7a" />
     </HBox>
 
-    <!-- Bottoni azioni (4 colonne) -->
     <HBox alignment="CENTER_LEFT" spacing="10.0">
         <Button styleClass="btn-secondary" text="SPRINT2" />
         <Button onAction="#onModify" styleClass="btn-secondary" text="Modify Playlist" />
@@ -31,7 +28,6 @@
         <Button onAction="#onDelete" styleClass="btn-danger" text="Delete Playlist" />
     </HBox>
 
-    <!-- Sezione modalitÃ  ascolto -->
     <VBox spacing="8.0">
         <Label styleClass="sottotitolo" text="Sprint 2 " textFill="#cccccc" />
         <HBox spacing="12.0">
@@ -41,7 +37,6 @@
         </HBox>
     </VBox>
 
-    <!-- Sezione tracce -->
     <Label styleClass="sottotitolo" text="Tracks" textFill="#cccccc" />
 
     <VBox fx:id="trackList" spacing="10.0" VBox.vgrow="ALWAYS" />
