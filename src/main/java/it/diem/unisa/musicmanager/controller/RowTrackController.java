@@ -80,7 +80,7 @@ public class RowTrackController {
         if (!isListenerAttached) {
             // Reagisce ai cambiamenti del servizio per aggiornare l'icona
             playerService.currentTrackProperty().addListener((o, ov, nv) ->{
-                updateCurrentTrackStyke();
+                updateCurrentTrackStyle();
                 updateButtonState();
             });
             playerService.isPlayingProperty().addListener((o, ov, nv) -> updateButtonState());
@@ -181,7 +181,7 @@ public class RowTrackController {
         this.onDeleteAction = onDeleteAction;
     }
 
-    private  void updateCurrentTrackStyke(){
+    private  void updateCurrentTrackStyle(){
         //reset della traccai corrente
         rootContainer.getStyleClass().remove("brano-row-playing");
 
