@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox prefHeight="600.0" prefWidth="400.0" spacing="15.0" styleClass="sfondo-principale" stylesheets="@../../css/style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.diem.unisa.musicmanager.controller.QueueViewController">
+   <padding>
+      <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+   </padding>
+   <children>
+      <Label styleClass="titolo-pagina" text="Listening Queue" textFill="WHITE">
+         <font>
+            <Font size="24.0" />
+         </font>
+      </Label>
+      <VBox spacing="5.0" style="-fx-background-color: #2b2b2b; -fx-padding: 10; -fx-background-radius: 5;">
+         <Label text="Now Playing" textFill="#1db954" style="-fx-font-weight: bold; -fx-font-size: 12px;"/>
+         <Label fx:id="labelCurrentTrack" text="Nessun brano in riproduzione" textFill="WHITE" style="-fx-font-size: 14px;"/>
+      </VBox>
+      <Label styleClass="sottotitolo" text="Next Tracks" textFill="#cccccc" />
+      <ListView fx:id="queueListView" prefHeight="200.0" prefWidth="200.0" styleClass="list-view-dark" VBox.vgrow="ALWAYS" />
+   </children>
+</VBox>
