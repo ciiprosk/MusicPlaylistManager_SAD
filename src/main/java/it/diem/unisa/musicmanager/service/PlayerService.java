@@ -89,8 +89,11 @@ public class PlayerService {
             setUpProgressListener(media);
             setupEndOfMediaHandler();
 
-            mediaPlayer.play();
-            isPlaying.set(true);
+            // Aspetta che il media sia pronto prima di suonare, evita il "salto vuoto"
+            mediaPlayer.setOnReady(() -> {
+                mediaPlayer.play();
+                isPlaying.set(true);
+            });
 
             if(trackService !=null) trackService.incrementPlayCount(track.getId());
         }
@@ -126,6 +129,10 @@ public class PlayerService {
 
     public void resume() {
         if (mediaPlayer != null) {
+            // Workaround per un bug noto del motore audio JavaFX (GStreamer): 
+            // Forziamo il riallineamento del buffer al tempo esatto prima di fare play 
+            // per evitare quel "micro-salto" o ripetizione dell'audio al resume.
+            mediaPlayer.seek(mediaPlayer.getCurrentTime());
             mediaPlayer.play();
             isPlaying.set(true); // Aggiorna isPlaying
         }

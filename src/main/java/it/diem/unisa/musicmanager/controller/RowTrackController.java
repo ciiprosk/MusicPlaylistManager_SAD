@@ -14,8 +14,9 @@ import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
 
-
 import java.io.IOException;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.WeakChangeListener;
 
 /**
  * Controller per la singola riga di un brano.
@@ -91,19 +92,22 @@ public class RowTrackController {
         this.trackService = trackService;
     }
 
+    private final ChangeListener<Track> currentTrackListener = (o, ov, nv) -> {
+        updateCurrentTrackStyle();
+        updateButtonState();
+    };
+
+    private final ChangeListener<Boolean> isPlayingListener = (o, ov, nv) -> {
+        updateCurrentTrackStyle();
+        updateButtonState();
+    };
+
     public void setPlayerService(PlayerService playerService) {
         this.playerService = playerService;
 
         if (!isListenerAttached) {
-            playerService.currentTrackProperty().addListener((o, ov, nv) -> {
-                updateCurrentTrackStyle();
-                updateButtonState();
-            });
-
-            playerService.isPlayingProperty().addListener((o, ov, nv) -> {
-                updateCurrentTrackStyle();
-                updateButtonState();
-            });
+            playerService.currentTrackProperty().addListener(new WeakChangeListener<>(currentTrackListener));
+            playerService.isPlayingProperty().addListener(new WeakChangeListener<>(isPlayingListener));
 
             isListenerAttached = true;
         }
