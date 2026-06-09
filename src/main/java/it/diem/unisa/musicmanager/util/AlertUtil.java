@@ -18,6 +18,15 @@ public final class AlertUtil {
         alert.showAndWait();
     }
 
+    //si chiama quando si vuole mostrare un messaggio informativo
+    public static void showInfo(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
     //si chiama quando si vuole mostrare un messaggio di conferma
     //chi lo chiama, gestisce poi gli eventi in base a ciò che viene premuto
     public static boolean showConfirmation(String title, String message) {

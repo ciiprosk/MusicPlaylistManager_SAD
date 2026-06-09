@@ -16,6 +16,9 @@ public class MainController {
     @FXML private PlayerController playerController;
     @FXML private HomeController homePageController;
 
+    private it.diem.unisa.musicmanager.service.QueueService queueService;
+    private it.diem.unisa.musicmanager.service.PlaylistService playlistService;
+
 
     @FXML
     public void initialize() {
@@ -55,6 +58,30 @@ public class MainController {
 
     public PlaylistController getPlaylistsPageController() {
         return playlistsPageController;
+    }
+
+    public void setQueueService(it.diem.unisa.musicmanager.service.QueueService queueService) {
+        this.queueService = queueService;
+    }
+
+    public void setPlaylistService(it.diem.unisa.musicmanager.service.PlaylistService playlistService) {
+        this.playlistService = playlistService;
+    }
+
+    @FXML
+    private void openQueue() {
+        try {
+            javafx.fxml.FXMLLoader loader = it.diem.unisa.musicmanager.util.WindowUtil.openWindow(
+                    "/it/diem/unisa/musicmanager/pages/queueView.fxml",
+                    "Coda di Riproduzione",
+                    javafx.stage.Modality.NONE
+            );
+            QueueViewController ctrl = loader.getController();
+            ctrl.setPlaylistService(playlistService);
+            ctrl.setQueueService(queueService);
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public TracksController getTracksPageController()

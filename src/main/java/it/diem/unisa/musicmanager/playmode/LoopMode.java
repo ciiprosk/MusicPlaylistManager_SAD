@@ -14,6 +14,10 @@ public class LoopMode implements PlayMode {
 
         int currentIndex = queue.indexOf(currentItem);
 
+        if (currentIndex == -1) {
+            return queue.get(0);
+        }
+
         return queue.get((currentIndex + 1) % queue.size());
 
     }

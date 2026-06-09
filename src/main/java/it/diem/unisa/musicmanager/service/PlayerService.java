@@ -62,15 +62,22 @@ public class PlayerService {
     }
 
     public void play(Track track) {
+        play(track, true);
+    }
+
+    public void play(Track track, boolean clearQueueItem) {
         if (track == null || track.getSongPath() == null) return;
 
         if (track.equals(loadedTrack) && mediaPlayer != null) {
+            // Se è lo stesso brano ed è in play, non fare nulla (o metti in pausa se preferisci, 
+            // ma di solito togglePlay gestisce questo).
+            // Se lo chiamo direttamente, faccio solo resume.
             resume();
             return;
         }
 
         // Segnaliamo alla coda che stiamo ascoltando una canzone "fuori coda"
-        if (queueService != null) {
+        if (clearQueueItem && queueService != null) {
             queueService.setCurrentItem(null);
         }
 
@@ -114,6 +121,7 @@ public class PlayerService {
 
     private void setupEndOfMediaHandler() {
         mediaPlayer.setOnEndOfMedia(() -> {
+            next();
             isPlaying.set(false);
             progress.set(0.0);
             Platform.runLater(this::next);
@@ -217,17 +225,9 @@ public class PlayerService {
         if(next !=null){
             List<Track> tracks = next.getPlayable().getTracksToPlay();
             if(!tracks.isEmpty()){
-                play(tracks.get(0));
+                play(tracks.get(0), false);
             }
         }
     }
-    /*
-    //metodo per andare alla prossima traccia, a seconda della Strategy applicata
-    public void next() {
-
-        currentPlayMode.nextItem(queue, currentIndex);     //
-
-    }
-    */
 
 }

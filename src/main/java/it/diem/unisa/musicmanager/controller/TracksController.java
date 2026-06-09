@@ -3,6 +3,7 @@ package it.diem.unisa.musicmanager.controller;
 import it.diem.unisa.musicmanager.model.Playlist;
 import it.diem.unisa.musicmanager.model.Track;
 import it.diem.unisa.musicmanager.service.PlayerService;
+import it.diem.unisa.musicmanager.service.QueueService;
 import it.diem.unisa.musicmanager.service.TrackService;
 import it.diem.unisa.musicmanager.util.WindowUtil;
 import javafx.beans.InvalidationListener;
@@ -36,6 +37,7 @@ public class TracksController {
 
     private TrackService trackService;
     private PlayerService playerService;
+    private QueueService queueService;
     private boolean isListenerAttached = false;
 
     @FXML private VBox trackList;
@@ -111,6 +113,7 @@ public class TracksController {
         controller.setOnDeleteAction(() -> trackService.deleteTrack(track.getId()));    //elimina dall'archivio la traccia
         controller.setTrackService(trackService); //i serviceeeee
         controller.setPlayerService(playerService);
+        controller.setQueueService(queueService);
         return card;
     }
 
@@ -154,5 +157,9 @@ public class TracksController {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void setQueueService(QueueService queueService) {
+        this.queueService = queueService;
     }
 }

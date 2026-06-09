@@ -3,6 +3,7 @@ package it.diem.unisa.musicmanager.controller;
 import it.diem.unisa.musicmanager.model.Playlist;
 import it.diem.unisa.musicmanager.service.PlayerService;
 import it.diem.unisa.musicmanager.service.PlaylistService;
+import it.diem.unisa.musicmanager.service.QueueService;
 import it.diem.unisa.musicmanager.service.TrackService;
 import it.diem.unisa.musicmanager.util.WindowUtil;
 import javafx.beans.InvalidationListener;
@@ -34,6 +35,7 @@ public class PlaylistController {
     private PlaylistService playlistService;
     private PlayerService playerService;
     private TrackService trackService;
+    private QueueService queueService;
     private boolean isListenerAttached = false;
 
     @FXML
@@ -151,6 +153,7 @@ public class PlaylistController {
         controller.setTrackService(trackService);
         controller.setPlaylistService(playlistService); //i serviceeeee
         controller.setPlayerService(playerService);
+        controller.setQueueService(queueService);
         controller.setPlaylist(playlist); //gli passo la playlist ddi cui creare la card
 
         return card;
@@ -164,6 +167,9 @@ public class PlaylistController {
                 e.printStackTrace();
             }
         }
+    }
+    public void setQueueService(QueueService queueService) {
+        this.queueService = queueService;
     }
 
 }

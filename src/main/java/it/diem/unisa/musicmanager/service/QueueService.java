@@ -66,6 +66,10 @@ public class QueueService {
         return currentItem;
     }
 
+    public javafx.collections.ObservableList<QueueItem> getQueueList() {
+        return sharedState.getQueue();
+    }
+
     public void setCurrentPlayMode(PlayMode playMode){
         this.playMode = playMode;
     }

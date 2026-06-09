@@ -5,10 +5,7 @@ import it.diem.unisa.musicmanager.dao.DAO;
 import it.diem.unisa.musicmanager.dao.JSONPlaylistDAO;
 import it.diem.unisa.musicmanager.dao.JSONTrackDAO;
 import it.diem.unisa.musicmanager.model.Playlist;
-import it.diem.unisa.musicmanager.service.PersistenceService;
-import it.diem.unisa.musicmanager.service.PlayerService;
-import it.diem.unisa.musicmanager.service.PlaylistService;
-import it.diem.unisa.musicmanager.service.TrackService;
+import it.diem.unisa.musicmanager.service.*;
 import it.diem.unisa.musicmanager.state.SharedState;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -33,8 +30,10 @@ public class MusicPlaylistManager extends Application {
         PlaylistService playlistService = new PlaylistService(playlistDAO, sharedState);
         TrackService trackService = new TrackService(trackDAO, sharedState);
         PlayerService playerService = new PlayerService();
+        QueueService queueService = new QueueService(sharedState);
 
         playerService.setTrackService(trackService);
+        playerService.setQueueService(queueService);
 
         trackService.addObserver(deletedTrackId -> {
             for (Playlist playlist : sharedState.getALlPlaylists()) {
@@ -51,26 +50,34 @@ public class MusicPlaylistManager extends Application {
 
         Scene scene = new Scene(fxmlLoader.load(), 1080, 720);
 
+
         MainController controller = fxmlLoader.getController();
+        controller.setPlaylistService(playlistService);
+        controller.setQueueService(queueService);
+
+        // passo service a home
+        controller.getHomePageController().setQueueService(queueService);
         controller.getHomePageController().setTrackService(trackService);
         controller.getHomePageController().setPlayerService(playerService);
         controller.getHomePageController().setPlaylistService(playlistService);
-        // Playlists page
 
+        // paasso service a playlist
+        controller.getPlaylistsPageController().setQueueService(queueService);
         controller.getPlaylistsPageController().setTrackService(trackService);
-        controller.getPlaylistsPageController().setPlaylistService(playlistService);
         controller.getPlaylistsPageController().setPlayerService(playerService);
-
+        controller.getPlaylistsPageController().setPlaylistService(playlistService);
         controller.getPlaylistsPageController().loadPlaylists();
 
-        // Tracks page
-
+        // passo service a tracks
+        controller.getTracksPageController().setQueueService(queueService);
         controller.getTracksPageController().setTrackService(trackService);
         controller.getTracksPageController().setPlayerService(playerService);
         controller.getTracksPageController().loadTracks();
 
+        //passo service al player
         controller.getPlayerController().setPlayerService(playerService);
-
+        controller.getPlayerController().setQueueService(queueService);
+        controller.getPlayerController().setPlaylistService(playlistService);
 
         stage.setMinWidth(900);
         stage.setMinHeight(650);

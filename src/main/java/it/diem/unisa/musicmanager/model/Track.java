@@ -94,7 +94,7 @@ public class Track  implements  Playable{
      */
     @Override
     public List<Track> getTracksToPlay() {
-        return List.of();
+        return java.util.List.of(this);
     }
 
     /**
