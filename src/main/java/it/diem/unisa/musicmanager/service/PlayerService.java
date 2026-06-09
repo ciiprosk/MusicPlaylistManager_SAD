@@ -89,6 +89,9 @@ public class PlayerService {
             setUpProgressListener(media);
             setupEndOfMediaHandler();
 
+            mediaPlayer.play();
+            isPlaying.set(true);
+
             if(trackService !=null) trackService.incrementPlayCount(track.getId());
         }
         catch (Exception e) {
