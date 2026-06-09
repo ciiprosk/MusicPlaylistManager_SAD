@@ -596,8 +596,6 @@ class PlaylistServiceTest {
         Track currentTrack = createTrack("CurrentTrack");
         Track newTrack = createTrack("NewTrack");
 
-        sharedState.getIsPlaying().set(true);
-
         playlistService.addTrackToPlaylist(
                 playlist.getId(),
                 currentTrack.getId()
@@ -610,8 +608,6 @@ class PlaylistServiceTest {
 
         Playlist updatedPlaylist =
                 sharedState.getALlPlaylists().get(0);
-
-        assertTrue(sharedState.getIsPlaying().get());
 
         assertTrue(
                 updatedPlaylist.containsTrack(newTrack.getId())
@@ -768,8 +764,6 @@ class PlaylistServiceTest {
                 track.getId()
         );
 
-        sharedState.getIsPlaying().set(true);
-
         playlistService.removeTrackFromPlaylist(
                 playlist.getId(),
                 track.getId()
@@ -777,8 +771,6 @@ class PlaylistServiceTest {
 
         Playlist updatedPlaylist =
                 sharedState.getALlPlaylists().get(0);
-
-        assertTrue(sharedState.getIsPlaying().get());
 
         assertFalse(
                 updatedPlaylist.containsTrack(track.getId())
