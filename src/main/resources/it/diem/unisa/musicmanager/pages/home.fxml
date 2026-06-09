@@ -1,40 +1,61 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.layout.StackPane?>
-<?import javafx.scene.text.Font?>
-
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
-<?import javafx.scene.control.Button?>
-<VBox spacing="20.0" styleClass="sfondo-principale" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.diem.unisa.musicmanager.controller.HomeController">
-    <padding>
-        <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
-    </padding>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-    <children>
-        <!-- Titolo a sinistra, bottone Genera a destra -->
-        <HBox alignment="CENTER_LEFT">
-            <Label styleClass="titolo-pagina" text="Home" textFill="WHITE">
-                <font>
-                    <Font size="32.0" />
-                </font>
-            </Label>
-            <Region HBox.hgrow="ALWAYS" />
-            <Button fx:id="btnGenerate" onAction="#goToGeneratePlaylist"  minWidth="150.0" mnemonicParsing="false"
-                     styleClass="btn-primario"
-                    text="Generate Playlist" />
-        </HBox>
+<ScrollPane fitToWidth="true"
+            hbarPolicy="NEVER"
+            vbarPolicy="AS_NEEDED"
+            styleClass="sfondo-principale"
+            xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="it.diem.unisa.musicmanager.controller.HomeController">
 
-        <Label styleClass="sottotitolo" text="Most Played Tracks" textFill="#cccccc" />
-        <VBox fx:id="topTracksContainer" spacing="10.0">
+    <content>
+        <VBox spacing="20.0" styleClass="sfondo-principale">
+            <padding>
+                <Insets bottom="40.0" left="30.0" right="30.0" top="30.0" />
+            </padding>
+
+            <children>
+
+                <HBox alignment="CENTER_LEFT">
+                    <Label styleClass="titolo-pagina" text="Home" textFill="WHITE">
+                        <font>
+                            <Font size="32.0" />
+                        </font>
+                    </Label>
+
+                    <Region HBox.hgrow="ALWAYS" />
+
+                    <Button fx:id="btnGenerate"
+                            onAction="#goToGeneratePlaylist"
+                            minWidth="150.0"
+                            mnemonicParsing="false"
+                            styleClass="btn-primario"
+                            text="Generate Playlist" />
+                </HBox>
+
+                <Label styleClass="sottotitolo" text="Most Played Tracks" textFill="#cccccc" />
+                <VBox fx:id="topTracksContainer" spacing="10.0" />
+
+                <Label styleClass="sottotitolo" text="Most Played Playlists" textFill="#cccccc" />
+                <FlowPane fx:id="topPlaylistsContainer"
+                          hgap="15.0"
+                          vgap="15.0"
+                          prefWrapLength="800.0" />
+
+                <Label styleClass="sottotitolo" text="Playlists" textFill="#cccccc" />
+                <VBox fx:id="recentPlaylistsContainer" spacing="10.0" />
+
+            </children>
         </VBox>
-
-        <Label styleClass="sottotitolo" text="Playlists" textFill="#cccccc" />
-        <VBox fx:id="recentPlaylistsContainer" spacing="10.0">
-        </VBox>
-    </children>
-</VBox>
+    </content>
+</ScrollPane>

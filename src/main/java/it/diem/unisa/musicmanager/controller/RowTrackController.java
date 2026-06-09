@@ -1,5 +1,6 @@
 package it.diem.unisa.musicmanager.controller;
 
+import it.diem.unisa.musicmanager.model.Tag;
 import it.diem.unisa.musicmanager.model.Track;
 import it.diem.unisa.musicmanager.service.PlayerService;
 import it.diem.unisa.musicmanager.service.TrackService;
@@ -13,8 +14,9 @@ import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
 
-
 import java.io.IOException;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.WeakChangeListener;
 
 /**
  * Controller per la singola riga di un brano.
@@ -38,6 +40,9 @@ public class RowTrackController {
     @FXML private CheckBox checkkSelect;
     @FXML private HBox rootContainer;
 
+    @FXML
+    private HBox tagsContainer;
+
     private boolean isListenerAttached = false;
     private Runnable onDeleteAction;
 
@@ -46,10 +51,18 @@ public class RowTrackController {
         checkkSelect.setManaged(isSelectionMode);
         checkkSelect.setSelected(isAlreadyInPlaylist);
 
-        btnPlay.setVisible(!isSelectionMode);
-        btnPlay.setManaged(!isSelectionMode);
-        btnModify.setVisible(!isSelectionMode);
-        btnModify.setManaged(!isSelectionMode);
+        if (btnPlay != null) {
+            btnPlay.setVisible(!isSelectionMode);
+            btnPlay.setManaged(!isSelectionMode);
+        }
+        if (btnModify != null) {
+            btnModify.setVisible(!isSelectionMode);
+            btnModify.setManaged(!isSelectionMode);
+        }
+        if (buttonMenu != null) {
+            buttonMenu.setVisible(!isSelectionMode);
+            buttonMenu.setManaged(!isSelectionMode);
+        }
     }
 
     public boolean isSelected() {
@@ -58,6 +71,7 @@ public class RowTrackController {
 
     public void setTrack(Track track) {
         this.track = track;
+
         lblTitle.setText(track.getTitle());
         lblAuthor.setText(track.getAuthor());
 
@@ -68,24 +82,37 @@ public class RowTrackController {
         if (lblPlayCount != null) {
             lblPlayCount.setText(track.getPlayCount() + " Plays");
         }
+
+        renderTags();
     }
+
+
 
     public void setTrackService(TrackService trackService) {
         this.trackService = trackService;
     }
 
+    private final ChangeListener<Track> currentTrackListener = (o, ov, nv) -> {
+        updateCurrentTrackStyle();
+        updateButtonState();
+    };
+
+    private final ChangeListener<Boolean> isPlayingListener = (o, ov, nv) -> {
+        updateCurrentTrackStyle();
+        updateButtonState();
+    };
+
     public void setPlayerService(PlayerService playerService) {
         this.playerService = playerService;
 
         if (!isListenerAttached) {
-            // Reagisce ai cambiamenti del servizio per aggiornare l'icona
-            playerService.currentTrackProperty().addListener((o, ov, nv) ->{
-                updateCurrentTrackStyle();
-                updateButtonState();
-            });
-            playerService.isPlayingProperty().addListener((o, ov, nv) -> updateButtonState());
+            playerService.currentTrackProperty().addListener(new WeakChangeListener<>(currentTrackListener));
+            playerService.isPlayingProperty().addListener(new WeakChangeListener<>(isPlayingListener));
+
             isListenerAttached = true;
         }
+
+        updateCurrentTrackStyle();
         updateButtonState();
     }
 
@@ -93,9 +120,13 @@ public class RowTrackController {
      * Aggiorna graficamente l'icona del pulsante basandosi esclusivamente sullo stato del Service.
      */
     private void updateButtonState() {
+        Track currentTrack = playerService != null
+                ? playerService.currentTrackProperty().get()
+                : null;
+
         boolean isCurrentAndPlaying = track != null
-                && playerService != null
-                && track.equals(playerService.currentTrackProperty().get())
+                && currentTrack != null
+                && track.getId().equals(currentTrack.getId())
                 && playerService.isPlayingProperty().get();
 
         btnPlay.setText(isCurrentAndPlaying ? "⏸" : "▶");
@@ -149,7 +180,17 @@ public class RowTrackController {
 
     private void openDetail() {
         try {
-            WindowUtil.openWindow("/it/diem/unisa/musicmanager/pages/detailSong.fxml", track.getTitle(), Modality.WINDOW_MODAL);
+            FXMLLoader loader = WindowUtil.openWindow(
+                    "/it/diem/unisa/musicmanager/pages/detailSong.fxml",
+                    track.getTitle(),
+                    Modality.WINDOW_MODAL
+            );
+
+            DetailSongController controller = loader.getController();
+
+            controller.setTrackService(trackService);
+            controller.setTrack(track);
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -181,13 +222,54 @@ public class RowTrackController {
         this.onDeleteAction = onDeleteAction;
     }
 
-    private  void updateCurrentTrackStyle(){
-        //reset della traccai corrente
+    private void updateCurrentTrackStyle() {
         rootContainer.getStyleClass().remove("brano-row-playing");
 
-        if(track != null && track.equals(playerService.currentTrackProperty().get())){
+        Track currentTrack = playerService != null
+                ? playerService.currentTrackProperty().get()
+                : null;
+
+        boolean isCurrentAndPlaying = track != null
+                && currentTrack != null
+                && track.getId().equals(currentTrack.getId())
+                && playerService.isPlayingProperty().get();
+
+        if (isCurrentAndPlaying) {
             rootContainer.getStyleClass().add("brano-row-playing");
         }
     }
 
+
+    private void renderTags() {
+        if (tagsContainer == null) return;
+
+        tagsContainer.getChildren().clear();
+
+        for (Tag tag : track.getTags()) {
+            tagsContainer.getChildren().add(createTag(tag));
+        }
+    }
+
+    //Creazione dinamica delle label associate ai tag
+    private Label createTag(Tag tag) {
+        Label label = new Label();
+        label.getStyleClass().add("tag");
+
+        switch (tag) {
+            case EXPLICIT -> {
+                label.setText("E");
+                label.getStyleClass().add("tag-explicit");
+            }
+            case FAVOURITE -> {
+                label.setText("♥");
+                label.getStyleClass().add("tag-favourite");
+            }
+            case NEWRELEASE -> {
+                label.setText("NEW");
+                label.getStyleClass().add("tag-newrelease");
+            }
+        }
+
+        return label;
+    }
 }

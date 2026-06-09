@@ -1,5 +1,6 @@
 package it.diem.unisa.musicmanager.service;
 
+import it.diem.unisa.musicmanager.model.QueueItem;
 import it.diem.unisa.musicmanager.model.Track;
 import it.diem.unisa.musicmanager.playmode.PlayMode;
 import it.diem.unisa.musicmanager.playmode.SequentialMode;
@@ -8,7 +9,10 @@ import javafx.beans.property.*;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import it.diem.unisa.musicmanager.state.SharedState;
+import javafx.util.Duration;
+
 import java.io.File;
+import java.util.List;
 
 /**
  * Service per la riproduzione dei brani.
@@ -19,14 +23,11 @@ import java.io.File;
 public class PlayerService {
 
     private TrackService trackService;
+    private QueueService queueService;
 
     private final ObjectProperty<Track> currentTrack = new SimpleObjectProperty<>(null);
     private final BooleanProperty isPlaying = new SimpleBooleanProperty(false);
     private final DoubleProperty progress = new SimpleDoubleProperty(0.0);
-
-    private PlayMode currentPlayMode = new SequentialMode();    //di default
-    private int currentIndex = 0;   //default
-
 
     private MediaPlayer mediaPlayer;
 
@@ -49,10 +50,15 @@ public class PlayerService {
         this.trackService = trackService;
     }
 
+    /*
     public void setCurrentPlayMode(PlayMode playMode) {
 
         this.currentPlayMode = playMode;
 
+    }
+    */
+    public void setQueueService(QueueService queueService) {
+        this.queueService = queueService;
     }
 
     public void play(Track track) {
@@ -63,43 +69,55 @@ public class PlayerService {
             return;
         }
 
-        stopCurrent();
+        // Segnaliamo alla coda che stiamo ascoltando una canzone "fuori coda"
+        if (queueService != null) {
+            queueService.setCurrentItem(null);
+        }
 
-        try {
-            File file = new File(track.getSongPath());
-            Media media = new Media(file.toURI().toString());
+        stopCurrent();
+        loadTrack(track);
+
+    }
+
+    private void loadTrack(Track track) {
+        try{
+            Media media = new Media(new File(track.getSongPath()).toURI().toString());
             mediaPlayer = new MediaPlayer(media);
             loadedTrack = track;
-
-            // Scriviamo nella nostra Property interna
             currentTrack.set(track);
 
-            // Calcolo dell'avanzamento sulle Property interne
-            mediaPlayer.currentTimeProperty().addListener((obs, oldV, newV) -> {
-                double total = media.getDuration().toSeconds();
-                if (total > 0) {
-                    double p = newV.toSeconds() / total;
-                    Platform.runLater(() -> progress.set(p)); // Aggiorna progress
-                }
+            setUpProgressListener(media);
+            setupEndOfMediaHandler();
+
+            // Aspetta che il media sia pronto prima di suonare, evita il "salto vuoto"
+            mediaPlayer.setOnReady(() -> {
+                mediaPlayer.play();
+                isPlaying.set(true);
             });
 
-            // Gestione fine brano
-            mediaPlayer.setOnEndOfMedia(() -> {
-                isPlaying.set(false);
-                progress.set(0.0);
-            });
-
-            mediaPlayer.play();
-            isPlaying.set(true); // Aggiorna isPlaying
-
-            if (trackService != null) {
-                trackService.incrementPlayCount(track.getId());
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            isPlaying.set(false);
+            if(trackService !=null) trackService.incrementPlayCount(track.getId());
         }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void setUpProgressListener(Media media){
+        mediaPlayer.currentTimeProperty().addListener((obs, oldV, newV) -> {
+            Duration total = mediaPlayer.getTotalDuration();
+             if (total != null && !total.isUnknown() && total.toSeconds() > 0) {
+                 double p = newV.toSeconds() / total.toSeconds();
+                 Platform.runLater(() -> progress.set(p));
+             }
+        });
+    }
+
+    private void setupEndOfMediaHandler() {
+        mediaPlayer.setOnEndOfMedia(() -> {
+            isPlaying.set(false);
+            progress.set(0.0);
+            Platform.runLater(this::next);
+        });
     }
 
     public void pause() {
@@ -111,6 +129,10 @@ public class PlayerService {
 
     public void resume() {
         if (mediaPlayer != null) {
+            // Workaround per un bug noto del motore audio JavaFX (GStreamer): 
+            // Forziamo il riallineamento del buffer al tempo esatto prima di fare play 
+            // per evitare quel "micro-salto" o ripetizione dell'audio al resume.
+            mediaPlayer.seek(mediaPlayer.getCurrentTime());
             mediaPlayer.play();
             isPlaying.set(true); // Aggiorna isPlaying
         }
@@ -152,6 +174,23 @@ public class PlayerService {
     }
 
     /**
+     * Avvia una traccia dall'inizio, anche se era già caricata.
+     * Utile quando si preme Play su una playlist e si vuole ripartire dalla prima traccia.
+     *
+     * @param track traccia da riprodurre dall'inizio.
+     */
+    public void playFromBeginning(Track track) {
+        if (track == null) {
+            return;
+        }
+
+        stopCurrent();
+        loadedTrack = null;
+
+        play(track);
+    }
+
+    /**
      * Gestisce l'alternanza di riproduzione e pausa per una determinata traccia.
      * Se la traccia è già in esecuzione, viene messa in pausa.
      * Se era in pausa, riprende. Se è un brano nuovo, lo fa partire.
@@ -160,14 +199,28 @@ public class PlayerService {
         if (track == null) return;
 
         // Se il brano passato è quello corrente e sta già suonando -> Pausa
-        if (track.equals(currentTrack.get()) && isPlaying.get()) {
+        Track current = currentTrack.get();
+
+        if (current != null
+                && track.getId().equals(current.getId())
+                && isPlaying.get()) {
             pause();
         } else {
-            // Altrimenti (è un brano nuovo o era in pausa) -> Riproduci
             play(track);
         }
     }
 
+    public void next(){
+        if (queueService == null) return;
+
+        QueueItem next = queueService.nextItem();
+        if(next !=null){
+            List<Track> tracks = next.getPlayable().getTracksToPlay();
+            if(!tracks.isEmpty()){
+                play(tracks.get(0));
+            }
+        }
+    }
     /*
     //metodo per andare alla prossima traccia, a seconda della Strategy applicata
     public void next() {

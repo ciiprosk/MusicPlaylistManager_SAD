@@ -14,7 +14,7 @@ import java.util.UUID;
  * Questa classe mantiene sia una lista di UUID per la persistenza su file (trackIDs),
  * sia una lista di oggetti Track risolti a runtime (tracksList).
  */
-public class Playlist {
+public class Playlist implements Playable{
 
     private String name;
     private UUID id;
@@ -24,6 +24,7 @@ public class Playlist {
     
     /** Lista in memoria degli oggetti Track. Non viene serializzata nel JSON. */
     private transient List<Track> tracksList;
+    private int playCount;
 
     /**
      * Costruttore della playlist.
@@ -34,6 +35,7 @@ public class Playlist {
         this.id = UUID.randomUUID();
         this.trackIDs = new ArrayList<>();
         this.tracksList = new ArrayList<>();
+        this.playCount = 0;
     }
 
     /**
@@ -47,6 +49,7 @@ public class Playlist {
         this.id = id;
         this.trackIDs = trackIDs != null ? new ArrayList<>(trackIDs) : new ArrayList<>();
         this.tracksList = new ArrayList<>();
+        this.playCount = 0;
     }
 
     /**
@@ -60,24 +63,37 @@ public class Playlist {
         this.id = playlistID;
         this.trackIDs = new ArrayList<>();
         this.tracksList = new ArrayList<>();
+        this.playCount = 0;
+    }
+
+
+    /**
+     * @return
+     */
+    @Override
+    public List<Track> getTracksToPlay() {
+        return tracksList;
     }
 
     /**
-     * Getter per il nome della playlist.
-     * @return il nome della playlist.
+     * @return
      */
-    public String getName() {
-        return name;
+    @Override
+    public QueueItemType getType() {
+        return QueueItemType.PLAYLIST;
     }
 
     /**
      * Getter per l'identificatore univoco della playlist.
      * @return l'identificatore univoco della playlist.
      */
+    @Override
     public UUID getId() {
         return id;
     }
-
+    public String getName(){
+        return this.name;
+    }
     /**
      * Setter per il nome della playlist.
      * @param name il nuovo nome della playlist.
@@ -106,6 +122,37 @@ public class Playlist {
     }
 
     */
+    /**
+     * Metodo legacy per l'aggiunta di una traccia tramite UUID.
+     * Aggiorna la lista degli ID usata per la persistenza su file.
+     *
+     * @param trackID l'identificatore univoco della traccia da aggiungere.
+     */
+    public void addTrack(UUID trackID) {
+        if (trackID != null && !trackIDs.contains(trackID)) {
+            trackIDs.add(trackID);
+        }
+
+        if (tracksList == null) {
+            tracksList = new ArrayList<>();
+        }
+    }
+
+    /**
+     * Metodo legacy per la rimozione di una traccia tramite UUID.
+     * Rimuove la traccia sia dalla lista degli ID sia dalla lista degli oggetti Track in memoria.
+     *
+     * @param trackID l'identificatore univoco della traccia da rimuovere.
+     */
+    public void removeTrack(UUID trackID) {
+        if (trackID != null) {
+            trackIDs.remove(trackID);
+
+            if (tracksList != null) {
+                tracksList.removeIf(track -> track.getId().equals(trackID));
+            }
+        }
+    }
     /**
      * Metodo che ritorna una copia della lista degli UUID delle tracce presenti.
      * @return una lista non modificabile di UUID delle tracce.
@@ -206,4 +253,11 @@ public class Playlist {
         return name != null ? name.hashCode() : 0;
     }
 
+    public int getPlayCount() {
+        return playCount;
+    }
+
+    public void incrementPlayCount() {
+        this.playCount++;
+    }
 }

@@ -7,20 +7,21 @@ import it.diem.unisa.musicmanager.service.TrackService;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import it.diem.unisa.musicmanager.model.Tag;
+import it.diem.unisa.musicmanager.util.TagUtils;
 
 import java.io.File;
 import java.time.Year;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Controller della finestra modale "Crea Brano" (addSong.fxml).
@@ -45,6 +46,9 @@ public class AddSongController {
     @FXML private Label lblFilePath;
     @FXML private Label lblError;
     @FXML private Button btnCrea;
+    @FXML private ToggleButton btnExplicit;
+    @FXML private ToggleButton btnFavorite;
+    @FXML private ToggleButton btnNewRelease;
 
     // Service per la gestione dei brani. Viene passato da chi apre il popup (TracksController).
     private TrackService trackService;
@@ -172,6 +176,8 @@ public class AddSongController {
         return (selezionato != null) ? selezionato : Genre.UNKNOWN;
     }
 
+
+
     /**
      * Gestisce il click su "Crea": controlla i campi, crea il brano e lo passa
      * al service per il salvataggio, poi chiude la finestra.
@@ -190,7 +196,7 @@ public class AddSongController {
 
         // UI check minimali
         if (audioPath == null || songLengthSeconds <= 0) {
-            lblError.setText("Carica un file audio valido.");
+            lblError.setText("Upload a valid audio file.");
             return;
         }
 
@@ -208,7 +214,8 @@ public class AddSongController {
                     genre,
                     audioPath,
                     songLengthSeconds,
-                    anno
+                    anno,
+                    TagUtils.fromToggles(btnExplicit, btnFavorite, btnNewRelease)
             );
 
             if (result.isPresent()) {

@@ -273,4 +273,33 @@ public class PlaylistService implements TrackObserver{
     private Track searchTrackById(UUID trackId) {
         return sharedState.getALlTracks().stream().filter(t -> t.getId().equals(trackId)).findFirst().orElseThrow(()-> new PlaylistInfoException("Track not found"));
     }
+
+    public Optional<String> incrementPlayCount(UUID playlistId) {
+
+        Playlist playlist = sharedState.getALlPlaylists()
+                .stream()
+                .filter(p -> p.getId().equals(playlistId))
+                .findFirst()
+                .orElse(null);
+
+        if (playlist == null) {
+            return Optional.of("Playlist not found");
+        }
+
+        playlist.incrementPlayCount();
+
+        playlistDAO.update(playlist);
+
+        updateInState(playlist);
+
+        return Optional.empty();
+    }
+
+    public List<Playlist> getTop5MostPlayedPlaylists() {
+        return sharedState.getALlPlaylists()
+                .stream()
+                .sorted((p1, p2) -> Integer.compare(p2.getPlayCount(), p1.getPlayCount()))
+                .limit(5)
+                .toList();
+    }
 }

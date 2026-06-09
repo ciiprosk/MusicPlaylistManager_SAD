@@ -4,9 +4,11 @@ import it.diem.unisa.musicmanager.dao.DAO;
 import it.diem.unisa.musicmanager.dao.JSONPlaylistDAO;
 import it.diem.unisa.musicmanager.model.Playlist;
 
+import it.diem.unisa.musicmanager.model.Tag;
 import it.diem.unisa.musicmanager.model.Track;
 import it.diem.unisa.musicmanager.model.Genre;
 
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -23,7 +25,7 @@ public class PlaylistSystemTest {
             // 1. TEST INSERT
             System.out.println("--- Test Inserimento ---");
             Playlist p1 = new Playlist("La mia Playlist Rock");
-            Track dummyTrack = new Track("Titolo Test", "Autore Test", Genre.ROCK, "path", 100, "2020");
+            Track dummyTrack = new Track("Titolo Test", "Autore Test", Genre.ROCK, "path", 100, "2020", EnumSet.noneOf(Tag.class));
             p1.addTrack(dummyTrack);
             dao.insert(p1);
             System.out.println("Inserita: " + p1.getName() + " ID: " + p1.getId());

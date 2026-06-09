@@ -50,6 +50,26 @@
             </HBox>
 
         </VBox>
+        <HBox spacing="10.0">
+            <padding>
+                <Insets left="60.0" />
+            </padding>
+
+            <ToggleButton fx:id="btnExplicit"
+                          styleClass="tag-toggle"
+                          text="Explicit"
+                          textFill="WHITE" />
+
+            <ToggleButton fx:id="btnFavorite"
+                          styleClass="tag-toggle"
+                          text="Favorite"
+                          textFill="WHITE" />
+
+            <ToggleButton fx:id="btnNewRelease"
+                          styleClass="tag-toggle"
+                          text="New Release"
+                          textFill="WHITE" />
+        </HBox>
 
         <HBox alignment="CENTER_RIGHT" spacing="12.0">
             <Label fx:id="lblError" maxWidth="Infinity" textFill="#ff5555" HBox.hgrow="ALWAYS" />
