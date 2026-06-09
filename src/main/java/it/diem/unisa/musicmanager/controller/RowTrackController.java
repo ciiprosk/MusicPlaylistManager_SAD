@@ -50,10 +50,18 @@ public class RowTrackController {
         checkkSelect.setManaged(isSelectionMode);
         checkkSelect.setSelected(isAlreadyInPlaylist);
 
-        btnPlay.setVisible(!isSelectionMode);
-        btnPlay.setManaged(!isSelectionMode);
-        btnModify.setVisible(!isSelectionMode);
-        btnModify.setManaged(!isSelectionMode);
+        if (btnPlay != null) {
+            btnPlay.setVisible(!isSelectionMode);
+            btnPlay.setManaged(!isSelectionMode);
+        }
+        if (btnModify != null) {
+            btnModify.setVisible(!isSelectionMode);
+            btnModify.setManaged(!isSelectionMode);
+        }
+        if (buttonMenu != null) {
+            buttonMenu.setVisible(!isSelectionMode);
+            buttonMenu.setManaged(!isSelectionMode);
+        }
     }
 
     public boolean isSelected() {

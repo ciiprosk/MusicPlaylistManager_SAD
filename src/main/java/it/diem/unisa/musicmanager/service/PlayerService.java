@@ -61,15 +61,17 @@ public class PlayerService {
         this.queueService = queueService;
     }
 
-    
     public void play(Track track) {
         if (track == null || track.getSongPath() == null) return;
 
-        if (loadedTrack != null
-                && track.getId().equals(loadedTrack.getId())
-                && mediaPlayer != null) {
+        if (track.equals(loadedTrack) && mediaPlayer != null) {
             resume();
             return;
+        }
+
+        // Segnaliamo alla coda che stiamo ascoltando una canzone "fuori coda"
+        if (queueService != null) {
+            queueService.setCurrentItem(null);
         }
 
         stopCurrent();
@@ -96,10 +98,10 @@ public class PlayerService {
 
     private void setUpProgressListener(Media media){
         mediaPlayer.currentTimeProperty().addListener((obs, oldV, newV) -> {
-            Duration total = media.getDuration();
-             if (total != null && !total.isUnknown()) {
+            Duration total = mediaPlayer.getTotalDuration();
+             if (total != null && !total.isUnknown() && total.toSeconds() > 0) {
                  double p = newV.toSeconds() / total.toSeconds();
-                 progress.set(p);
+                 Platform.runLater(() -> progress.set(p));
              }
         });
     }
