@@ -10,12 +10,14 @@ import java.util.UUID;
 public class QueueItem {
     private final Playable playable;
     private final UUID belongsToPlaylist;
+    private UUID playlistProgressive;
 
 
-    public QueueItem(Playable playable, UUID belongsToPlaylist) {
+    public QueueItem(Playable playable, UUID belongsToPlaylist, UUID playlistProgressive) {
         this.playable = playable;
 
         this.belongsToPlaylist = belongsToPlaylist;
+        this.playlistProgressive = playlistProgressive;
     }
 
     public Playable getPlayable() {
@@ -24,7 +26,7 @@ public class QueueItem {
     public UUID getBelongsToPlaylist() {
         return belongsToPlaylist;
     }
-
+    public UUID getPlaylistProgressive() { return playlistProgressive;}
     public boolean isPlaylist(){
         if(playable.getType() != QueueItemType.PLAYLIST) return false;
         return true;

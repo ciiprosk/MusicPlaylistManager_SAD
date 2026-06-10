@@ -32,14 +32,15 @@ public class QueueService {
 
         List<QueueItem> queue = new ArrayList<>();
         UUID belongsToPlaylist = null; //setto a null perché non so ancora se l'oggetto è playlist o traccia
-
+        UUID playlistProgressive = null;
         if(playable.getType() == QueueItemType.PLAYLIST){
             //la traccia apparteiene a una playlist per cui bisgna cambaire il belong tp
             belongsToPlaylist = playable.getId();
             List<Track> trackOfPlaylist = playable.getTracksToPlay();
+            playlistProgressive = UUID.randomUUID();
             for (Track track : trackOfPlaylist) {
                 //per ogni traccia devo creare un queue item
-                QueueItem queueItem = new QueueItem(track, belongsToPlaylist);
+                QueueItem queueItem = new QueueItem(track, belongsToPlaylist, playlistProgressive);
                 queue.add(queueItem);
                 sharedState.getQueue().add(queueItem);
 
@@ -47,7 +48,7 @@ public class QueueService {
         }else {
 
             //convertire l'oggetto in un queueitem
-            QueueItem queueItem = new QueueItem(playable, belongsToPlaylist);
+            QueueItem queueItem = new QueueItem(playable, belongsToPlaylist, playlistProgressive);
             queue.add(queueItem);
             sharedState.getQueue().add(queueItem);
         }
@@ -91,9 +92,10 @@ public class QueueService {
         //se sono qui vuol dire che l'oggetto corrente appartiene a una playlist
 
         UUID playlistID = currentItem.getBelongsToPlaylist();
+        UUID groupPlaylistID = currentItem.getPlaylistProgressive();
 
         QueueItem next = nextItem();
-        while(next != null && playlistID.equals(next.getBelongsToPlaylist())){
+        while(next != null && groupPlaylistID.equals(next.getPlaylistProgressive()) && groupPlaylistID !=null && playlistID.equals(next.getBelongsToPlaylist())){
             next = nextItem();
         }
 
