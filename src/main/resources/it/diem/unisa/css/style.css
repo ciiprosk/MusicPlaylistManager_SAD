@@ -954,3 +954,48 @@
     -fx-background-color: #2196F3;
     -fx-letter-spacing: 0.5;
 }
+
+/* ==========================================================================
+   SCROLL PANE (rimuove lo sfondo bianco di default del tema)
+   ========================================================================== */
+.scroll-pane {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+.scroll-pane > .viewport {
+    -fx-background-color: transparent;
+}
+
+/* ==========================================================================
+   LIST VIEW SCURA (coda di riproduzione, ecc.)
+   ========================================================================== */
+.list-view-dark {
+    -fx-background-color: transparent;
+    -fx-control-inner-background: #1e1e1e;        /* fondo delle celle, anche vuote */
+    -fx-control-inner-background-alt: #1e1e1e;    /* righe alternate */
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+    -fx-border-color: transparent;
+}
+.list-view-dark .virtual-flow .clipped-container {
+    -fx-background-color: transparent;
+}
+/* celle piene */
+.list-view-dark .list-cell {
+    -fx-background-color: #252525;
+    -fx-text-fill: white;
+    -fx-padding: 10px;
+}
+/* celle VUOTE: niente bianco sotto l'ultima traccia */
+.list-view-dark .list-cell:empty {
+    -fx-background-color: transparent;
+}
+.list-view-dark .list-cell:filled:hover {
+    -fx-background-color: #333333;
+    -fx-cursor: hand;
+}
+.list-view-dark .list-cell:filled:selected {
+    -fx-background-color: #456b59;
+    -fx-text-fill: white;
+}

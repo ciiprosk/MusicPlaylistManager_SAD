@@ -596,6 +596,8 @@ class PlaylistServiceTest {
         Track currentTrack = createTrack("CurrentTrack");
         Track newTrack = createTrack("NewTrack");
 
+
+
         playlistService.addTrackToPlaylist(
                 playlist.getId(),
                 currentTrack.getId()

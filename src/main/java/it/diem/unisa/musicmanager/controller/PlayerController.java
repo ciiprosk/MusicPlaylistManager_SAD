@@ -97,7 +97,7 @@ public class PlayerController {
 
     @FXML
     public void handleChangeMode(ActionEvent actionEvent) {
-            //cicla tra le modalità e le setta nella queue service
+        //cicla tra le modalità e le setta nella queue service
         currentPlayModeIndex = (currentPlayModeIndex + 1) % playModes.length;
         queueService.setCurrentPlayMode(playModes[currentPlayModeIndex]);
         updateModeButton();

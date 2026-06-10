@@ -272,4 +272,133 @@ class QueueServiceTest {
                 EnumSet.noneOf(Tag.class)
         );
     }
+
+    // TEST AVANZAMENTO AL BRANO SUCCESSIVO IN MODALITÀ SEQUENZIALE
+
+    @Test
+    void nextItemShouldMoveToNextTrackInSequentialMode() {
+
+        Track firstTrack =
+                createTrack("First Track");
+
+        Track secondTrack =
+                createTrack("Second Track");
+
+        Track thirdTrack =
+                createTrack("Third Track");
+
+        queueService.addToQueue(firstTrack);
+        queueService.addToQueue(secondTrack);
+        queueService.addToQueue(thirdTrack);
+
+        QueueItem firstItem =
+                sharedState.getQueue().get(0);
+
+        queueService.setCurrentItem(firstItem);
+
+        QueueItem nextItem =
+                queueService.nextItem();
+
+        assertNotNull(
+                nextItem
+        );
+
+        assertEquals(
+                secondTrack.getId(),
+                nextItem.getPlayable().getId()
+        );
+
+        assertEquals(
+                secondTrack.getId(),
+                queueService.getCurrentItem().getPlayable().getId()
+        );
+    }
+
+    // TEST INTERRUZIONE RIPRODUZIONE QUANDO SI SALTA L'ULTIMO BRANO DELLA CODA
+
+    @Test
+    void nextItemShouldReturnNullWhenSkippingLastTrackInSequentialMode() {
+
+        Track onlyTrack =
+                createTrack("Only Track");
+
+        queueService.addToQueue(onlyTrack);
+
+        QueueItem onlyItem =
+                sharedState.getQueue().get(0);
+
+        queueService.setCurrentItem(onlyItem);
+
+        QueueItem nextItem =
+                queueService.nextItem();
+
+        assertNull(
+                nextItem
+        );
+
+        assertNull(
+                queueService.getCurrentItem()
+        );
+
+        assertTrue(
+                sharedState.getQueue().isEmpty()
+        );
+    }
+
+    // TEST AVANZAMENTO SEQUENZIALE FINO ALLA FINE DELLA CODA
+
+    @Test
+    void nextItemShouldAdvanceUntilQueueEnds() {
+
+        Track firstTrack =
+                createTrack("First Track");
+
+        Track secondTrack =
+                createTrack("Second Track");
+
+        Track thirdTrack =
+                createTrack("Third Track");
+
+        queueService.addToQueue(firstTrack);
+        queueService.addToQueue(secondTrack);
+        queueService.addToQueue(thirdTrack);
+
+        QueueItem firstItem =
+                sharedState.getQueue().get(0);
+
+        queueService.setCurrentItem(firstItem);
+
+        QueueItem secondItem =
+                queueService.nextItem();
+
+        assertNotNull(secondItem);
+        assertEquals(
+                secondTrack.getId(),
+                secondItem.getPlayable().getId()
+        );
+
+        QueueItem thirdItem =
+                queueService.nextItem();
+
+        assertNotNull(thirdItem);
+        assertEquals(
+                thirdTrack.getId(),
+                thirdItem.getPlayable().getId()
+        );
+
+        QueueItem endItem =
+                queueService.nextItem();
+
+        assertNull(
+                endItem
+        );
+
+        assertNull(
+                queueService.getCurrentItem()
+        );
+
+        assertTrue(
+                sharedState.getQueue().isEmpty()
+        );
+    }
 }

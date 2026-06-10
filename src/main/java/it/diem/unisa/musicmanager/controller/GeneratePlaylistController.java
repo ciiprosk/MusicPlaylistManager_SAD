@@ -8,6 +8,7 @@ import it.diem.unisa.musicmanager.service.PlaylistService;
 import it.diem.unisa.musicmanager.service.TrackService;
 import it.diem.unisa.musicmanager.specification.GenreSpecification;
 import it.diem.unisa.musicmanager.specification.Specification;
+import it.diem.unisa.musicmanager.specification.TagSpecification;
 import it.diem.unisa.musicmanager.specification.YearSpecification;
 import it.diem.unisa.musicmanager.util.AlertUtil;
 import it.diem.unisa.musicmanager.util.WindowUtil;
@@ -20,6 +21,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.layout.VBox;
 
 import java.util.Comparator;
+import java.util.EnumSet;
 import java.util.Optional;
 
 /**
@@ -109,13 +111,25 @@ public class GeneratePlaylistController {
             return new YearSpecification((Integer) value);
         } else if (value instanceof Genre) {
             return new GenreSpecification((Genre) value);
-        } else if (value instanceof Tag) {
-            // return new TagSpecification((Tag) value);
-            return null; // non disponibile finche' Track non ha getTags()
         }
         return null;
     }
+    private Optional<Specification<Track>> buildTagSpec(VBox column) {
 
+        EnumSet<Tag> selectedTags = EnumSet.noneOf(Tag.class);
+
+        for (Node node : column.getChildren()) {
+            if (node instanceof CheckBox cb && cb.isSelected()) {
+                selectedTags.add((Tag) cb.getUserData());
+            }
+        }
+
+        if (selectedTags.isEmpty()) {
+            return Optional.empty();
+        }
+
+        return Optional.of(new TagSpecification(selectedTags));
+    }
     // Genera Playlist
 
     @FXML
@@ -124,7 +138,7 @@ public class GeneratePlaylistController {
         // Combina le colonne in AND tra loro
         Optional<Specification<Track>> yearSpec  = buildColumnSpec(yearBox);
         Optional<Specification<Track>> genreSpec = buildColumnSpec(genreBox);
-        Optional<Specification<Track>> tagSpec   = buildColumnSpec(tagBox);
+        Optional<Specification<Track>> tagSpec = buildTagSpec(tagBox);
 
         // Unisci tutte le colonne selezionate con AND
         Specification<Track> criteria = null;
