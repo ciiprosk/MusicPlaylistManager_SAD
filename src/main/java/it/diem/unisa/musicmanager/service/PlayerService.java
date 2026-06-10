@@ -233,5 +233,18 @@ public class PlayerService {
             }
         }
     }
+    public void skipPlaylist(){
+        if (queueService == null) return;
+        //prima in next chiedeva al service la traccia successiva ora salta la cos
+        QueueItem next = queueService.skipCurrentPlaylist();
+
+        if (next != null) {
+            play(next.getPlayable().getTracksToPlay().get(0), false, true);
+        } else {
+            stopCurrent();
+            currentTrack.set(null);
+        }
+
+    }
 
 }

@@ -92,27 +92,7 @@ public class PlayerController {
 
     @FXML
     public void handleSkipPlaylist(ActionEvent actionEvent) {
-        //la logica è che deve saltare tutti i brani presenti nella coda e saltareli tutti alla porssima traccia
-        if (queueService == null) return;
-
-        QueueItem current = queueService.getCurrentItem();
-        if(current == null) return;
-
-        UUID currentPlaylist = current.getBelongsToPlaylist();
-
-        //se è una traccia sola l'id n di associatìzione è null
-        QueueItem next = queueService.nextItem();
-
-        while(next != null && currentPlaylist.equals(next.getBelongsToPlaylist())){
-            next = queueService.nextItem();
-        }
-
-        if (next != null) {
-            List<Track> tracks = next.getPlayable().getTracksToPlay();
-            if(!tracks.isEmpty()){
-                playerService.play(tracks.get(0), false);
-            }
-        }
+        playerService.skipPlaylist();
     }
 
     @FXML
@@ -136,7 +116,7 @@ public class PlayerController {
         try {
             javafx.fxml.FXMLLoader loader = it.diem.unisa.musicmanager.util.WindowUtil.openWindow(
                     "/it/diem/unisa/musicmanager/pages/queueView.fxml",
-                    "Coda di Riproduzione",
+                    "Listening Queue",
                     javafx.stage.Modality.NONE
             );
             QueueViewController ctrl = loader.getController();

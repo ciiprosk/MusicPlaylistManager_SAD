@@ -1,9 +1,6 @@
 package it.diem.unisa.musicmanager.service;
 
-import it.diem.unisa.musicmanager.model.Playable;
-import it.diem.unisa.musicmanager.model.QueueItem;
-import it.diem.unisa.musicmanager.model.QueueItemType;
-import it.diem.unisa.musicmanager.model.Track;
+import it.diem.unisa.musicmanager.model.*;
 import it.diem.unisa.musicmanager.playmode.PlayMode;
 import it.diem.unisa.musicmanager.playmode.SequentialMode;
 import it.diem.unisa.musicmanager.state.SharedState;
@@ -88,6 +85,20 @@ public class QueueService {
     }
 
 
+    public QueueItem skipCurrentPlaylist(){
+        //se l'oggetto corrente è null o non appartiene a una playlist allora prosegue con il prossimo item
+        if (currentItem == null || currentItem.getBelongsToPlaylist() == null) return nextItem();
+        //se sono qui vuol dire che l'oggetto corrente appartiene a una playlist
+
+        UUID playlistID = currentItem.getBelongsToPlaylist();
+
+        QueueItem next = nextItem();
+        while(next != null && playlistID.equals(next.getBelongsToPlaylist())){
+            next = nextItem();
+        }
+
+        return next;
+    }
 
 
 
