@@ -13,6 +13,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
+import javafx.scene.control.Tooltip;
 
 import java.util.List;
 import java.util.UUID;
@@ -52,6 +53,7 @@ public class PlayerController {
      */
     public void setPlayerService(PlayerService playerService) {
         this.playerService = playerService;
+        setupTooltips();
         // listener una sola volta
         if(!isListenerAttached) {
             bind();
@@ -106,9 +108,24 @@ public class PlayerController {
 
     private void updateModeButton(){
         switch (currentPlayModeIndex){
-            case 0 -> buttonMode.setText("⇢"); //U+21E2
-            case 1 -> buttonMode.setText("⇄"); //\u21C4
-            case 2 -> buttonMode.setText("↻"); //\u21BB
+            case 0 -> {
+                buttonMode.setText("⇢");
+                buttonMode.setTooltip(
+                        new Tooltip("Modalità sequenziale: i brani vengono riprodotti in ordine")
+                );
+            }
+            case 1 -> {
+                buttonMode.setText("⇄");
+                buttonMode.setTooltip(
+                        new Tooltip("Modalità casuale: i brani vengono riprodotti in ordine casuale")
+                );
+            }
+            case 2 -> {
+                buttonMode.setText("↻");
+                buttonMode.setTooltip(
+                        new Tooltip("Modalità ripetizione: la coda viene riprodotta in loop")
+                );
+            }
         }
     }
 
@@ -126,6 +143,29 @@ public class PlayerController {
         } catch (java.io.IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void setupTooltips() {
+
+        buttonPlay.setTooltip(
+                new Tooltip("Riproduci o metti in pausa il brano")
+        );
+
+        buttonNext.setTooltip(
+                new Tooltip("Passa al brano successivo")
+        );
+
+        buttonSkipPlaylist.setTooltip(
+                new Tooltip("Salta tutti i brani della playlist corrente")
+        );
+
+        buttonMode.setTooltip(
+                new Tooltip("Cambia modalità di riproduzione")
+        );
+
+        buttonQueue.setTooltip(
+                new Tooltip("Apri la coda di ascolto")
+        );
     }
 
     private void bind() {
