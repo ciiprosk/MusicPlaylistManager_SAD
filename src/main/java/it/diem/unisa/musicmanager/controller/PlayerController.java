@@ -165,6 +165,10 @@ public class PlayerController {
             playerService.seek(sliderProgress.getValue());
             userIsSeeking = false;
         });
+
+        // 6. Quando cambia currentTrackProperty() o la queue, chiamiamo updateNextButton()
+        playerService.currentTrackProperty().addListener((o, ov, nv) -> updateNextButton());
+        queueService.getQueueList().addListener((ListChangeListener<QueueItem>) c -> updateNextButton());
     }
 
     private void updateSkipPlaylistButton() {
@@ -198,4 +202,9 @@ public class PlayerController {
     private String format(long totalSeconds) {
         return String.format("%02d:%02d", totalSeconds / 60, totalSeconds % 60);
     }
+
+    private void updateNextButton() {
+        buttonNext.setDisable(!queueService.hasNext());
+    }
+
 }

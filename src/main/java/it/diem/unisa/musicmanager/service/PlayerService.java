@@ -218,43 +218,36 @@ public class PlayerService {
         }
     }
 
-    public void next(){
-        if (queueService == null) return;
-
-        try {
-            QueueItem next = queueService.nextItem();
-            if (next != null) {
-                List<Track> tracks = next.getPlayable().getTracksToPlay();
-                if (!tracks.isEmpty()) {
-                    play(tracks.get(0), false, true);
-                }
-            }
-        } catch (QueueException e) {
-            // La coda è esaurita: resetta lo stato del player in modo
-            // che la prossima aggiunta alla coda possa partire automaticamente.
+    public void next() {
+        if (queueService == null || !queueService.hasNext()) {
+            // reset stato player
             stopCurrent();
             loadedTrack = null;
             currentTrack.set(null);
+            return;
         }
+        QueueItem next = queueService.nextItem();
     }
-    public void skipPlaylist(){
-        if (queueService == null) return;
-        try {
-            // prima in next chiedeva al service la traccia successiva ora salta la cos
-            QueueItem next = queueService.skipCurrentPlaylist();
 
+    public void skipPlaylist() {
+        if (queueService == null) return;
+
+        if (!queueService.hasNext()) {
+            stopCurrent();
+            loadedTrack = null;
+            currentTrack.set(null);
+            return;
+        }
+
+        try {
+            QueueItem next = queueService.skipCurrentPlaylist();
             if (next != null) {
                 play(next.getPlayable().getTracksToPlay().get(0), false, true);
             } else {
-                stopCurrent();
-                loadedTrack = null;
-                currentTrack.set(null);
+                stopCurrent(); loadedTrack = null; currentTrack.set(null);
             }
-        } catch (QueueException e) {
-            // La coda è esaurita: resetta lo stato del player.
-            stopCurrent();
-            loadedTrack = null;
-            currentTrack.set(null);
+        } catch (QueueException e) {    // La coda è esaurita: resetta lo stato del player.
+            stopCurrent(); loadedTrack = null; currentTrack.set(null);
         }
     }
 
