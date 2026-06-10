@@ -1,5 +1,6 @@
 package it.diem.unisa.musicmanager.service;
 
+import it.diem.unisa.musicmanager.exception.QueueException;
 import it.diem.unisa.musicmanager.model.QueueItem;
 import it.diem.unisa.musicmanager.model.Track;
 import it.diem.unisa.musicmanager.playmode.PlayMode;
@@ -220,26 +221,41 @@ public class PlayerService {
     public void next(){
         if (queueService == null) return;
 
-        QueueItem next = queueService.nextItem();
-        if(next !=null){
-            List<Track> tracks = next.getPlayable().getTracksToPlay();
-            if(!tracks.isEmpty()){
-                play(tracks.get(0), false, true);
+        try {
+            QueueItem next = queueService.nextItem();
+            if (next != null) {
+                List<Track> tracks = next.getPlayable().getTracksToPlay();
+                if (!tracks.isEmpty()) {
+                    play(tracks.get(0), false, true);
+                }
             }
+        } catch (QueueException e) {
+            // La coda è esaurita: resetta lo stato del player in modo
+            // che la prossima aggiunta alla coda possa partire automaticamente.
+            stopCurrent();
+            loadedTrack = null;
+            currentTrack.set(null);
         }
     }
     public void skipPlaylist(){
         if (queueService == null) return;
-        //prima in next chiedeva al service la traccia successiva ora salta la cos
-        QueueItem next = queueService.skipCurrentPlaylist();
+        try {
+            // prima in next chiedeva al service la traccia successiva ora salta la cos
+            QueueItem next = queueService.skipCurrentPlaylist();
 
-        if (next != null) {
-            play(next.getPlayable().getTracksToPlay().get(0), false, true);
-        } else {
+            if (next != null) {
+                play(next.getPlayable().getTracksToPlay().get(0), false, true);
+            } else {
+                stopCurrent();
+                loadedTrack = null;
+                currentTrack.set(null);
+            }
+        } catch (QueueException e) {
+            // La coda è esaurita: resetta lo stato del player.
             stopCurrent();
+            loadedTrack = null;
             currentTrack.set(null);
         }
-
     }
 
 }

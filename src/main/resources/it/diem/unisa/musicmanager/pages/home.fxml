@@ -54,9 +54,6 @@
                           vgap="15.0"
                           prefWrapLength="800.0" />
 
-                <Label styleClass="sottotitolo" text="Playlists" textFill="#cccccc" />
-                <VBox fx:id="recentPlaylistsContainer" spacing="10.0" />
-
             </children>
         </VBox>
     </content>
