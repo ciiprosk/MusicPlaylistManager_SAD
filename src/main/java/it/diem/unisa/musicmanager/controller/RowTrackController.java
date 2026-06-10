@@ -29,6 +29,8 @@ public class RowTrackController {
     private TrackService trackService;
     private PlayerService playerService;
     private QueueService queueService;
+    private it.diem.unisa.musicmanager.service.PlaylistService playlistService;
+    private it.diem.unisa.musicmanager.model.Playlist parentPlaylist;
 
     @FXML private Label lblTitle;
     @FXML private Label lblAuthor;
@@ -122,6 +124,14 @@ public class RowTrackController {
         this.queueService = queueService;
     }
 
+    public void setPlaylistService(it.diem.unisa.musicmanager.service.PlaylistService playlistService) {
+        this.playlistService = playlistService;
+    }
+
+    public void setParentPlaylist(it.diem.unisa.musicmanager.model.Playlist parentPlaylist) {
+        this.parentPlaylist = parentPlaylist;
+    }
+
     /**
      * Aggiorna graficamente l'icona del pulsante basandosi esclusivamente sullo stato del Service.
      */
@@ -144,7 +154,14 @@ public class RowTrackController {
     @FXML
     public void handlePlay(ActionEvent actionEvent) {
         if (playerService != null && track != null) {
+            Track currentTrack = playerService.currentTrackProperty().get();
+            boolean wasAlreadyLoaded = currentTrack != null && track.getId().equals(currentTrack.getId());
+
             playerService.togglePlay(track);//lo fa il seerivce
+
+            if (!wasAlreadyLoaded && parentPlaylist != null && playlistService != null) {
+                playlistService.incrementPlayCount(parentPlaylist.getId());
+            }
         }
     }
 
