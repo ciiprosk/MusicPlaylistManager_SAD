@@ -134,9 +134,10 @@ public class Track  implements  Playable{
     }
 
     public Set<Tag> getTags() {
-        return tags.isEmpty()
-                ? EnumSet.noneOf(Tag.class)
-                : EnumSet.copyOf(tags);
+        if (tags == null || tags.isEmpty()) {
+            return EnumSet.noneOf(Tag.class);
+        }
+        return EnumSet.copyOf(tags);
     }
 
     //metodi utili per i tag
@@ -153,9 +154,11 @@ public class Track  implements  Playable{
     }
 
     public void setTags(Set<Tag> tags) {
-        this.tags = (tags != null)
-                ? EnumSet.copyOf(tags)
-                : EnumSet.noneOf(Tag.class);
+        if (tags == null || tags.isEmpty()) {
+            this.tags = EnumSet.noneOf(Tag.class);
+        } else {
+            this.tags = EnumSet.copyOf(tags);
+        }
     }
     public void setTitle(String title) {
         this.title = validateTitle(title);
