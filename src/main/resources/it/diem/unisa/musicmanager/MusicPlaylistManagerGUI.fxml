@@ -43,7 +43,7 @@
    </left>
 
    <center>
-      <StackPane fx:id="viewStack" styleClass="content-area" BorderPane.alignment="CENTER">
+      <StackPane fx:id="viewStack" minHeight="0.0" styleClass="content-area" BorderPane.alignment="CENTER">
          <children>
             <fx:include fx:id="playlistsPage" source="pages/playlist.fxml" />
             <fx:include fx:id="tracksPage" source="pages/tracks.fxml" />

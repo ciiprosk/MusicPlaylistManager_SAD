@@ -13,6 +13,7 @@
 <ScrollPane fitToWidth="true"
             hbarPolicy="NEVER"
             vbarPolicy="AS_NEEDED"
+            minHeight="0.0"
             styleClass="sfondo-principale"
             xmlns="http://javafx.com/javafx/21"
             xmlns:fx="http://javafx.com/fxml/1"

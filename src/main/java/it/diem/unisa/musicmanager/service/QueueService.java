@@ -1,9 +1,6 @@
 package it.diem.unisa.musicmanager.service;
 
-import it.diem.unisa.musicmanager.model.Playable;
-import it.diem.unisa.musicmanager.model.QueueItem;
-import it.diem.unisa.musicmanager.model.QueueItemType;
-import it.diem.unisa.musicmanager.model.Track;
+import it.diem.unisa.musicmanager.model.*;
 import it.diem.unisa.musicmanager.playmode.PlayMode;
 import it.diem.unisa.musicmanager.playmode.SequentialMode;
 import it.diem.unisa.musicmanager.state.SharedState;
@@ -35,14 +32,15 @@ public class QueueService {
 
         List<QueueItem> queue = new ArrayList<>();
         UUID belongsToPlaylist = null; //setto a null perché non so ancora se l'oggetto è playlist o traccia
-
+        UUID playlistProgressive = null;
         if(playable.getType() == QueueItemType.PLAYLIST){
             //la traccia apparteiene a una playlist per cui bisgna cambaire il belong tp
             belongsToPlaylist = playable.getId();
             List<Track> trackOfPlaylist = playable.getTracksToPlay();
+            playlistProgressive = UUID.randomUUID();
             for (Track track : trackOfPlaylist) {
                 //per ogni traccia devo creare un queue item
-                QueueItem queueItem = new QueueItem(track, belongsToPlaylist);
+                QueueItem queueItem = new QueueItem(track, belongsToPlaylist, playlistProgressive);
                 queue.add(queueItem);
                 sharedState.getQueue().add(queueItem);
 
@@ -50,7 +48,7 @@ public class QueueService {
         }else {
 
             //convertire l'oggetto in un queueitem
-            QueueItem queueItem = new QueueItem(playable, belongsToPlaylist);
+            QueueItem queueItem = new QueueItem(playable, belongsToPlaylist, playlistProgressive);
             queue.add(queueItem);
             sharedState.getQueue().add(queueItem);
         }
@@ -88,6 +86,40 @@ public class QueueService {
     }
 
 
+    public QueueItem skipCurrentPlaylist(){
+        //se l'oggetto corrente è null o non appartiene a una playlist allora prosegue con il prossimo item
+        if (currentItem == null || currentItem.getBelongsToPlaylist() == null) return nextItem();
+        //se sono qui vuol dire che l'oggetto corrente appartiene a una playlist
+
+        UUID playlistID = currentItem.getBelongsToPlaylist();
+        UUID groupPlaylistID = currentItem.getPlaylistProgressive();
+
+        QueueItem next = nextItem();
+        while(next != null && groupPlaylistID.equals(next.getPlaylistProgressive()) && groupPlaylistID !=null && playlistID.equals(next.getBelongsToPlaylist())){
+            next = nextItem();
+        }
+
+        return next;
+    }
+
+    //il metodo dev evedere se la tracci asu cui è stato fatto play appartiene a una playlist (sono in detailedPlaylist)
+    // e appartiene metto le tracce in coda rimanenti
+    public QueueItem queuePlaylistFromTrack(Playable playable, Track trackInPlaylist){
+        if(playable == null || trackInPlaylist == null) return null;
+
+        getQueueList().clear(); //ripulisce la coda
+        addToQueue(playable); // metto turtta la playlst in coda ma devo togliere le precedenti a wurrlla che tsa andando play
+
+        QueueItem queueItem = nextItem();
+        //dobbiamo scartare le alee canzoni fio a quellla su ci abbiamo cliccato play
+        while(queueItem != null && !trackInPlaylist.getId().equals(queueItem.getPlayable().getId())){
+            queueItem = nextItem();
+        }
+
+        //restistuisce l'elemento trovatooo
+        return queueItem;
+
+    }
 
 
 

@@ -36,6 +36,7 @@ public class PlaylistCardController {
 
     @FXML private Label labelName;
     @FXML private Label labelTracks;
+    @FXML private Label labelPlayCount;
     @FXML private Button btnPlay;
     @FXML private Button btnModify;
     @FXML private Button btnMenu;
@@ -53,6 +54,9 @@ public class PlaylistCardController {
         labelName.setText(playlist.getName());
         int n = playlist.getTracksList().size();
         labelTracks.setText(n + (n == 1 ? " Track" : " Tracks"));
+        if (labelPlayCount != null) {
+            labelPlayCount.setText(playlist.getPlayCount() + (playlist.getPlayCount() == 1 ? " Play" : " Plays"));
+        }
     }
 
     public void setPlaylistService(PlaylistService playlistService) {

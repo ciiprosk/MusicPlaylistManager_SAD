@@ -143,6 +143,8 @@ public class DetailedPlaylistController {
                 controller.setPlayerService(playerService);
                 controller.setTrackService(trackService);
                 controller.setQueueService(queueService);
+                controller.setPlaylistService(playlistService);
+                controller.setParentPlaylist(playlist);
 
                 //se premo il tasto elimina, rimuovo la traccia dalla playlist
                 controller.setOnDeleteAction(() -> {
