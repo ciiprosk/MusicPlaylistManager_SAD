@@ -11,6 +11,7 @@
 <?import javafx.scene.text.Font?>
 
 <ScrollPane fitToWidth="true"
+            fitToHeight="true"
             hbarPolicy="NEVER"
             vbarPolicy="AS_NEEDED"
             minHeight="0.0"
