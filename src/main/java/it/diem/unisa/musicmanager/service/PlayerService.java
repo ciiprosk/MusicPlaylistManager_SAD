@@ -227,6 +227,14 @@ public class PlayerService {
             return;
         }
         QueueItem next = queueService.nextItem();
+
+        if (next != null) {
+            List<Track> tracks = next.getPlayable().getTracksToPlay();
+            if (!tracks.isEmpty()) {
+                play(tracks.get(0), false, true);
+            }
+        }
+
     }
 
     public void skipPlaylist() {

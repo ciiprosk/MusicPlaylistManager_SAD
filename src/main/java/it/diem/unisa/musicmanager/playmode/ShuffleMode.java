@@ -32,6 +32,22 @@ public class ShuffleMode implements PlayMode {
 
         return Optional.of(queue.get(randomIndex));
 
+
+    }
+
+    @Override
+    public boolean hasNext(List<QueueItem> queue, QueueItem currentItem) {
+
+        if (queue.isEmpty())
+            return false;
+
+        int index = queue.indexOf(currentItem);
+
+        if (index == -1)
+            return !queue.isEmpty();
+
+        return queue.size() > 1;                  // c'è almeno un altro oltre al corrente
+
     }
 
 }

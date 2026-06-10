@@ -4,6 +4,10 @@ import it.diem.unisa.musicmanager.model.Playlist;
 //import it.diem.unisa.musicmanager.service.PlaylistService;
 //import it.diem.unisa.musicmanager.service.TrackService;
 import it.diem.unisa.musicmanager.model.Track;
+import it.diem.unisa.musicmanager.playmode.LoopMode;
+import it.diem.unisa.musicmanager.playmode.PlayMode;
+import it.diem.unisa.musicmanager.playmode.SequentialMode;
+import it.diem.unisa.musicmanager.playmode.ShuffleMode;
 import it.diem.unisa.musicmanager.service.PlayerService;
 import it.diem.unisa.musicmanager.service.PlaylistService;
 import it.diem.unisa.musicmanager.service.QueueService;
@@ -37,6 +41,9 @@ public class DetailedPlaylistController {
     @FXML private Label labelName;
     @FXML private Label lblTrackCount;
     @FXML private VBox trackList;
+    @FXML private Button buttonSequential;
+    @FXML private Button buttonLoop;
+    @FXML private Button buttonShuffle;
 
 
     // La playlist mostrata.
@@ -255,6 +262,48 @@ public class DetailedPlaylistController {
 
     }
 
+    public void onSequential(ActionEvent actionEvent) {
+        if (playlist == null || playlist.getTracksList().isEmpty()) return;
+        if (playlistService != null) playlistService.incrementPlayCount(playlist.getId());
+        if (queueService != null && playerService != null) {
+            queueService.clearQueue();
+            queueService.setCurrentPlayMode(new SequentialMode());
+            queueService.addToQueue(playlist);
+            playerService.next();
+            updateModeButtons(buttonSequential);
+        }
+    }
+
+    public void onLoop(ActionEvent actionEvent) {
+        if (playlist == null || playlist.getTracksList().isEmpty()) return;
+        if (playlistService != null) playlistService.incrementPlayCount(playlist.getId());
+        if (queueService != null && playerService != null) {
+            queueService.clearQueue();
+            queueService.setCurrentPlayMode(new LoopMode());
+            queueService.addToQueue(playlist);
+            playerService.next();
+            updateModeButtons(buttonLoop);
+        }
+    }
+
+    public void onShuffle(ActionEvent actionEvent) {
+
+        if (playlist == null || playlist.getTracksList().isEmpty())
+            return;
+        if (playlistService != null)
+            playlistService.incrementPlayCount(playlist.getId());
+
+        if (queueService != null && playerService != null) {
+
+            queueService.clearQueue();
+            queueService.setCurrentPlayMode(new ShuffleMode());
+            queueService.addToQueue(playlist);
+            playerService.next();
+            updateModeButtons(buttonShuffle);
+
+        }
+    }
+
     /*
     private void close(ActionEvent e) {
         Stage stage = (Stage) ((Node) e.getSource()).getScene().getWindow();
@@ -262,6 +311,19 @@ public class DetailedPlaylistController {
     }
 
      */
+
+    private void updateModeButtons(Button active) { //metodo per CSS + gestione delle modalità ascolto playlist
+        // Reset tutti
+        buttonSequential.setDisable(false);
+        buttonLoop.setDisable(false);
+        buttonShuffle.setDisable(false);
+        buttonSequential.getStyleClass().remove("btn-mode-active");
+        buttonLoop.getStyleClass().remove("btn-mode-active");
+        buttonShuffle.getStyleClass().remove("btn-mode-active");
+        // Attiva solo quello selezionato
+        active.setDisable(true);
+        active.getStyleClass().add("btn-mode-active");
+    }
 
     private void deletePlaylist() {
         if (playlistService == null || playlist == null) return;

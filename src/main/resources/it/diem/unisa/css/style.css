@@ -330,6 +330,16 @@
     -fx-text-fill: #ffffff;
 }
 
+.btn-mode-active {
+    -fx-background-color: #27ae60;
+    -fx-text-fill: white;
+    -fx-opacity: 1.0;
+}
+.btn-mode-active:disabled {
+    -fx-background-color: #27ae60;
+    -fx-text-fill: white;
+    -fx-opacity: 1.0;  /* forza l'opacità piena anche quando disabilitato */
+}
 
 /*NUOVO*/
 
@@ -885,9 +895,9 @@
 .btn-mode {
     -fx-background-color: #3c3c3c;
     -fx-text-fill: #cccccc;
-    -fx-font-size: 12px;
-    -fx-padding: 6 12 6 12;
-    -fx-background-radius: 8px;
+    -fx-font-size: 13px;
+    -fx-padding: 8 16 8 16;
+    -fx-background-radius: 6px;
     -fx-cursor: hand;
     -fx-border-color: #555555;
     -fx-border-width: 1px;

@@ -67,11 +67,7 @@ public class QueueService {
     }
 
     public boolean hasNext() {
-        List<QueueItem> queue = sharedState.getQueue();
-        if (queue.isEmpty()) return false;
-        int index = queue.indexOf(currentItem);
-        if (index == -1) return true;       // perché indexOf ritorna -1 in caso currentItem non sia presente
-        return index < queue.size() - 1;    // ci sono elementi dopo il corrente
+        return playMode.hasNext(getQueueList(), currentItem);
     }
 
     /**

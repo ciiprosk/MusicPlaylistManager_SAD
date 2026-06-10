@@ -9,4 +9,6 @@ public interface PlayMode {
 
     Optional<QueueItem> nextItem(List<QueueItem> queue, QueueItem currentItem);
 
+    boolean hasNext(List<QueueItem> queue, QueueItem currentItem);
+
 }

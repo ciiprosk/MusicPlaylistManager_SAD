@@ -23,4 +23,11 @@ public class LoopMode implements PlayMode {
 
     }
 
+    @Override
+    public boolean hasNext(List<QueueItem> queue, QueueItem currentItem) {
+
+        return !queue.isEmpty();
+
+    }
+
 }

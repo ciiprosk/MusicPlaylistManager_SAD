@@ -8,11 +8,13 @@ import it.diem.unisa.musicmanager.playmode.SequentialMode;
 import it.diem.unisa.musicmanager.playmode.ShuffleMode;
 import it.diem.unisa.musicmanager.service.PlayerService;
 import it.diem.unisa.musicmanager.service.QueueService;
+import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
+import javafx.scene.control.Tooltip;
 
 import java.util.List;
 import java.util.UUID;
@@ -63,7 +65,12 @@ public class PlayerController {
     }
 
     public void setQueueService(QueueService queueService) {
+
         this.queueService = queueService;
+
+        queueService.getQueueList().addListener((ListChangeListener<QueueItem>) c -> updateNextButton());
+
+        updateNextButton();
     }
 
     public void setPlaylistService(it.diem.unisa.musicmanager.service.PlaylistService playlistService) {
@@ -106,9 +113,18 @@ public class PlayerController {
 
     private void updateModeButton(){
         switch (currentPlayModeIndex){
-            case 0 -> buttonMode.setText("⇢"); //U+21E2
-            case 1 -> buttonMode.setText("⇄"); //\u21C4
-            case 2 -> buttonMode.setText("↻"); //\u21BB
+            case 0 -> {
+                buttonMode.setText("⇢");
+                buttonMode.setTooltip(new Tooltip("Sequential"));   //testo in sovraimpressione sul tasto
+            } //U+21E2
+            case 1 -> {
+                buttonMode.setText("⇄"); //\u21C4
+                buttonMode.setTooltip(new Tooltip("Sequential"));   //testo in sovraimpressione sul tasto
+            }
+            case 2 -> {
+                buttonMode.setText("↻"); //\u21BB
+                buttonMode.setTooltip(new Tooltip("Sequential"));   //testo in sovraimpressione sul tasto
+            }
         }
     }
 
@@ -166,9 +182,9 @@ public class PlayerController {
             userIsSeeking = false;
         });
 
-        // 6. Quando cambia currentTrackProperty() o la queue, chiamiamo updateNextButton()
+        // 6. Quando cambia currentTrackProperty(), chiamiamo updateNextButton()
         playerService.currentTrackProperty().addListener((o, ov, nv) -> updateNextButton());
-        queueService.getQueueList().addListener((ListChangeListener<QueueItem>) c -> updateNextButton());
+
     }
 
     private void updateSkipPlaylistButton() {

@@ -41,4 +41,12 @@ public class SequentialMode implements PlayMode {
         }
     }
 
+    @Override
+    public boolean hasNext(List<QueueItem> queue, QueueItem currentItem) {
+        if (queue.isEmpty()) return false;
+        int index = queue.indexOf(currentItem);
+        if (index == -1) return true;
+        return index < queue.size() - 1;     // ci sono elementi dopo
+    }
+
 }

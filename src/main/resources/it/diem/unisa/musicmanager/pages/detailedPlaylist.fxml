@@ -33,7 +33,7 @@
       <children>
               <Button onAction="#onAddToQueue" styleClass="btn-secondary" text="Add to Queue" />
               <Button onAction="#onModify" styleClass="btn-secondary" text="Modify Playlist" />
-              <Button onAction="#onAddTrack" styleClass="btn-primario" text="Add/Remove Track" />
+              <Button onAction="#onAddTrack" styleClass="btn-primary" text="Add/Remove Track" />
               <Button onAction="#onDelete" styleClass="btn-danger" text="Delete Playlist" />
       </children>
        </HBox>
@@ -43,9 +43,9 @@
               <Label styleClass="sottotitolo" text="Play Mode" textFill="#cccccc" />
               <HBox spacing="12.0">
                  <children>
-                     <Button styleClass="btn-mode" text="⇢ Sequential" />
-                     <Button styleClass="btn-mode" text="↻ Loop" />
-                     <Button styleClass="btn-mode" text="⇄ Shuffle" />
+                     <Button fx:id="buttonSequential" onAction="#onSequential" styleClass="btn-mode" text="⇢ Sequential" />
+                     <Button fx:id="buttonLoop" onAction="#onLoop" styleClass="btn-mode" text="↻ Loop" />
+                     <Button fx:id="buttonShuffle" onAction="#onShuffle" styleClass="btn-mode" text="⇄ Shuffle" />
                  </children>
               </HBox>
       </children>
