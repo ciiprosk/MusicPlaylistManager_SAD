@@ -80,7 +80,7 @@ public class PlayerController {
             playerService.pause();
         } else {
             Track current = playerService.currentTrackProperty().get();
-            if (current != null) playerService.play(current);
+            if (current != null) playerService.play(current, false, true);
         }
 
     }

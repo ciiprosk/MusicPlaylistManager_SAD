@@ -3,6 +3,7 @@ package it.diem.unisa.musicmanager.playmode;
 import it.diem.unisa.musicmanager.model.QueueItem;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 public class ShuffleMode implements PlayMode {
@@ -10,10 +11,10 @@ public class ShuffleMode implements PlayMode {
     private final Random random = new Random();
 
     @Override
-    public QueueItem nextItem(List<QueueItem> queue, QueueItem currentItem) {
+    public Optional<QueueItem> nextItem(List<QueueItem> queue, QueueItem currentItem) {
 
         if (queue.isEmpty())
-            return null;
+            return Optional.empty();
 
         int currentIndex = queue.indexOf(currentItem);
 
@@ -24,12 +25,12 @@ public class ShuffleMode implements PlayMode {
 
         // Se la coda è vuota dopo la rimozione, la riproduzione è finita
         if (queue.isEmpty())
-            return null;
+            return Optional.empty();
 
         // Scegli un indice casuale tra i brani rimanenti
         int randomIndex = random.nextInt(queue.size());
 
-        return queue.get(randomIndex);
+        return Optional.of(queue.get(randomIndex));
 
     }
 

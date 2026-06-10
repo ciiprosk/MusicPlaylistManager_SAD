@@ -107,8 +107,8 @@ public class PlaylistCardController {
         }
 
         if (queueService != null && playerService != null) {
-            // Svuotiamo la coda precedente
-            queueService.getQueueList().clear();
+            // Svuotiamo la coda precedente (incluso currentItem)
+            queueService.clearQueue();
             
             // Aggiungiamo l'intera playlist alla coda
             queueService.addToQueue(playlist);
@@ -118,7 +118,7 @@ public class PlaylistCardController {
             // mentre il resto della playlist rimane in coda pronto per essere ascoltato!
             playerService.next();
         } else if (playerService != null) {
-            playerService.play(firstTrack);
+            playerService.play(firstTrack, false, true);
         }
     }
 

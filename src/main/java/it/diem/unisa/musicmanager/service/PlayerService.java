@@ -61,14 +61,6 @@ public class PlayerService {
         this.queueService = queueService;
     }
 
-    public void play(Track track) {
-        play(track, true, false);
-    }
-
-    public void play(Track track, boolean clearQueueItem) {
-        play(track, clearQueueItem, false);
-    }
-
     public void play(Track track, boolean clearQueueItem, boolean forceRestart) {
         if (track == null || track.getSongPath() == null) return;
 
@@ -125,7 +117,6 @@ public class PlayerService {
 
     private void setupEndOfMediaHandler() {
         mediaPlayer.setOnEndOfMedia(() -> {
-            next();
             isPlaying.set(false);
             progress.set(0.0);
             Platform.runLater(this::next);
@@ -199,7 +190,7 @@ public class PlayerService {
         stopCurrent();
         loadedTrack = null;
 
-        play(track);
+        play(track, false, true);
     }
 
     /**
@@ -218,7 +209,11 @@ public class PlayerService {
                 && isPlaying.get()) {
             pause();
         } else {
-            play(track);
+            // Nuova traccia fuori coda: svuota la coda (clearQueueItem=true) e riproduci (forceRestart = false)
+            if (queueService != null) {
+                queueService.clearQueue();
+            }
+            play(track, true, false);
         }
     }
 

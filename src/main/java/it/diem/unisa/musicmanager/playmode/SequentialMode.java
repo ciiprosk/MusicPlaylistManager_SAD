@@ -3,6 +3,7 @@ package it.diem.unisa.musicmanager.playmode;
 import it.diem.unisa.musicmanager.model.QueueItem;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Queue;
 
 /**
@@ -17,9 +18,9 @@ public class SequentialMode implements PlayMode {
      * @return il prossimo brano della playlist.
      */
     @Override
-    public QueueItem nextItem(List<QueueItem> queue, QueueItem currentItem) {
+    public Optional<QueueItem> nextItem(List<QueueItem> queue, QueueItem currentItem) {
         if (queue.isEmpty()) {
-            return null;
+            return Optional.empty();
         }
 
         int currentIndex = queue.indexOf(currentItem);
@@ -27,16 +28,16 @@ public class SequentialMode implements PlayMode {
         if (currentIndex != -1) {
             queue.remove(currentIndex);
             if (currentIndex >= queue.size()) {
-                return null; // era l'ultimo
+                return Optional.empty(); // era l'ultimo
             }
-            return queue.get(currentIndex); // dopo il remove, il prossimo è qui
+            return Optional.of(queue.get(currentIndex)); // dopo il remove, il prossimo è qui
         } else {
             // Il brano attuale non è nella coda, peschiamo il primo!
             QueueItem next = queue.get(0);
             // Rimuoviamo il primo per "consumarlo"
             // Wait, se lo rimuoviamo subito sparisce dalla coda prima di finire?
             // Per ora lasciamolo in coda per vederlo. Lo rimuoveremo quando passerà al successivo!
-            return next;
+            return Optional.of(next);
         }
     }
 

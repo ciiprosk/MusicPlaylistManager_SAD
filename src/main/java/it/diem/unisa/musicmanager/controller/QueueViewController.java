@@ -74,7 +74,7 @@ public class QueueViewController {
     }
 
     private void updateCurrentTrackLabel(Track track) {
-        if (track == null) {
+        if (track == null || !playerService.isPlayingProperty().get()) {
             labelCurrentTrack.setText("No Track Playing");
         } else {
             labelCurrentTrack.setText(track.getTitle() + " - " + track.getAuthor());

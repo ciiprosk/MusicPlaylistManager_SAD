@@ -215,11 +215,11 @@ public class DetailedPlaylistController {
         }
 
         if (queueService != null && playerService != null) {
-            queueService.getQueueList().clear();
+            queueService.clearQueue();
             queueService.addToQueue(playlist);
             playerService.next();
         } else if (playerService != null) {
-            playerService.play(playlist.getTracksList().get(0));
+            playerService.play(playlist.getTracksList().get(0), false, true);
         }
     }
 

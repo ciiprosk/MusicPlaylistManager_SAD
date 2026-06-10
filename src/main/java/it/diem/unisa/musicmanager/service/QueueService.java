@@ -1,14 +1,12 @@
 package it.diem.unisa.musicmanager.service;
 
+import it.diem.unisa.musicmanager.exception.QueueException;
 import it.diem.unisa.musicmanager.model.*;
 import it.diem.unisa.musicmanager.playmode.PlayMode;
 import it.diem.unisa.musicmanager.playmode.SequentialMode;
 import it.diem.unisa.musicmanager.state.SharedState;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Queue;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Service per la gestione della coda dei brani.
@@ -68,6 +66,16 @@ public class QueueService {
         return sharedState.getQueue();
     }
 
+    /**
+     * Svuota la coda e resetta l'item corrente.
+     * Da usare ogni volta che si inizia una nuova sessione di ascolto
+     * (es. Play su una playlist nuova, Play su una traccia singola fuori coda).
+     */
+    public void clearQueue() {
+        sharedState.getQueue().clear();
+        currentItem = null;
+    }
+
     public void setCurrentPlayMode(PlayMode playMode){
         this.playMode = playMode;
     }
@@ -81,10 +89,17 @@ public class QueueService {
         //il metodo chiede allo strategy quale deve essere il porssimo item
         //perprima cosa gli passo allo startegy la mia coda attuale
 
-        currentItem= playMode.nextItem(sharedState.getQueue(),currentItem );
+        Optional<QueueItem> optionalItem= playMode.nextItem(sharedState.getQueue(),currentItem );
+
+        if (!optionalItem.isPresent())
+            throw new QueueException("The Queue is Empty.");
+
+        this.currentItem = optionalItem.get();
+
         return currentItem;
     }
 
+    
 
     public QueueItem skipCurrentPlaylist(){
         //se l'oggetto corrente è null o non appartiene a una playlist allora prosegue con il prossimo item
@@ -103,7 +118,7 @@ public class QueueService {
     }
 
     //il metodo dev evedere se la tracci asu cui è stato fatto play appartiene a una playlist (sono in detailedPlaylist)
-    // e appartiene metto le tracce in coda rimanenti
+    // se appartiene metto le tracce in coda rimanenti
     public QueueItem queuePlaylistFromTrack(Playable playable, Track trackInPlaylist){
         if(playable == null || trackInPlaylist == null) return null;
 
@@ -120,6 +135,7 @@ public class QueueService {
         return queueItem;
 
     }
+
 
 
 
