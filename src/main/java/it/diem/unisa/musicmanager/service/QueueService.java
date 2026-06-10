@@ -102,6 +102,25 @@ public class QueueService {
         return next;
     }
 
+    //il metodo dev evedere se la tracci asu cui è stato fatto play appartiene a una playlist (sono in detailedPlaylist)
+    // e appartiene metto le tracce in coda rimanenti
+    public QueueItem queuePlaylistFromTrack(Playable playable, Track trackInPlaylist){
+        if(playable == null || trackInPlaylist == null) return null;
+
+        getQueueList().clear(); //ripulisce la coda
+        addToQueue(playable); // metto turtta la playlst in coda ma devo togliere le precedenti a wurrlla che tsa andando play
+
+        QueueItem queueItem = nextItem();
+        //dobbiamo scartare le alee canzoni fio a quellla su ci abbiamo cliccato play
+        while(queueItem != null && !trackInPlaylist.getId().equals(queueItem.getPlayable().getId())){
+            queueItem = nextItem();
+        }
+
+        //restistuisce l'elemento trovatooo
+        return queueItem;
+
+    }
+
 
 
 }

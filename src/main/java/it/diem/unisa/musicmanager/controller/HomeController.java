@@ -72,6 +72,7 @@ public class HomeController {
 
     public void setPlaylistService(it.diem.unisa.musicmanager.service.PlaylistService playlistService) {
         this.playlistService = playlistService;
+        createPlaylistListener();
         loadTopPlaylists();
     }
 
@@ -89,6 +90,21 @@ public class HomeController {
             });
 
             isListenerAttached = true;
+        }
+    }
+
+    private boolean isPlaylistListenerAttached = false;
+
+    private void createPlaylistListener() {
+        if (!isPlaylistListenerAttached && playlistService != null) {
+            playlistService.getPlaylists().addListener(new InvalidationListener() {
+                @Override
+                public void invalidated(Observable observable) {
+                    javafx.application.Platform.runLater(() -> loadTopPlaylists());
+                }
+            });
+
+            isPlaylistListenerAttached = true;
         }
     }
 
