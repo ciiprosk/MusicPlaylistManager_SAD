@@ -157,10 +157,18 @@ public class RowTrackController {
             Track currentTrack = playerService.currentTrackProperty().get();
             boolean wasAlreadyLoaded = currentTrack != null && track.getId().equals(currentTrack.getId());
 
-            playerService.togglePlay(track);//lo fa il seerivce
-
-            if (!wasAlreadyLoaded && parentPlaylist != null && playlistService != null) {
-                playlistService.incrementPlayCount(parentPlaylist.getId());
+            if (wasAlreadyLoaded) {
+                playerService.togglePlay(track);
+            } else if (parentPlaylist != null && queueService != null) {
+                it.diem.unisa.musicmanager.model.QueueItem item = queueService.queuePlaylistFromTrack(parentPlaylist, track);
+                if (item != null) {
+                    playerService.play(track, false, true);
+                    if (playlistService != null) {
+                        playlistService.incrementPlayCount(parentPlaylist.getId());
+                    }
+                }
+            } else {
+                playerService.togglePlay(track);
             }
         }
     }
