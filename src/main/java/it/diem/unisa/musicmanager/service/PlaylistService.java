@@ -51,12 +51,16 @@ public class PlaylistService implements TrackObserver{
 
     @Override
     public void onTrackDeleted(UUID trackId) {
-        // la playlist è un observer di tracce: gestisce l'eliminazione delle tracce eliminate nella playlist
+
+        if (trackId == null) {
+            return;
+        }
+
         for (Playlist playlist : sharedState.getALlPlaylists()) {
             if (playlist.containsTrack(trackId)) {
-                Track track = searchTrackById(trackId);
-                playlist.removeTrack(track);
+                playlist.removeTrack(trackId);
                 playlistDAO.update(playlist);
+                updateInState(playlist);
             }
         }
     }

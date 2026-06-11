@@ -13,7 +13,7 @@ import java.util.*;
  * Nella coda possono essere inserite sia le singole tracce sia intere playlist.
  *
  */
-public class QueueService {
+public class QueueService implements TrackObserver {
     //deve prendere una track e impacchettarli in unqueue item
     private final SharedState sharedState;
     private QueueItem currentItem;
@@ -140,7 +140,23 @@ public class QueueService {
 
     }
 
+    @Override
+    public void onTrackDeleted(UUID trackId) {
 
+        if (trackId == null) {
+            return;
+        }
 
+        sharedState.getQueue().removeIf(queueItem ->
+                queueItem.getPlayable() instanceof Track track
+                        && track.getId().equals(trackId)
+        );
+
+        if (currentItem != null
+                && currentItem.getPlayable() instanceof Track track
+                && track.getId().equals(trackId)) {
+            currentItem = null;
+        }
+    }
 
 }

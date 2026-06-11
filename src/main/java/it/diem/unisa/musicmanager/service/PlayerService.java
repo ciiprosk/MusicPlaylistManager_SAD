@@ -14,6 +14,7 @@ import javafx.util.Duration;
 
 import java.io.File;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Service per la riproduzione dei brani.
@@ -21,7 +22,7 @@ import java.util.List;
  * stato play/pausa, avanzamento) accedendo alle sue Property. Cosi' la player
  * bar e le altre viste si aggiornano da sole (pattern Observer).
  */
-public class PlayerService {
+public class PlayerService implements TrackObserver {
 
     private TrackService trackService;
     private QueueService queueService;
@@ -122,8 +123,6 @@ public class PlayerService {
 
     private void setupEndOfMediaHandler() {
         mediaPlayer.setOnEndOfMedia(() -> {
-            isPlaying.set(false);
-            progress.set(0.0);
             Platform.runLater(this::next);
         });
     }
@@ -137,8 +136,8 @@ public class PlayerService {
 
     public void resume() {
         if (mediaPlayer != null) {
-            // Workaround per un bug noto del motore audio JavaFX (GStreamer): 
-            // Forziamo il riallineamento del buffer al tempo esatto prima di fare play 
+            // Workaround per un bug noto del motore audio JavaFX (GStreamer):
+            // Forziamo il riallineamento del buffer al tempo esatto prima di fare play
             // per evitare quel "micro-salto" o ripetizione dell'audio al resume.
             mediaPlayer.seek(mediaPlayer.getCurrentTime());
             mediaPlayer.play();
@@ -223,43 +222,129 @@ public class PlayerService {
     }
 
     public void next() {
-        if (queueService == null || !queueService.hasNext()) {
-            // reset stato player
+        if (queueService == null) {
             stopCurrent();
             loadedTrack = null;
             currentTrack.set(null);
+            isPlaying.set(false);
+            progress.set(0.0);
             return;
         }
-        QueueItem next = queueService.nextItem();
-
-        if (next != null) {
-            List<Track> tracks = next.getPlayable().getTracksToPlay();
-            if (!tracks.isEmpty()) {
-                play(tracks.get(0), false, true);
-            }
-        }
-
-    }
-
-    public void skipPlaylist() {
-        if (queueService == null) return;
 
         if (!queueService.hasNext()) {
             stopCurrent();
             loadedTrack = null;
             currentTrack.set(null);
+            isPlaying.set(false);
+            progress.set(0.0);
+
+            queueService.clearQueue();
+
+            return;
+        }
+
+        QueueItem next = queueService.nextItem();
+
+        if (next != null) {
+            List<Track> tracks = next.getPlayable().getTracksToPlay();
+
+            if (!tracks.isEmpty()) {
+                play(tracks.get(0), false, true);
+            } else {
+                stopCurrent();
+                loadedTrack = null;
+                currentTrack.set(null);
+                isPlaying.set(false);
+                progress.set(0.0);
+
+                queueService.clearQueue();
+            }
+        } else {
+            stopCurrent();
+            loadedTrack = null;
+            currentTrack.set(null);
+            isPlaying.set(false);
+            progress.set(0.0);
+
+            queueService.clearQueue();
+        }
+    }
+
+    public void skipPlaylist() {
+        if (queueService == null) {
+            stopCurrent();
+            loadedTrack = null;
+            currentTrack.set(null);
+            isPlaying.set(false);
+            progress.set(0.0);
+            return;
+        }
+
+        if (!queueService.hasNext()) {
+            stopCurrent();
+            loadedTrack = null;
+            currentTrack.set(null);
+            isPlaying.set(false);
+            progress.set(0.0);
+            queueService.clearQueue();
             return;
         }
 
         try {
             QueueItem next = queueService.skipCurrentPlaylist();
+
             if (next != null) {
-                play(next.getPlayable().getTracksToPlay().get(0), false, true);
+                List<Track> tracks = next.getPlayable().getTracksToPlay();
+
+                if (!tracks.isEmpty()) {
+                    play(tracks.get(0), false, true);
+                } else {
+                    stopCurrent();
+                    loadedTrack = null;
+                    currentTrack.set(null);
+                    isPlaying.set(false);
+                    progress.set(0.0);
+                    queueService.clearQueue();
+                }
             } else {
-                stopCurrent(); loadedTrack = null; currentTrack.set(null);
+                stopCurrent();
+                loadedTrack = null;
+                currentTrack.set(null);
+                isPlaying.set(false);
+                progress.set(0.0);
+                queueService.clearQueue();
             }
-        } catch (QueueException e) {    // La coda è esaurita: resetta lo stato del player.
-            stopCurrent(); loadedTrack = null; currentTrack.set(null);
+
+        } catch (QueueException e) {
+            stopCurrent();
+            loadedTrack = null;
+            currentTrack.set(null);
+            isPlaying.set(false);
+            progress.set(0.0);
+            queueService.clearQueue();
+        }
+    }
+
+    @Override
+    public void onTrackDeleted(UUID trackId) {
+
+        if (trackId == null) {
+            return;
+        }
+
+        Track current =
+                currentTrack.get();
+
+        if (current != null && current.getId().equals(trackId)) {
+            stopCurrent();
+            loadedTrack = null;
+            currentTrack.set(null);
+            isPlaying.set(false);
+            progress.set(0.0);
+
+            if (queueService != null) {
+                queueService.setCurrentItem(null);
+            }
         }
     }
 

@@ -35,16 +35,21 @@ public class MusicPlaylistManager extends Application {
         playerService.setTrackService(trackService);
         playerService.setQueueService(queueService);
 
-        trackService.addObserver(deletedTrackId -> {
-            for (Playlist playlist : sharedState.getALlPlaylists()) {
-                if (playlist.containsTrack(deletedTrackId)) {
-                    playlistService.removeTrackFromPlaylist(
-                            playlist.getId(),
-                            deletedTrackId
-                    );
-                }
-            }
-        });
+        trackService.addObserver(playlistService);
+        trackService.addObserver(queueService);
+        trackService.addObserver(playerService);
+
+        //trackService.addObserver(deletedTrackId -> {
+           // for (Playlist playlist : sharedState.getALlPlaylists()) {
+              //  if (playlist.containsTrack(deletedTrackId)) {
+                  //  playlistService.removeTrackFromPlaylist(
+                   //         playlist.getId(),
+                    //        deletedTrackId
+                //    );
+              //  }
+          //  }
+      //  });
+
 
         FXMLLoader fxmlLoader = new FXMLLoader(MusicPlaylistManager.class.getResource("MusicPlaylistManagerGUI.fxml"));
 
