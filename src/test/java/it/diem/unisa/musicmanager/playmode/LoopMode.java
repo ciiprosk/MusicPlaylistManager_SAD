@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -40,17 +41,19 @@ class LoopModeTest {
 
         queue.add(item);
 
-        QueueItem result =
+        Optional<QueueItem> result =
                 loopMode.nextItem(
                         queue,
                         item
                 );
 
-        assertNotNull(result);
+        assertTrue(
+                result.isPresent()
+        );
 
         assertEquals(
                 track.getId(),
-                result.getPlayable().getId()
+                result.get().getPlayable().getId()
         );
 
         assertEquals(
@@ -89,17 +92,19 @@ class LoopModeTest {
         queue.add(secondItem);
         queue.add(thirdItem);
 
-        QueueItem result =
+        Optional<QueueItem> result =
                 loopMode.nextItem(
                         queue,
                         thirdItem
                 );
 
-        assertNotNull(result);
+        assertTrue(
+                result.isPresent()
+        );
 
         assertEquals(
                 firstTrack.getId(),
-                result.getPlayable().getId()
+                result.get().getPlayable().getId()
         );
 
         assertEquals(
@@ -131,17 +136,19 @@ class LoopModeTest {
         queue.add(firstItem);
         queue.add(secondItem);
 
-        QueueItem result =
+        Optional<QueueItem> result =
                 loopMode.nextItem(
                         queue,
                         secondItem
                 );
 
-        assertNotNull(result);
+        assertTrue(
+                result.isPresent()
+        );
 
         assertEquals(
                 firstTrack.getId(),
-                result.getPlayable().getId()
+                result.get().getPlayable().getId()
         );
 
         assertEquals(
@@ -188,17 +195,19 @@ class LoopModeTest {
         queue.add(secondItem);
         queue.add(thirdItem);
 
-        QueueItem result =
+        Optional<QueueItem> result =
                 loopMode.nextItem(
                         queue,
                         firstItem
                 );
 
-        assertNotNull(result);
+        assertTrue(
+                result.isPresent()
+        );
 
         assertEquals(
                 secondTrack.getId(),
-                result.getPlayable().getId()
+                result.get().getPlayable().getId()
         );
 
         assertEquals(
@@ -247,22 +256,24 @@ class LoopModeTest {
         queue.add(secondItem);
         queue.add(thirdItem);
 
-        QueueItem result =
+        Optional<QueueItem> result =
                 loopMode.nextItem(
                         queue,
                         thirdItem
                 );
 
-        assertNotNull(result);
+        assertTrue(
+                result.isPresent()
+        );
 
         assertEquals(
                 firstTrack.getId(),
-                result.getPlayable().getId()
+                result.get().getPlayable().getId()
         );
 
         assertEquals(
                 playlistId,
-                result.getBelongsToPlaylist()
+                result.get().getBelongsToPlaylist()
         );
 
         assertEquals(
@@ -271,21 +282,23 @@ class LoopModeTest {
         );
     }
 
-    // TEST: SE LA CODA È VUOTA, IL LOOP RESTITUISCE NULL
+    // TEST: SE LA CODA È VUOTA, IL LOOP RESTITUISCE OPTIONAL VUOTO
 
     @Test
-    void nextItemShouldReturnNullWhenQueueIsEmpty() {
+    void nextItemShouldReturnEmptyWhenQueueIsEmpty() {
 
         List<QueueItem> queue =
                 new ArrayList<>();
 
-        QueueItem result =
+        Optional<QueueItem> result =
                 loopMode.nextItem(
                         queue,
                         null
                 );
 
-        assertNull(result);
+        assertTrue(
+                result.isEmpty()
+        );
 
         assertTrue(
                 queue.isEmpty()

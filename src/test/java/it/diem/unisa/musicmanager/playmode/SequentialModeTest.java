@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -50,21 +51,23 @@ class SequentialModeTest {
         queue.add(secondItem);
         queue.add(thirdItem);
 
-        QueueItem result =
+        Optional<QueueItem> result =
                 sequentialMode.nextItem(
                         queue,
                         firstItem
                 );
 
-        assertNotNull(result);
+        assertTrue(
+                result.isPresent()
+        );
 
         assertTrue(
-                result.isTrack()
+                result.get().isTrack()
         );
 
         assertEquals(
                 secondTrack.getId(),
-                result.getPlayable().getId()
+                result.get().getPlayable().getId()
         );
     }
 
@@ -101,14 +104,18 @@ class SequentialModeTest {
         int currentIndex =
                 queue.indexOf(firstItem);
 
-        QueueItem result =
+        Optional<QueueItem> result =
                 sequentialMode.nextItem(
                         queue,
                         firstItem
                 );
 
+        assertTrue(
+                result.isPresent()
+        );
+
         int resultIndex =
-                queue.indexOf(result);
+                queue.indexOf(result.get());
 
         assertEquals(
                 0,
@@ -126,14 +133,14 @@ class SequentialModeTest {
 
         assertEquals(
                 secondTrack.getId(),
-                result.getPlayable().getId()
+                result.get().getPlayable().getId()
         );
     }
 
     // TEST: QUANDO SI SALTA L'ULTIMO BRANO, LA STRATEGIA SI ARRESTA
 
     @Test
-    void nextItemShouldReturnNullWhenCurrentItemIsLastTrack() {
+    void nextItemShouldReturnEmptyWhenCurrentItemIsLastTrack() {
 
         Track onlyTrack =
                 createTrack("Only Track");
@@ -146,13 +153,15 @@ class SequentialModeTest {
 
         queue.add(onlyItem);
 
-        QueueItem result =
+        Optional<QueueItem> result =
                 sequentialMode.nextItem(
                         queue,
                         onlyItem
                 );
 
-        assertNull(result);
+        assertTrue(
+                result.isEmpty()
+        );
 
         assertTrue(
                 queue.isEmpty()
@@ -182,47 +191,53 @@ class SequentialModeTest {
         queue.add(firstItem);
         queue.add(secondItem);
 
-        QueueItem nextItem =
+        Optional<QueueItem> nextItem =
                 sequentialMode.nextItem(
                         queue,
                         firstItem
                 );
 
-        assertNotNull(nextItem);
+        assertTrue(
+                nextItem.isPresent()
+        );
 
         assertEquals(
                 secondTrack.getId(),
-                nextItem.getPlayable().getId()
+                nextItem.get().getPlayable().getId()
         );
 
-        QueueItem endItem =
+        Optional<QueueItem> endItem =
                 sequentialMode.nextItem(
                         queue,
-                        nextItem
+                        nextItem.get()
                 );
 
-        assertNull(endItem);
+        assertTrue(
+                endItem.isEmpty()
+        );
 
         assertTrue(
                 queue.isEmpty()
         );
     }
 
-    // TEST: SE LA CODA È VUOTA, LA STRATEGIA RESTITUISCE NULL
+    // TEST: SE LA CODA È VUOTA, LA STRATEGIA RESTITUISCE OPTIONAL VUOTO
 
     @Test
-    void nextItemShouldReturnNullWhenQueueIsEmpty() {
+    void nextItemShouldReturnEmptyWhenQueueIsEmpty() {
 
         List<QueueItem> queue =
                 new ArrayList<>();
 
-        QueueItem result =
+        Optional<QueueItem> result =
                 sequentialMode.nextItem(
                         queue,
                         null
                 );
 
-        assertNull(result);
+        assertTrue(
+                result.isEmpty()
+        );
 
         assertTrue(
                 queue.isEmpty()
@@ -259,28 +274,30 @@ class SequentialModeTest {
         queue.add(secondItem);
         queue.add(thirdItem);
 
-        QueueItem result =
+        Optional<QueueItem> result =
                 sequentialMode.nextItem(
                         queue,
                         firstItem
                 );
 
-        assertNotNull(result);
+        assertTrue(
+                result.isPresent()
+        );
 
         assertTrue(
-                result.isPlaylist()
+                result.get().isPlaylist()
         );
 
         assertEquals(
                 secondPlaylist.getId(),
-                result.getPlayable().getId()
+                result.get().getPlayable().getId()
         );
     }
 
     // TEST: LA STRATEGIA SEQUENZIALE SI FERMA QUANDO SI SALTA L'ULTIMA PLAYLIST
 
     @Test
-    void nextItemShouldReturnNullWhenCurrentItemIsLastPlaylist() {
+    void nextItemShouldReturnEmptyWhenCurrentItemIsLastPlaylist() {
 
         Playlist playlist =
                 new Playlist("Only Playlist");
@@ -293,13 +310,15 @@ class SequentialModeTest {
 
         queue.add(onlyItem);
 
-        QueueItem result =
+        Optional<QueueItem> result =
                 sequentialMode.nextItem(
                         queue,
                         onlyItem
                 );
 
-        assertNull(result);
+        assertTrue(
+                result.isEmpty()
+        );
 
         assertTrue(
                 queue.isEmpty()
