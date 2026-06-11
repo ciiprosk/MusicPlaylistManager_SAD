@@ -108,11 +108,15 @@ public class PlayerService {
 
     private void setUpProgressListener(Media media){
         mediaPlayer.currentTimeProperty().addListener((obs, oldV, newV) -> {
+            if (mediaPlayer == null) {
+                return; // Se il player è stato azzerato dal cambio playlist, esce senza crashare
+            }
+
             Duration total = mediaPlayer.getTotalDuration();
-             if (total != null && !total.isUnknown() && total.toSeconds() > 0) {
-                 double p = newV.toSeconds() / total.toSeconds();
-                 Platform.runLater(() -> progress.set(p));
-             }
+            if (total != null && !total.isUnknown() && total.toSeconds() > 0) {
+                double p = newV.toSeconds() / total.toSeconds();
+                Platform.runLater(() -> progress.set(p));
+            }
         });
     }
 

@@ -28,7 +28,7 @@
 
     <HBox alignment="CENTER_RIGHT" spacing="10.0">
         <Region HBox.hgrow="ALWAYS" />
-        <Button text="Cancel" styleClass="btn-secondary" />
+        <Button text="Cancel" styleClass="btn-secondary" onAction="#onCancel"/>
         <Button text="Save" styleClass="btn-primario" onAction="#onSave" />
     </HBox>
 

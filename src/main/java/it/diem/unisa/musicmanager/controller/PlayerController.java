@@ -119,11 +119,11 @@ public class PlayerController {
             } //U+21E2
             case 1 -> {
                 buttonMode.setText("⇄"); //\u21C4
-                buttonMode.setTooltip(new Tooltip("Sequential"));   //testo in sovraimpressione sul tasto
+                buttonMode.setTooltip(new Tooltip("Shuffle"));   //testo in sovraimpressione sul tasto
             }
             case 2 -> {
                 buttonMode.setText("↻"); //\u21BB
-                buttonMode.setTooltip(new Tooltip("Sequential"));   //testo in sovraimpressione sul tasto
+                buttonMode.setTooltip(new Tooltip("Loop"));   //testo in sovraimpressione sul tasto
             }
         }
     }
@@ -135,6 +135,10 @@ public class PlayerController {
                     "Listening Queue",
                     javafx.stage.Modality.NONE
             );
+            // --- AGGIUNGI QUESTA PROTEZIONE QUI ---
+            if (loader == null) {
+                return; // Ferma il codice se la finestra della coda è già aperta!
+            }
             QueueViewController ctrl = loader.getController();
             ctrl.setPlaylistService(playlistService);
             ctrl.setQueueService(queueService);

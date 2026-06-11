@@ -174,38 +174,24 @@ public class DetailedPlaylistController {
 
     public void onModify(ActionEvent actionEvent) {
         try {
-            FXMLLoader loader = WindowUtil.openWindow("/it/diem/unisa/musicmanager/pages/editPlaylist.fxml", playlist.getName(),Modality.APPLICATION_MODAL);
+            FXMLLoader loader = WindowUtil.openWindow(
+                    "/it/diem/unisa/musicmanager/pages/editPlaylist.fxml",
+                    "Modify: " + playlist.getName(),
+                    Modality.APPLICATION_MODAL
+            );
 
-            EditPlaylistController controller = loader.getController();
-
-            controller.setPlaylistService(playlistService);
-            controller.setPlaylist(playlist);
-
-            /*
-            FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource("/it/diem/unisa/musicmanager/pages/editPlaylist.fxml"));
-            Parent root = loader.load();
-
-            EditPlaylistController controller = loader.getController();
-            controller.setPlaylist(playlist);
-
-            controller.setPlaylistService(playlistService);
-            //close(actionEvent);
-
-            Stage stage = new Stage();
-            stage.setTitle("Modifica Playlist");
-            stage.setResizable(false);
-            stage.initModality(Modality.APPLICATION_MODAL);
-            stage.setScene(new Scene(root));
-            stage.showAndWait();
-            */
-            WindowUtil.close( (Node) actionEvent.getSource());
-
-
-            // Dopo la chiusura, aggiorniamo il nome mostrato (potrebbe essere cambiato).
-            if (playlist != null) {
-                labelName.setText(playlist.getName());
+            // Protezione anti-crash anche qui
+            if (loader == null) {
+                return;
             }
+
+            EditPlaylistController controller = loader.getController();
+            controller.setPlaylistService(playlistService);
+            controller.setPlaylist(playlist);
+
+            // NOTA: Ho rimosso WindowUtil.close(...) da qui!
+            // In questo modo la schermata di dettaglio resta aperta sotto
+            // mentre modifichi il nome sopra.
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -230,17 +216,29 @@ public class DetailedPlaylistController {
         }
     }
 
+    @FXML
     public void onAddTrack(ActionEvent actionEvent) {
-        //con trackseevice aggiungo una traccia alla playlist ma manca una view
         try {
-            FXMLLoader loader = WindowUtil.openWindow("/it/diem/unisa/musicmanager/pages/addTrackPlaylist.fxml", playlist.getName(), Modality.APPLICATION_MODAL);
-            AddTrackPlaylisController controller= loader.getController();
+            // Apriamo la finestra usando il titolo della playlist corrente
+            FXMLLoader loader = WindowUtil.openWindow(
+                    "/it/diem/unisa/musicmanager/pages/addTrackPlaylist.fxml",
+                    "Add Track to: " + playlist.getName(), // Titolo dinamico specifico
+                    Modality.APPLICATION_MODAL
+            );
 
-            //gli passo la playlist corrente e il service
+            // 1. PROTEZIONE ANTI-CRASH: se la finestra è già aperta, ci fermiamo qui
+            if (loader == null) {
+                return;
+            }
 
+            AddTrackPlaylisController controller = loader.getController();
+
+            // Passiamo i dati al controller della nuova finestra
             controller.setPlaylistService(playlistService);
             controller.setTrackService(trackService);
             controller.setPlaylist(playlist);
+
+            // Quando la finestra di aggiunta salva e si chiude, rinfreschiamo la lista
             controller.setOnSaveCallback(() -> {
                 javafx.application.Platform.runLater(() -> {
                     updateTrackCount();
@@ -249,9 +247,8 @@ public class DetailedPlaylistController {
             });
 
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
-
     }
 
     public void onDelete(ActionEvent actionEvent) {

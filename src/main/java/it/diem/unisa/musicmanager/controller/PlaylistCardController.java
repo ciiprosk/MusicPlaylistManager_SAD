@@ -40,7 +40,6 @@ public class PlaylistCardController {
     @FXML private Button btnPlay;
     @FXML private Button btnModify;
     @FXML private Button btnMenu;
-    @FXML private javafx.scene.layout.VBox rootCard;
 
     // La playlist mostrata da questa card.
     private Playlist playlist;
@@ -81,44 +80,41 @@ public class PlaylistCardController {
      * Click su Play: avvia la riproduzione della playlist.
      * (Da collegare al PlayerService quando disponibile.)
      */
+    /**
+     * Click su Play: avvia immediatamente la riproduzione della playlist corrente,
+     * interrompendo qualsiasi altra playlist o brano in esecuzione.
+     */
     @FXML
     private void handlePlay() {
-        if (playlist == null || playlist.getTracksList().isEmpty()) {
+        // Controllo di sicurezza per evitare crash se i dati non sono pronti
+        if (playlist == null || playlist.getTracksList().isEmpty() || playerService == null) {
             return;
         }
 
+        // Recuperiamo la prima traccia della playlist che vogliamo ascoltare
         Track firstTrack = playlist.getTracksList().get(0);
 
-        Track currentTrack = playerService != null
-                ? playerService.currentTrackProperty().get()
-                : null;
-
-        boolean isThisPlaylistAlreadyPlaying =
-                playerService != null
-                        && currentTrack != null
-                        && currentTrack.getId().equals(firstTrack.getId())
-                        && playerService.isPlayingProperty().get();
-
-        if (isThisPlaylistAlreadyPlaying) {
-            return;
-        }
-
+        // Incrementiamo il contatore dei "Plays" della playlist tramite il service
         if (playlistService != null) {
             playlistService.incrementPlayCount(playlist.getId());
         }
 
-        if (queueService != null && playerService != null) {
-            // Svuotiamo la coda precedente (incluso currentItem)
+        if (queueService != null) {
+            // 1. Svuotiamo completamente la vecchia coda d'ascolto attiva
             queueService.clearQueue();
-            
-            // Aggiungiamo l'intera playlist alla coda
+
+            // 2. Aggiungiamo l'intera nuova playlist alla coda
             queueService.addToQueue(playlist);
-            
-            // Facciamo partire la prima canzone usando il metodo next()
-            // In questo modo la prima canzone viene suonata e rimossa dalla coda (se in SequentialMode),
-            // mentre il resto della playlist rimane in coda pronto per essere ascoltato!
-            playerService.next();
-        } else if (playerService != null) {
+
+            // 3. AGGIORNAMENTO CRUCIALE: Forziamo il player a suonare DIRETTAMENTE la prima traccia.
+            // Passando true come terzo parametro (forceRestart), indichiamo al PlayerService di
+            // stoppare immediatamente la vecchia canzone e avviare la nuova senza esitazioni.
+            playerService.play(firstTrack, false, true);
+
+            // 4. Allineiamo la coda indicando qual è il brano attualmente in riproduzione
+            queueService.setCurrentItem(queueService.getQueueList().isEmpty() ? null : queueService.getQueueList().get(0));
+        } else {
+            // Fallback di sicurezza nel caso in cui il QueueService non fosse iniettato
             playerService.play(firstTrack, false, true);
         }
     }
@@ -180,19 +176,31 @@ public class PlaylistCardController {
     private void openEditPlaylist() {
         if (playlistService == null) return;
         try {
-            FXMLLoader loader = WindowUtil.openWindow(
-                    "/it/diem/unisa/musicmanager/pages/editPlaylist.fxml",
-                    "Modify: " + playlist.getName(),
-                    Modality.APPLICATION_MODAL
-            );
+            FXMLLoader loader = WindowUtil.openWindow("/it/diem/unisa/musicmanager/pages/editPlaylist.fxml", playlist.getName(),Modality.APPLICATION_MODAL);
+            EditPlaylistController ctrl = loader.getController();
 
-            // Controllo anti-crash se la finestra è già aperta
-            if (loader == null) return;
+            //
+            //ctrl.setTrackService(trackService);
+            ctrl.setPlaylist(playlist);
+            ctrl.setPlaylistService(playlistService);
+            //ctrl.setPlayerService(playerService); non serve
+
+            /*
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/it/diem/unisa/musicmanager/pages/editPlaylist.fxml"));
+            Parent root = loader.load();
 
             EditPlaylistController ctrl = loader.getController();
             ctrl.setPlaylist(playlist);
             ctrl.setPlaylistService(playlistService);
 
+            Stage stage = new Stage();
+            stage.setTitle("Modify Playlist");
+            stage.setResizable(false);
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setScene(new Scene(root));
+            stage.showAndWait();
+            */
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -242,6 +250,4 @@ public class PlaylistCardController {
     private void openAddTrackToPlaylist() {
         //DA FAREE
     }
-
-
 }

@@ -95,4 +95,9 @@ public class AddTrackPlaylisController {
 
         }
     }
+    @FXML
+    private void onCancel(javafx.event.ActionEvent event) {
+        // Chiude la finestra corrente in modo sicuro e pulisce la mappa in WindowUtil
+        it.diem.unisa.musicmanager.util.WindowUtil.close((javafx.scene.Node) event.getSource());
+    }
 }
