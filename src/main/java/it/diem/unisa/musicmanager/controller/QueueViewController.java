@@ -5,6 +5,7 @@ import it.diem.unisa.musicmanager.model.QueueItem;
 import it.diem.unisa.musicmanager.model.Track;
 import it.diem.unisa.musicmanager.service.PlaylistService;
 import it.diem.unisa.musicmanager.service.QueueService;
+import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListCell;
@@ -65,31 +66,42 @@ public class QueueViewController {
             // Nasconde sempre la testa (= brano corrente, già mostrato in "Now Playing")
             filteredQueue = new FilteredList<>(this.queueService.getQueueList(), this::shouldDisplay);
             this.queueListView.setItems(filteredQueue);
-
-
-            // Dopo uno skip la testa cambia: serve riapplicare il predicato
-            this.queueService.getQueueList().addListener(
-                    (ListChangeListener<QueueItem>) c -> refreshFilter());
         }
     }
 
     public void setPlayerService(it.diem.unisa.musicmanager.service.PlayerService playerService) {
         this.playerService = playerService;
         if (this.playerService != null && labelCurrentTrack != null) {
-            // Aggiorna subito
             updateCurrentTrackLabel(this.playerService.currentTrackProperty().get());
-            // Aggiunge il listener per i futuri cambiamenti
+
             this.playerService.currentTrackProperty().addListener((observable, oldValue, newValue) -> {
                 updateCurrentTrackLabel(newValue);
+                Platform.runLater(this::refreshFilter);
             });
         }
+        initFilteredList(); // <--- Inizializza anche qui se il queueService era già arrivato
     }
-    private boolean shouldDisplay(QueueItem item) {
-        if (queueService == null) {
-            return true;
+
+    /**
+     * Inizializza centralmente la lista filtrata per evitare liste vuote dovute all'ordine dei setter
+     */
+    private void initFilteredList() {
+        if (this.queueService != null && this.queueListView != null && this.filteredQueue == null) {
+            filteredQueue = new FilteredList<>(this.queueService.getQueueList(), this::shouldDisplay);
+            this.queueListView.setItems(filteredQueue);
         }
-        // Nasconde solo la testa, sempre (play o pausa è indifferente)
-        return queueService.getQueueList().indexOf(item) != 0;
+    }
+
+    private boolean shouldDisplay(QueueItem item) {
+        if (item == null) return false;
+        if (playerService == null) return true;
+
+        Track currentTrack = playerService.currentTrackProperty().get();
+        if (currentTrack == null) return true;
+
+        Track itemTrack = (Track) item.getPlayable();
+        // NASCONDE dalla lista solo se è lo stesso brano che sta suonando come NOW PLAYING
+        return itemTrack == null || !itemTrack.getId().equals(currentTrack.getId());
     }
 
     private void refreshFilter() {
