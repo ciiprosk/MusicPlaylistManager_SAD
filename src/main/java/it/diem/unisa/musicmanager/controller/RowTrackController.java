@@ -222,8 +222,12 @@ public class RowTrackController {
                     Modality.WINDOW_MODAL
             );
 
-            DetailSongController controller = loader.getController();
 
+            if (loader == null) {
+                return; // La finestra era già aperta, ci fermiamo senza crashare!
+            }
+
+            DetailSongController controller = loader.getController();
             controller.setTrackService(trackService);
             controller.setTrack(track);
 
@@ -235,6 +239,10 @@ public class RowTrackController {
     private void openEditTrack() {
         try {
             FXMLLoader loader = WindowUtil.openWindow("/it/diem/unisa/musicmanager/pages/editSong.fxml", "Modify Track", Modality.WINDOW_MODAL);
+            // Controllo anti-crash: se la finestra di questa specifica traccia è già aperta, ci fermiamo
+            if (loader == null) {
+                return;
+            }
             EditSongController controller = loader.getController();
             controller.setTrackService(trackService);
             controller.setTrack(track);

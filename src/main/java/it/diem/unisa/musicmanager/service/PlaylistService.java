@@ -187,6 +187,15 @@ public class PlaylistService implements TrackObserver{
         }
     }
 
+    /**
+     * Cerca le playlist il cui nome contiene la parola chiave specificata.
+     * La ricerca non è sensibile alle lettere maiuscole o minuscole (case-insensitive).
+     * Se la parola chiave è nulla, vuota o composta solo da spazi, viene restituita
+     * una copia modificabile di tutte le playlist disponibili.
+     *
+     * @param keyword la stringa da cercare nel nome della playlist
+     * @return una {@link List} contenente le playlist che corrispondono ai criteri di ricerca
+     */
     public List<Playlist> searchPlaylists(String keyword) {
         if (keyword == null || keyword.isBlank()) {
             return new java.util.ArrayList<>(sharedState.getALlPlaylists());
@@ -241,7 +250,17 @@ public class PlaylistService implements TrackObserver{
         return playlist.getTracksList();
     }
 
-    // --- Generazione automatica di playlist ---
+    /**
+     * Crea un oggetto Playlist filtrando una collezione di tracce in base a una specifica.
+
+     * Metodo puro che non applica persistenza: istanzia la nuova playlist e vi aggiunge
+     * tutte le tracce che soddisfano il criterio {@link Specification#isSatisfiedBy(Object)}.
+     *
+     * @param name     il nome da assegnare alla playlist
+     * @param tracks   la collezione di tracce da filtrare
+     * @param criteria la specifica contenente i criteri di filtraggio
+     * @return la {@link Playlist} generata contenente solo le tracce filtrate
+     */
     public Playlist generate(String name, Collection<Track> tracks, Specification<Track> criteria) {
         Playlist playlist = new Playlist(name);
         tracks.stream()
@@ -251,29 +270,56 @@ public class PlaylistService implements TrackObserver{
     }
 
     /**
-     * Genera la playlist e la salva, riusando lo stesso percorso delle altre.
-     * @return Optional.empty() se ok, Optional con messaggio d'errore se il nome
-     *         e' duplicato (stessa convenzione di addTrack).
+     * Genera una nuova playlist filtrando le tracce fornite tramite la specifica e la salva.
+     *
+     * Verifica preventivamente che non esista già una playlist con lo stesso nome. In caso
+     * positivo, persiste la playlist su file tramite DAO e aggiorna lo stato in memoria.
+     *
+     * @param name     il nome da assegnare alla playlist
+     * @param tracks   la collezione di tutte le tracce disponibili da filtrare
+     * @param criteria la specifica contenente i criteri di filtraggio logici
+     * @return un Optional vuoto se l'operazione ha successo, oppure un Optional
+     * contenente il messaggio di errore se il nome della playlist è duplicato
      */
     public Optional<String> generateAndSave(String name, Collection<Track> tracks, Specification<Track> criteria) {
 
-        Playlist playlist = generate(name, tracks, criteria);   // il metodo puro di prima
-
-        if (playlistDAO.isDuplicated(playlist)) {
+        // 1. Controllo preventivo sul nome (ottimizzazione)
+        if (playlistDAO.isDuplicated(new Playlist(name))) {
             return Optional.of("Error: A playlist with this name already exists!");
         }
 
-        playlistDAO.insert(playlist);                        // persistenza su JSON
-        sharedState.getALlPlaylists().add(playlist);         // <-- VERIFICA il nome di questo getter
+        // 2. Delega della logica algoritmica al metodo puro
+        Playlist playlist = generate(name, tracks, criteria);
+
+        // 3. Persistenza ed effetti collaterali
+        playlistDAO.insert(playlist);
+        sharedState.getALlPlaylists().add(playlist);
+
         return Optional.empty();
     }
 
 
-
+    /**
+     * Cerca una traccia nello stato condiviso tramite il suo identificativo univoco.
+     *
+     * @param trackId l'UUID della traccia da cercare
+     * @return la Track trovata
+     * @throws PlaylistInfoException se nessuna traccia corrisponde all'ID fornito
+     */
     private Track searchTrackById(UUID trackId) {
         return sharedState.getALlTracks().stream().filter(t -> t.getId().equals(trackId)).findFirst().orElseThrow(()-> new PlaylistInfoException("Track not found"));
     }
 
+    /**
+     * Incrementa il contatore delle riproduzioni di una playlist e aggiorna i dati.
+     *
+     * Cerca la playlist per ID: se esiste, incrementa il suo playCount,
+     * persiste la modifica nel database tramite DAO e aggiorna lo stato in memoria.
+     *
+     * @param playlistId l'UUID della playlist da aggiornare
+     * @return un Optional con il messaggio di errore se la playlist non esiste,
+     * oppure Optional#empty() se l'operazione va a buon fine
+     */
     public Optional<String> incrementPlayCount(UUID playlistId) {
 
         Playlist playlist = sharedState.getALlPlaylists()
@@ -295,6 +341,14 @@ public class PlaylistService implements TrackObserver{
         return Optional.empty();
     }
 
+    /**
+     * Restituisce le prime 5 playlist con il maggior numero di riproduzioni.
+     * Recupera tutte le playlist dallo stato condiviso, le ordina in ordine
+     * decrescente in base al contatore delle riproduzioni e ne seleziona al massimo 5.
+     *
+     * @return una List contenente le 5 playlist più ascoltate, ordinate dal numero
+     * maggiore al minore di riproduzioni
+     */
     public List<Playlist> getTop5MostPlayedPlaylists() {
         return sharedState.getALlPlaylists()
                 .stream()

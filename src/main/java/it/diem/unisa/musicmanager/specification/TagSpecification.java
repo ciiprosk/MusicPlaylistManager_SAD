@@ -8,20 +8,17 @@ import java.util.EnumSet;
 /**
  * Seleziona le tracce che contengono i tag richiesti.
  */
-public record TagSpecification(EnumSet<Tag> tags) implements Specification<Track> {
+public record TagSpecification(Tag tag) implements Specification<Track> {
 
+    /**
+     * Verifica se la traccia specificata soddisfa il criterio, controllando
+     * che la collezione dei tag della traccia non sia nulla e che contenga
+     * il tag racchiuso in questa specifica.
+     *
+     * @param track il candidato di tipo Track da valutare
+     * @return true si se la traccia contiene il tag richiesto,
+     * false altrimenti (incluso il caso in cui la traccia non abbia tag)
+     */
     @Override
-    public boolean isSatisfiedBy(Track track) {
-        if (tags == null || tags.isEmpty()) {
-            return true;
-        }
-
-        for (Tag t : tags) {
-            if (track.getTags().contains(t)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
+    public boolean isSatisfiedBy(Track track) { return track.getTags() != null && track.getTags().contains(tag); }
 }

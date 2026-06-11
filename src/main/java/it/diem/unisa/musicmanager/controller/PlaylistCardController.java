@@ -40,6 +40,7 @@ public class PlaylistCardController {
     @FXML private Button btnPlay;
     @FXML private Button btnModify;
     @FXML private Button btnMenu;
+    @FXML private javafx.scene.layout.VBox rootCard;
 
     // La playlist mostrata da questa card.
     private Playlist playlist;
@@ -128,9 +129,16 @@ public class PlaylistCardController {
     @FXML
     private void handleModify() {
         try {
-            FXMLLoader loader = WindowUtil.openWindow("/it/diem/unisa/musicmanager/pages/editPlaylist.fxml", "Modifica Playlist", Modality.APPLICATION_MODAL);
+            // Usiamo un titolo specifico per la playlist corrente
+            FXMLLoader loader = WindowUtil.openWindow(
+                    "/it/diem/unisa/musicmanager/pages/editPlaylist.fxml",
+                    "Modify: " + playlist.getName(),
+                    Modality.APPLICATION_MODAL
+            );
 
-            // Passiamo la playlist al controller della modifica.
+            // Controllo anti-crash se la finestra è già aperta
+            if (loader == null) return;
+
             EditPlaylistController controller = loader.getController();
             controller.setPlaylist(playlist);
             controller.setPlaylistService(playlistService);
@@ -172,31 +180,19 @@ public class PlaylistCardController {
     private void openEditPlaylist() {
         if (playlistService == null) return;
         try {
-            FXMLLoader loader = WindowUtil.openWindow("/it/diem/unisa/musicmanager/pages/editPlaylist.fxml", playlist.getName(),Modality.APPLICATION_MODAL);
-            EditPlaylistController ctrl = loader.getController();
+            FXMLLoader loader = WindowUtil.openWindow(
+                    "/it/diem/unisa/musicmanager/pages/editPlaylist.fxml",
+                    "Modify: " + playlist.getName(),
+                    Modality.APPLICATION_MODAL
+            );
 
-            //
-            //ctrl.setTrackService(trackService);
-            ctrl.setPlaylist(playlist);
-            ctrl.setPlaylistService(playlistService);
-            //ctrl.setPlayerService(playerService); non serve
-
-            /*
-            FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource("/it/diem/unisa/musicmanager/pages/editPlaylist.fxml"));
-            Parent root = loader.load();
+            // Controllo anti-crash se la finestra è già aperta
+            if (loader == null) return;
 
             EditPlaylistController ctrl = loader.getController();
             ctrl.setPlaylist(playlist);
             ctrl.setPlaylistService(playlistService);
 
-            Stage stage = new Stage();
-            stage.setTitle("Modify Playlist");
-            stage.setResizable(false);
-            stage.initModality(Modality.APPLICATION_MODAL);
-            stage.setScene(new Scene(root));
-            stage.showAndWait();
-            */
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -204,28 +200,22 @@ public class PlaylistCardController {
 
     private void openDetail() {
         try {
-            FXMLLoader loader = WindowUtil.openWindow("/it/diem/unisa/musicmanager/pages/detailedPlaylist.fxml", playlist.getName(),Modality.NONE);
-            DetailedPlaylistController ctrl = loader.getController();
+            FXMLLoader loader = WindowUtil.openWindow(
+                    "/it/diem/unisa/musicmanager/pages/detailedPlaylist.fxml",
+                    playlist.getName(),
+                    Modality.NONE
+            );
 
+            // Controllo anti-crash se la finestra di dettaglio di questa playlist è già aperta
+            if (loader == null) return;
+
+            DetailedPlaylistController ctrl = loader.getController();
             ctrl.setPlaylistService(playlistService);
             ctrl.setTrackService(trackService);
             ctrl.setPlayerService(playerService);
             ctrl.setQueueService(queueService);
             ctrl.setPlaylist(playlist);
-            /*
-            FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource("/it/diem/unisa/musicmanager/pages/detailedPlaylist.fxml"));
-            Parent root = loader.load();
 
-
-
-            Stage stage = new Stage();
-            stage.setTitle(playlist.getName());
-            stage.setResizable(false);
-            stage.initModality(Modality.NONE);
-            stage.setScene(new Scene(root, 900, 650));
-            stage.show();
-            */
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -252,4 +242,6 @@ public class PlaylistCardController {
     private void openAddTrackToPlaylist() {
         //DA FAREE
     }
+
+
 }

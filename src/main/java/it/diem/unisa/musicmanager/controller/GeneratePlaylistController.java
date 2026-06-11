@@ -20,6 +20,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.layout.VBox;
 
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.Optional;
@@ -40,6 +41,13 @@ public class GeneratePlaylistController {
     private TrackService trackService;
     private PlaylistService playlistService;
 
+    /**
+     * Inizializza il controller iniettando i servizi necessari e avviando
+     * il popolamento dinamico dei componenti grafici della UI.
+     *
+     * @param trackService    il servizio per la gestione e il recupero delle tracce musicali
+     * @param playlistService il servizio per la generazione e il salvataggio delle playlist
+     */
     public void init(TrackService trackService, PlaylistService playlistService) {
         this.trackService = trackService;
         this.playlistService = playlistService;
@@ -49,7 +57,11 @@ public class GeneratePlaylistController {
     }
 
     // Popola le colonne
-
+    /**
+     * Estrae dinamicamente gli anni di pubblicazione da tutte le tracce disponibili,
+     * li ordina in modo crescente e popola il contenitore grafico dedicato con le relative CheckBox.
+     * Vengono considerati validi solo gli anni non nulli composti da esattamente 4 cifre.
+     */
     private void populateYears() {
         trackService.getAllTracks().stream()
                 .map(Track::getYear)
@@ -60,6 +72,11 @@ public class GeneratePlaylistController {
                         createCheckBox(year, Integer.parseInt(year))));
     }
 
+    /**
+     * Estrae dinamicamente i generi musicali da tutte le tracce disponibili,
+     * li ordina alfabeticamente e popola il contenitore grafico dedicato con le relative CheckBox.
+     * Il genere di fallback {@code Genre.UNKNOWN} viene escluso dal popolamento.
+     */
     private void populateGenres() {
         trackService.getAllTracks().stream()
                 .map(Track::getGenre)
@@ -70,12 +87,30 @@ public class GeneratePlaylistController {
                         createCheckBox(genre.name(), genre)));
     }
 
+    /**
+     * Estrae dinamicamente i tag da tutte le tracce disponibili analizzando le rispettive collezioni,
+     * li ordina alfabeticamente ed elimina i duplicati prima di popolare il contenitore grafico dedicato.
+     * Questo approccio garantisce che vengano mostrati solo i tag effettivamente associati ad almeno una traccia.
+     */
     private void populateTags() {
-        for (Tag tag : Tag.values()) {
-            tagBox.getChildren().add(createCheckBox(tag.name(), tag));
-        }
+        trackService.getAllTracks().stream()
+                .map(Track::getTags) // Supponendo che restituisca una List<Tag> o Set<Tag>
+                .filter(tags -> tags != null)
+                .flatMap(Collection::stream) // "Appiattisce" le liste di tag in un unico stream di singoli tag
+                .distinct()                  // Elimina i duplicati
+                .sorted(Comparator.comparing(Enum::name)) // Ordina alfabeticamente
+                .forEach(tag -> tagBox.getChildren().add(
+                        createCheckBox(tag.name(), tag)));
     }
 
+    /**
+     * Fabbrica un'istanza di {@link CheckBox} configurata con un testo descrittivo,
+     * uno stile CSS personalizzato per il testo e un oggetto di business associato come user data.
+     *
+     * @param label    il testo da mostrare accanto alla CheckBox
+     * @param userData l'oggetto di dominio (es. Integer, Genre, Tag) da associare alla CheckBox
+     * @return un'istanza di {@link CheckBox} pronta per essere inserita nella UI
+     */
     private CheckBox createCheckBox(String label, Object userData) {
         CheckBox cb = new CheckBox(label);
         cb.setUserData(userData);
@@ -86,8 +121,14 @@ public class GeneratePlaylistController {
     // Costruzione della Specification composta
 
     /**
-     * Combina in OR tutte le CheckBox selezionate di una colonna (VBox).
-     * Ritorna Optional.empty() se nessuna e' selezionata in quella colonna.
+     * Analizza le CheckBox selezionate in una {@link VBox} e ne combina i criteri in OR
+     * Scorre i nodi della colonna: per ogni CheckBox spuntata, converte il suo {@code userData}
+     * in una specifica tramite {@link #toSpecification(Object)} e la concatena alle altre
+     * usando il metodo {@link Specification#or(Specification)}.
+     *
+     * @param column il contenitore grafico della UI da analizzare
+     * @return un {@link Optional} con la specifica combinata in OR, oppure {@link Optional#empty()}
+     * se nessuna CheckBox è selezionata
      */
     private Optional<Specification<Track>> buildColumnSpec(VBox column) {
         Specification<Track> combined = null;
@@ -104,41 +145,38 @@ public class GeneratePlaylistController {
     }
 
     /**
-     * Converte il valore userData di una CheckBox nella Specification corrispondente.
+     * Converte l'oggetto {@code userData} di una CheckBox nella relativa {@link Specification}
+     * Riconosce il tipo di dato e istanzia la specifica concreta corrispondente
+     * (anno, genere o tag). Restituisce {@code null} se il tipo non è gestito.
+     * @param value l'oggetto estratto dalla CheckBox (Integer, Genre o Tag)
+     * @return la specifica concreta adatta al tipo, oppure {@code null}
      */
     private Specification<Track> toSpecification(Object value) {
         if (value instanceof Integer) {
             return new YearSpecification((Integer) value);
         } else if (value instanceof Genre) {
             return new GenreSpecification((Genre) value);
+        } else if (value instanceof Tag) {
+            return new TagSpecification((Tag) value);
         }
         return null;
     }
-    private Optional<Specification<Track>> buildTagSpec(VBox column) {
 
-        EnumSet<Tag> selectedTags = EnumSet.noneOf(Tag.class);
-
-        for (Node node : column.getChildren()) {
-            if (node instanceof CheckBox cb && cb.isSelected()) {
-                selectedTags.add((Tag) cb.getUserData());
-            }
-        }
-
-        if (selectedTags.isEmpty()) {
-            return Optional.empty();
-        }
-
-        return Optional.of(new TagSpecification(selectedTags));
-    }
     // Genera Playlist
-
+    /**
+     * Gestisce l'evento di generazione della playlist al click sul pulsante.
+     * Recupera le specifiche dalle tre colonne (anni, generi, tag) tramite {@link #buildColumnSpec},
+     * le combina in AND logico e delega al servizio il filtraggio e il salvataggio.
+     * Mostra un alert di errore se non ci sono selezioni o se il salvataggio fallisce.
+     * @param event l'evento di azione scatenato dalla UI
+     */
     @FXML
     private void onGenerate(ActionEvent event) {
 
         // Combina le colonne in AND tra loro
         Optional<Specification<Track>> yearSpec  = buildColumnSpec(yearBox);
         Optional<Specification<Track>> genreSpec = buildColumnSpec(genreBox);
-        Optional<Specification<Track>> tagSpec = buildTagSpec(tagBox);
+        Optional<Specification<Track>> tagSpec   = buildColumnSpec(tagBox);
 
         // Unisci tutte le colonne selezionate con AND
         Specification<Track> criteria = null;
@@ -184,7 +222,14 @@ public class GeneratePlaylistController {
 
         return sb.toString().trim();
     }
-
+    /**
+     * Scorre gli elementi di una colonna visiva e aggiunge al costruttore di stringhe
+     * il testo di ogni CheckBox selezionata.
+     * Viene utilizzato per raccogliere i nomi dei filtri attivi e generare
+     * automaticamente il titolo della playlist.
+     * @param sb     il costruttore di stringhe su cui accumulare i testi
+     * @param column il contenitore grafico della UI da cui leggere le selezioni
+     */
     private void appendSelected(StringBuilder sb, VBox column) {
         for (Node node : column.getChildren()) {
             if (node instanceof CheckBox && ((CheckBox) node).isSelected()) {

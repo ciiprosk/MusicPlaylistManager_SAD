@@ -16,44 +16,48 @@
     <padding>
         <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
     </padding>
-   <children>
-   
-       <HBox alignment="CENTER_LEFT" spacing="12.0">
-      <children>
-              <Label fx:id="labelName" styleClass="titolo-pagina" text="Playlist Name" textFill="WHITE">
-                  <font>
-                      <Font size="32.0" />
-                  </font>
-              </Label>
-              <Label fx:id="lblTrackCount" styleClass="menu-title" text="# 0 tracks" textFill="#7a7a7a" />
-      </children>
-       </HBox>
-   
-       <HBox alignment="CENTER_LEFT" spacing="10.0">
-      <children>
-              <Button onAction="#onAddToQueue" styleClass="btn-secondary" text="Add to Queue" />
-              <Button onAction="#onModify" styleClass="btn-secondary" text="Modify Playlist" />
-              <Button onAction="#onAddTrack" styleClass="btn-primary" text="Add/Remove Track" />
-              <Button onAction="#onDelete" styleClass="btn-danger" text="Delete Playlist" />
-      </children>
-       </HBox>
-   
-       <VBox spacing="8.0">
-      <children>
-              <Label styleClass="sottotitolo" text="Play Mode" textFill="#cccccc" />
-              <HBox spacing="12.0">
-                 <children>
-                     <Button fx:id="buttonSequential" onAction="#onSequential" styleClass="btn-mode" text="⇢ Sequential" />
-                     <Button fx:id="buttonLoop" onAction="#onLoop" styleClass="btn-mode" text="↻ Loop" />
-                     <Button fx:id="buttonShuffle" onAction="#onShuffle" styleClass="btn-mode" text="⇄ Shuffle" />
-                 </children>
-              </HBox>
-      </children>
-       </VBox>
-   
-       <Label styleClass="sottotitolo" text="Tracks" textFill="#cccccc" />
-   
-       <VBox fx:id="trackList" spacing="10.0" VBox.vgrow="ALWAYS" />
-   </children>
+    <children>
+
+        <HBox alignment="CENTER_LEFT" spacing="12.0">
+            <children>
+                <Label fx:id="labelName" styleClass="titolo-pagina" text="Playlist Name" textFill="WHITE">
+                    <font>
+                        <Font size="32.0" />
+                    </font>
+                </Label>
+                <Label fx:id="lblTrackCount" styleClass="menu-title" text="# 0 tracks" textFill="#7a7a7a" />
+            </children>
+        </HBox>
+
+        <HBox alignment="CENTER_LEFT" spacing="10.0">
+            <children>
+                <Button onAction="#onAddToQueue" styleClass="btn-secondary" text="Add to Queue" />
+                <Button onAction="#onModify" styleClass="btn-secondary" text="Modify Playlist" />
+                <Button onAction="#onAddTrack" styleClass="btn-primary" text="Add/Remove Track" />
+                <Button onAction="#onDelete" styleClass="btn-danger" text="Delete Playlist" />
+            </children>
+        </HBox>
+
+        <VBox spacing="8.0">
+            <children>
+                <Label styleClass="sottotitolo" text="Play Mode" textFill="#cccccc" />
+                <HBox spacing="12.0">
+                    <children>
+                        <Button fx:id="buttonSequential" onAction="#onSequential" styleClass="btn-mode" text="⇢ Sequential" />
+                        <Button fx:id="buttonLoop" onAction="#onLoop" styleClass="btn-mode" text="↻ Loop" />
+                        <Button fx:id="buttonShuffle" onAction="#onShuffle" styleClass="btn-mode" text="⇄ Shuffle" />
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+
+        <Label styleClass="sottotitolo" text="Tracks" textFill="#cccccc" />
+
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" VBox.vgrow="ALWAYS" style="-fx-background-color: transparent; -fx-background-insets: 0; -fx-padding: 0;">
+            <content>
+                <VBox fx:id="trackList" spacing="10.0" style="-fx-background-color: transparent;" />
+            </content>
+        </ScrollPane>
+    </children>
 
 </VBox>
