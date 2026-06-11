@@ -9,6 +9,7 @@ import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.collections.transformation.FilteredList;
 
 public class QueueViewController {
 
@@ -20,35 +21,16 @@ public class QueueViewController {
     private QueueService queueService;
     private PlaylistService playlistService;
     private it.diem.unisa.musicmanager.service.PlayerService playerService;
+    private FilteredList<QueueItem> filteredQueue;
 
     @FXML
     public void initialize() {
         queueListView.setCellFactory(param -> new ListCell<>() {
             @Override
             protected void updateItem(QueueItem item, boolean empty) {
-                // --- STRATEGIA DI SHIFT (SLITTAMENTO) ---
-                // Invece di usare l'item che ci passa JavaFX, prendiamo l'indice della cella corrente
-                int index = getIndex();
-
-                // Se c'è una traccia in riproduzione, facciamo "slittare" la lista in avanti di 1.
-                // La cella 0 mostrerà l'elemento 1, la cella 1 l'elemento 2, e così via.
-                Track currentPlayingTrack = (playerService != null) ? playerService.currentTrackProperty().get() : null;
-
-                if (currentPlayingTrack != null && queueService != null && !queueService.getQueueList().isEmpty()) {
-                    // Aggiorniamo l'item prendendo quello successivo nella coda reale
-                    if (index + 1 < queueService.getQueueList().size()) {
-                        item = queueService.getQueueList().get(index + 1);
-                    } else {
-                        item = null; // Siamo arrivati alla fine della coda effettiva
-                    }
-                }
-
-                super.updateItem(item, empty || item == null);
-
+                super.updateItem(item, empty);
                 if (empty || item == null) {
                     setText(null);
-                    setGraphic(null);
-                    setStyle("-fx-background-color: transparent; -fx-border-color: transparent; -fx-border-width: 0;");
                 } else {
                     Track track = (Track) item.getPlayable();
                     String display = track.getTitle() + " - " + track.getAuthor();
@@ -59,7 +41,8 @@ public class QueueViewController {
                         }
                     }
                     setText(display);
-                    setStyle("-fx-text-fill: white; -fx-font-size: 14px; -fx-background-color: #2b2b2b; -fx-border-color: #333333; -fx-border-width: 0 0 1 0; -fx-padding: 8px;");
+                    // Applicare stili per renderlo visibile su sfondo scuro
+                    setStyle("-fx-text-fill: white; -fx-font-size: 14px; -fx-background-color: #2b2b2b; -fx-border-color: #333333; -fx-border-width: 0 0 1 0;");
                 }
             }
         });
@@ -82,18 +65,11 @@ public class QueueViewController {
     public void setPlayerService(it.diem.unisa.musicmanager.service.PlayerService playerService) {
         this.playerService = playerService;
         if (this.playerService != null && labelCurrentTrack != null) {
+            // Aggiorna subito
             updateCurrentTrackLabel(this.playerService.currentTrackProperty().get());
-
-            if (queueListView != null) {
-                queueListView.refresh();
-            }
-
+            // Aggiunge il listener per i futuri cambiamenti
             this.playerService.currentTrackProperty().addListener((observable, oldValue, newValue) -> {
                 updateCurrentTrackLabel(newValue);
-
-                if (queueListView != null) {
-                    queueListView.refresh();
-                }
             });
         }
     }
