@@ -70,9 +70,16 @@ public class DetailSongController {
     private void handleEdit(ActionEvent e) {
         if (track == null) return;
         try {
+            // MODIFICATO IL TITOLO: aggiungiamo "Modify: " davanti,
+            // così la chiave nella mappa di WindowUtil sarà unica ("Modify: 66")
             FXMLLoader loader = WindowUtil.openWindow(
                     "/it/diem/unisa/musicmanager/pages/editSong.fxml",
-                    track.getTitle(), Modality.WINDOW_MODAL);
+                    "Modify: " + track.getTitle(), Modality.APPLICATION_MODAL);
+
+            if (loader == null) {
+                return;
+            }
+
             EditSongController controller = loader.getController();
             controller.setTrackService(trackService);
             controller.setTrack(track);
@@ -82,7 +89,6 @@ public class DetailSongController {
             ex.printStackTrace();
         }
     }
-
 
     /**
      * Elimina: chiede conferma e, se confermato, elimina il brano dall'archivio.

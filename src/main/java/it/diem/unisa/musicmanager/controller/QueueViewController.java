@@ -32,7 +32,6 @@ public class QueueViewController {
                 } else {
                     Track track = (Track) item.getPlayable();
                     String display = track.getTitle() + " - " + track.getAuthor();
-                    
                     if (item.getBelongsToPlaylist() != null && playlistService != null) {
                         java.util.Optional<Playlist> opt = playlistService.getPlaylistById(item.getBelongsToPlaylist());
                         if (opt.isPresent()) {
