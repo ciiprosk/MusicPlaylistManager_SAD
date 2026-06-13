@@ -12,27 +12,29 @@ public class ShuffleMode implements PlayMode {
 
     @Override
     public Optional<QueueItem> nextItem(List<QueueItem> queue, QueueItem currentItem) {
-
         if (queue.isEmpty())
             return Optional.empty();
 
         int currentIndex = queue.indexOf(currentItem);
 
+        // Consuma il brano corrente
         if (currentIndex != -1) {
-            // Rimuovi il brano corrente dalla coda
             queue.remove(currentIndex);
         }
 
-        // Se la coda è vuota dopo la rimozione, la riproduzione è finita
         if (queue.isEmpty())
             return Optional.empty();
 
-        // Scegli un indice casuale tra i brani rimanenti
+        // Pesca a caso tra i rimanenti
         int randomIndex = random.nextInt(queue.size());
+        QueueItem next = queue.get(randomIndex);
 
-        return Optional.of(queue.get(randomIndex));
+        // Porta il prossimo in testa: così il corrente è SEMPRE a indice 0
+        // ed è questo che fa funzionare il filtro della vista (mostra tutto dopo lo 0)
+        queue.remove(randomIndex);
+        queue.add(0, next);
 
-
+        return Optional.of(next);
     }
 
     @Override

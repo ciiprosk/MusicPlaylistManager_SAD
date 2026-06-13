@@ -31,6 +31,7 @@ public class QueueViewController {
                 super.updateItem(item, empty);
                 if (empty || item == null) {
                     setText(null);
+                    setGraphic(null);
                 } else {
                     Track track = (Track) item.getPlayable();
                     String display = track.getTitle() + " - " + track.getAuthor();
@@ -41,8 +42,6 @@ public class QueueViewController {
                         }
                     }
                     setText(display);
-                    // Applicare stili per renderlo visibile su sfondo scuro
-                    setStyle("-fx-text-fill: white; -fx-font-size: 14px; -fx-background-color: #2b2b2b; -fx-border-color: #333333; -fx-border-width: 0 0 1 0;");
                 }
             }
         });
@@ -58,7 +57,9 @@ public class QueueViewController {
     public void setQueueService(QueueService queueService) {
         this.queueService = queueService;
         if (this.queueService != null && this.queueListView != null) {
-            this.queueListView.setItems(this.queueService.getQueueList());
+            this.filteredQueue = new FilteredList<>(this.queueService.getQueueList(), item -> true);
+            this.queueListView.setItems(this.filteredQueue);   // ← la lista filtrata, non quella grezza
+            refreshQueueFilter();
         }
     }
 
@@ -70,15 +71,27 @@ public class QueueViewController {
             // Aggiunge il listener per i futuri cambiamenti
             this.playerService.currentTrackProperty().addListener((observable, oldValue, newValue) -> {
                 updateCurrentTrackLabel(newValue);
+                refreshQueueFilter();
             });
         }
     }
 
     private void updateCurrentTrackLabel(Track track) {
-        if (track == null || !playerService.isPlayingProperty().get()) {
+        if (track == null) {
             labelCurrentTrack.setText("No Track Playing");
         } else {
             labelCurrentTrack.setText(track.getTitle() + " - " + track.getAuthor());
         }
+    }
+
+    private void refreshQueueFilter() {
+        if (filteredQueue == null) return;
+        javafx.collections.ObservableList<QueueItem> source = queueService.getQueueList();
+        filteredQueue.setPredicate(item -> {
+            QueueItem current = queueService.getCurrentItem();
+            int currentIndex = (current == null) ? -1 : source.indexOf(current);
+            return source.indexOf(item) > currentIndex;   // solo le prossime
+        });
+        javafx.application.Platform.runLater(() -> queueListView.refresh());
     }
 }

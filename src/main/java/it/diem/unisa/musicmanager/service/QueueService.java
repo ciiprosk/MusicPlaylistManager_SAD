@@ -103,22 +103,31 @@ public class QueueService implements TrackObserver {
         return currentItem;
     }
 
-    
+
 
     public QueueItem skipCurrentPlaylist(){
-        //se l'oggetto corrente è null o non appartiene a una playlist allora prosegue con il prossimo item
+        // se il corrente non appartiene a una playlist, è un semplice next
         if (currentItem == null || currentItem.getBelongsToPlaylist() == null) return nextItem();
-        //se sono qui vuol dire che l'oggetto corrente appartiene a una playlist
 
         UUID playlistID = currentItem.getBelongsToPlaylist();
-        UUID groupPlaylistID = currentItem.getPlaylistProgressive();
+        UUID groupID = currentItem.getPlaylistProgressive();
 
-        QueueItem next = nextItem();
-        while(next != null && groupPlaylistID.equals(next.getPlaylistProgressive()) && groupPlaylistID !=null && playlistID.equals(next.getBelongsToPlaylist())){
-            next = nextItem();
+        // Rimuovi dalla coda OGNI item di questo gruppo, ovunque si trovi (anche sparpagliati da shuffle)
+        sharedState.getQueue().removeIf(item ->
+                groupID != null
+                        && groupID.equals(item.getPlaylistProgressive())
+                        && playlistID.equals(item.getBelongsToPlaylist())
+        );
+
+        // Il corrente era del gruppo: l'abbiamo appena tolto, quindi azzeriamo il cursore
+        currentItem = null;
+
+        // Coda finita dopo aver tolto la playlist? Niente next, nessuna eccezione.
+        if (sharedState.getQueue().isEmpty()) {
+            return null;
         }
 
-        return next;
+        return nextItem();
     }
 
     //il metodo dev evedere se la tracci asu cui è stato fatto play appartiene a una playlist (sono in detailedPlaylist)
@@ -126,7 +135,8 @@ public class QueueService implements TrackObserver {
     public QueueItem queuePlaylistFromTrack(Playable playable, Track trackInPlaylist){
         if(playable == null || trackInPlaylist == null) return null;
 
-        getQueueList().clear(); //ripulisce la coda
+        //getQueueList().clear(); //ripulisce la coda
+        clearQueue();
         addToQueue(playable); // metto turtta la playlst in coda ma devo togliere le precedenti a wurrlla che tsa andando play
 
         QueueItem queueItem = nextItem();
@@ -157,6 +167,11 @@ public class QueueService implements TrackObserver {
                 && track.getId().equals(trackId)) {
             currentItem = null;
         }
+    }
+
+    /** Restituisce il prossimo item SENZA avanzare il cursore. Per la sola visualizzazione. */
+    public QueueItem peekNext(){
+        return playMode.nextItem(getQueueList(), currentItem).orElse(null);
     }
 
 }

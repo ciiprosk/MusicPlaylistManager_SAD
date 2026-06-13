@@ -109,13 +109,15 @@ public class PlaylistCardController {
             // 3. AGGIORNAMENTO CRUCIALE: Forziamo il player a suonare DIRETTAMENTE la prima traccia.
             // Passando true come terzo parametro (forceRestart), indichiamo al PlayerService di
             // stoppare immediatamente la vecchia canzone e avviare la nuova senza esitazioni.
-            playerService.play(firstTrack, false, true);
+            //playerService.play(firstTrack, false, true);
 
             // 4. Allineiamo la coda indicando qual è il brano attualmente in riproduzione
-            queueService.setCurrentItem(queueService.getQueueList().isEmpty() ? null : queueService.getQueueList().get(0));
+            //queueService.setCurrentItem(queueService.getQueueList().isEmpty() ? null : queueService.getQueueList().get(0));
+            playerService.next();
         } else {
             // Fallback di sicurezza nel caso in cui il QueueService non fosse iniettato
-            playerService.play(firstTrack, false, true);
+            //playerService.play(firstTrack, false, true);
+            playerService.play(playlist.getTracksList().get(0), false, true);
         }
     }
 
@@ -168,9 +170,21 @@ public class PlaylistCardController {
                 queueService.addToQueue(playlist);
                 it.diem.unisa.musicmanager.util.AlertUtil.showInfo("Coda aggiornata", "La playlist '" + playlist.getName() + "' è stata aggiunta alla coda di riproduzione!");
             }
-        } );
-        menu.getItems().addAll(detailItem, modifyItem, deleteItem);
+        });
+
+        menu.getItems().addAll(detailItem, modifyItem, deleteItem, addQueueItem);  // ← addQueueItem ora c'è
+
         menu.show(btnMenu, Side.BOTTOM, 0, 0);
+
+
+        // Aggancia lo stylesheet al popup DOPO lo show (prima getScene() è null).
+        // Il guard evita il crash se il path non viene trovato: in quel caso il menu
+        // si apre comunque, solo senza stile.
+        var cssUrl = getClass().getResource("/it.diem.unisa/css/style.css");
+        if (cssUrl != null) {
+            menu.getScene().getStylesheets().add(cssUrl.toExternalForm());
+        }
+
     }
 
     private void openEditPlaylist() {

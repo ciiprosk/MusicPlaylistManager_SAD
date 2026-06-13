@@ -1010,15 +1010,34 @@
     -fx-text-fill: white;
 }
 
-/* Classe che si attiva quando la playlist è in riproduzione */
-.playlist-card-playing {
-    -fx-background-color: linear-gradient(to right, #1db954, #191414); /* Sfumatura Verde Spotify -> Sfondo scuro */
-    -fx-border-color: #1db954; /* Bordino verde neon */
-    -fx-border-width: 1px;
-    -fx-effect: dropshadow(three-pass-box, rgba(29, 185, 84, 0.3), 10, 0, 0, 0); /* Bagliore verde esterno */
+/* la finestrina che si apre */
+.context-menu {
+    -fx-background-color: #2b2b2b;
+    -fx-background-radius: 8;
+    -fx-padding: 6;
+    -fx-border-color: #3a3a3a;
+    -fx-border-radius: 8;
+    -fx-border-width: 1;
+    /* ombra per staccarlo dallo sfondo */
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 12, 0.2, 0, 4);
 }
 
-/* Opzionale: se vuoi far brillare di verde anche il testo del titolo quando suona */
-.playlist-card-playing .titolo-playlist {
-    -fx-text-fill: #1db954;
+/* ogni voce del menu */
+.context-menu .menu-item {
+    -fx-padding: 8 16 8 16;
+    -fx-background-radius: 5;
+}
+
+/* il testo della voce */
+.context-menu .menu-item .label {
+    -fx-text-fill: #e0e0e0;
+    -fx-font-size: 13px;
+}
+
+/* voce sotto il cursore / selezionata */
+.context-menu .menu-item:focused {
+    -fx-background-color: #1db954;   /* il tuo verde */
+}
+.context-menu .menu-item:focused .label {
+    -fx-text-fill: white;
 }
