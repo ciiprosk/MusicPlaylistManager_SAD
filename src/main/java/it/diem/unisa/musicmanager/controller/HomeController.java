@@ -17,6 +17,7 @@ import java.io.IOException;import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import java.util.List;
 import javafx.scene.layout.FlowPane;
+import it.diem.unisa.musicmanager.command.CommandManager;
 /**
  * Controller responsible for managing the behavior of the Home view.
  *
@@ -40,6 +41,7 @@ public class HomeController {
     private  PlayerService playerService;
     private  PlaylistService playlistService;
     private QueueService queueService;
+    private CommandManager commandManager;
 
     @FXML
     public void initialize() {
@@ -78,6 +80,11 @@ public class HomeController {
 
     public void setQueueService(QueueService queueService) {
         this.queueService = queueService;
+    }
+
+    public void setCommandManager(CommandManager commandManager) {
+        this.commandManager = commandManager;
+        loadTopPlaylists();
     }
 
     private void createTrackListener() {
@@ -166,6 +173,7 @@ public class HomeController {
         if (playlistService == null
                 || trackService == null
                 || playerService == null
+                || commandManager == null
                 || topPlaylistsContainer == null) {
             return;
         }
@@ -198,6 +206,8 @@ public class HomeController {
                 controller.setPlayerService(playerService);
                 controller.setQueueService(queueService);
                 controller.setPlaylist(playlist);
+                controller.setCommandManager(commandManager);
+
 
                 topPlaylistsContainer.getChildren().add(card);
 
