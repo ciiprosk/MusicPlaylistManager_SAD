@@ -25,6 +25,9 @@ import javafx.stage.Modality;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import it.diem.unisa.musicmanager.command.CommandManager;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -56,6 +59,8 @@ public class DetailedPlaylistController {
     private QueueService queueService;
     private boolean isTrackListenerAttached = false;
     private CommandManager commandManager;
+    private Track draggedTrack;
+
     /**
      * Chiamato automaticamente da JavaFX appena la schermata e' pronta.
      * Definisce come mostrare ogni traccia: titolo, autore e durata.
@@ -147,6 +152,63 @@ public class DetailedPlaylistController {
 
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/it/diem/unisa/musicmanager/components/trackRow.fxml"));
                 HBox row = loader.load();
+
+                row.setOnDragDetected(event -> {
+                    draggedTrack = track;
+
+                    Dragboard dragboard = row.startDragAndDrop(TransferMode.MOVE);
+                    ClipboardContent content = new ClipboardContent();
+                    content.putString(track.getId().toString());
+                    dragboard.setContent(content);
+
+                    event.consume();
+                });
+
+                row.setOnDragOver(event -> {
+                    if (draggedTrack != null
+                            && !draggedTrack.getId().equals(track.getId())) {
+                        event.acceptTransferModes(TransferMode.MOVE);
+                    }
+
+                    event.consume();
+                });
+
+                row.setOnDragDropped(event -> {
+                    boolean completed = false;
+
+                    if (draggedTrack != null
+                            && playlist != null
+                            && playlistService != null) {
+
+                        int fromIndex =
+                                playlist.getTracksList().indexOf(draggedTrack);
+
+                        int toIndex =
+                                playlist.getTracksList().indexOf(track);
+
+                        if (fromIndex >= 0
+                                && toIndex >= 0
+                                && fromIndex != toIndex) {
+
+                            playlistService.moveTrackInPlaylist(
+                                    playlist.getId(),
+                                    fromIndex,
+                                    toIndex
+                            );
+
+                            loadTracks();
+                            completed = true;
+                        }
+                    }
+
+                    event.setDropCompleted(completed);
+                    event.consume();
+                });
+
+                row.setOnDragDone(event -> {
+                    draggedTrack = null;
+                    event.consume();
+                });
 
                 RowTrackController controller = loader.getController();
                 controller.setTrack(updatedTrack);

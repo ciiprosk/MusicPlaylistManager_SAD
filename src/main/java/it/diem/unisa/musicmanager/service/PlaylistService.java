@@ -192,6 +192,44 @@ public class PlaylistService implements TrackObserver{
     }
 
     /**
+     * Sposta una traccia da una posizione a un'altra all'interno di una playlist.
+     * Il nuovo ordine viene salvato nel file JSON e aggiornato nello SharedState.
+     *
+     * @param playlistID identificatore della playlist da modificare
+     * @param fromIndex posizione iniziale della traccia
+     * @param toIndex nuova posizione della traccia
+     */
+    public void moveTrackInPlaylist(
+            UUID playlistID,
+            int fromIndex,
+            int toIndex
+    ) {
+        Playlist playlist = sharedState.getALlPlaylists()
+                .stream()
+                .filter(p -> p.getId().equals(playlistID))
+                .findFirst()
+                .orElseThrow(() ->
+                        new PlaylistInfoException("Playlist not found")
+                );
+
+        int numberOfTracks =
+                playlist.getTracksList().size();
+
+        if (fromIndex < 0
+                || fromIndex >= numberOfTracks
+                || toIndex < 0
+                || toIndex >= numberOfTracks
+                || fromIndex == toIndex) {
+            return;
+        }
+
+        playlist.moveTrack(fromIndex, toIndex);
+
+        playlistDAO.update(playlist);
+        updateInState(playlist);
+    }
+
+    /**
      * Cerca le playlist il cui nome contiene la parola chiave specificata.
      * La ricerca non è sensibile alle lettere maiuscole o minuscole (case-insensitive).
      * Se la parola chiave è nulla, vuota o composta solo da spazi, viene restituita

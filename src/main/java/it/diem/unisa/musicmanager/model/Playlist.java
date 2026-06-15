@@ -215,6 +215,35 @@ public class Playlist implements Playable{
     }
 
     /**
+     * Sposta una traccia da una posizione a un'altra all'interno della playlist.
+     * Mantiene sincronizzate sia la lista degli UUID usata per la persistenza,
+     * sia la lista degli oggetti Track usata a runtime.
+     *
+     * @param fromIndex indice iniziale della traccia
+     * @param toIndex indice finale della traccia
+     */
+    public void moveTrack(int fromIndex, int toIndex) {
+
+        if (trackIDs == null || tracksList == null) {
+            return;
+        }
+
+        if (fromIndex < 0
+                || fromIndex >= trackIDs.size()
+                || toIndex < 0
+                || toIndex >= trackIDs.size()
+                || fromIndex == toIndex) {
+            return;
+        }
+
+        UUID movedTrackId = trackIDs.remove(fromIndex);
+        trackIDs.add(toIndex, movedTrackId);
+
+        Track movedTrack = tracksList.remove(fromIndex);
+        tracksList.add(toIndex, movedTrack);
+    }
+
+    /**
      * Ritorna la lista degli oggetti Track reali contenuti nella playlist.
      * Questa lista è popolata in fase di caricamento dal PersistenceService.
      * @return una lista non modificabile degli oggetti Track presenti nella playlist.

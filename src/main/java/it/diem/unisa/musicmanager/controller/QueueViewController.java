@@ -10,6 +10,9 @@ import javafx.fxml.FXML;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.collections.transformation.FilteredList;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
 
 public class QueueViewController {
 
@@ -22,28 +25,126 @@ public class QueueViewController {
     private PlaylistService playlistService;
     private it.diem.unisa.musicmanager.service.PlayerService playerService;
     private FilteredList<QueueItem> filteredQueue;
+    private QueueItem draggedQueueItem;
 
     @FXML
     public void initialize() {
-        queueListView.setCellFactory(param -> new ListCell<>() {
-            @Override
-            protected void updateItem(QueueItem item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                    setGraphic(null);
-                } else {
-                    Track track = (Track) item.getPlayable();
-                    String display = track.getTitle() + " - " + track.getAuthor();
-                    if (item.getBelongsToPlaylist() != null && playlistService != null) {
-                        java.util.Optional<Playlist> opt = playlistService.getPlaylistById(item.getBelongsToPlaylist());
+
+        queueListView.setCellFactory(param -> {
+            ListCell<QueueItem> cell = new ListCell<>() {
+
+                @Override
+                protected void updateItem(
+                        QueueItem item,
+                        boolean empty
+                ) {
+                    super.updateItem(item, empty);
+
+                    if (empty || item == null) {
+                        setText(null);
+                        setGraphic(null);
+                        return;
+                    }
+
+                    if (!(item.getPlayable() instanceof Track track)) {
+                        setText(null);
+                        setGraphic(null);
+                        return;
+                    }
+
+                    String display =
+                            track.getTitle()
+                                    + " - "
+                                    + track.getAuthor();
+
+                    if (item.getBelongsToPlaylist() != null
+                            && playlistService != null) {
+
+                        java.util.Optional<Playlist> opt =
+                                playlistService.getPlaylistById(
+                                        item.getBelongsToPlaylist()
+                                );
+
                         if (opt.isPresent()) {
-                            display += " (from Playlist: " + opt.get().getName() + ")";
+                            display +=
+                                    " (from Playlist: "
+                                            + opt.get().getName()
+                                            + ")";
                         }
                     }
+
                     setText(display);
                 }
-            }
+            };
+
+            cell.setOnDragDetected(event -> {
+                if (cell.isEmpty() || cell.getItem() == null) {
+                    return;
+                }
+
+                draggedQueueItem = cell.getItem();
+
+                Dragboard dragboard =
+                        cell.startDragAndDrop(TransferMode.MOVE);
+
+                ClipboardContent content =
+                        new ClipboardContent();
+
+                content.putString(
+                        draggedQueueItem
+                                .getPlayable()
+                                .getId()
+                                .toString()
+                );
+
+                dragboard.setContent(content);
+                event.consume();
+            });
+
+            cell.setOnDragOver(event -> {
+                if (draggedQueueItem != null
+                        && !cell.isEmpty()
+                        && cell.getItem() != null
+                        && cell.getItem() != draggedQueueItem) {
+
+                    event.acceptTransferModes(
+                            TransferMode.MOVE
+                    );
+                }
+
+                event.consume();
+            });
+
+            cell.setOnDragDropped(event -> {
+                boolean completed = false;
+
+                QueueItem targetItem =
+                        cell.getItem();
+
+                if (draggedQueueItem != null
+                        && targetItem != null
+                        && queueService != null
+                        && draggedQueueItem != targetItem) {
+
+                    queueService.moveQueueItem(
+                            draggedQueueItem,
+                            targetItem
+                    );
+
+                    refreshQueueFilter();
+                    completed = true;
+                }
+
+                event.setDropCompleted(completed);
+                event.consume();
+            });
+
+            cell.setOnDragDone(event -> {
+                draggedQueueItem = null;
+                event.consume();
+            });
+
+            return cell;
         });
     }
 
@@ -56,9 +157,29 @@ public class QueueViewController {
 
     public void setQueueService(QueueService queueService) {
         this.queueService = queueService;
+
         if (this.queueService != null && this.queueListView != null) {
-            this.filteredQueue = new FilteredList<>(this.queueService.getQueueList(), item -> true);
-            this.queueListView.setItems(this.filteredQueue);   // ← la lista filtrata, non quella grezza
+            this.filteredQueue = new FilteredList<>(
+                    this.queueService.getQueueList(),
+                    item -> true
+            );
+
+            this.queueListView.setItems(filteredQueue);
+
+            this.queueService.getQueueList().addListener(
+                    (ListChangeListener<QueueItem>) change ->
+                            refreshQueueFilter()
+            );
+
+            /*
+             * Fondamentale quando la traccia successiva è uguale a quella corrente:
+             * currentTrackProperty potrebbe non cambiare, mentre currentItem cambia.
+             */
+            this.queueService.currentItemProperty().addListener(
+                    (observable, oldItem, newItem) ->
+                            refreshQueueFilter()
+            );
+
             refreshQueueFilter();
         }
     }

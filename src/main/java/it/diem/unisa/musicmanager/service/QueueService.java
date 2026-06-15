@@ -5,6 +5,9 @@ import it.diem.unisa.musicmanager.model.*;
 import it.diem.unisa.musicmanager.playmode.PlayMode;
 import it.diem.unisa.musicmanager.playmode.SequentialMode;
 import it.diem.unisa.musicmanager.state.SharedState;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 
 import java.util.*;
 
@@ -16,7 +19,8 @@ import java.util.*;
 public class QueueService implements TrackObserver {
     //deve prendere una track e impacchettarli in unqueue item
     private final SharedState sharedState;
-    private QueueItem currentItem;
+    private final ObjectProperty<QueueItem> currentItem =
+            new SimpleObjectProperty<>(null);
     private PlayMode playMode;
 
     public QueueService(SharedState sharedState) {
@@ -54,11 +58,15 @@ public class QueueService implements TrackObserver {
     }
 
     //la classe deve imple,enatre la logica del singolo item della coda
-    public void setCurrentItem(QueueItem queueItem){
-        this.currentItem = queueItem;
+    public void setCurrentItem(QueueItem queueItem) {
+        currentItem.set(queueItem);
     }
 
-    public QueueItem getCurrentItem(){
+    public QueueItem getCurrentItem() {
+        return currentItem.get();
+    }
+
+    public ReadOnlyObjectProperty<QueueItem> currentItemProperty() {
         return currentItem;
     }
 
@@ -67,7 +75,7 @@ public class QueueService implements TrackObserver {
     }
 
     public boolean hasNext() {
-        return playMode.hasNext(getQueueList(), currentItem);
+        return playMode.hasNext(getQueueList(), getCurrentItem());
     }
 
     /**
@@ -77,7 +85,7 @@ public class QueueService implements TrackObserver {
      */
     public void clearQueue() {
         sharedState.getQueue().clear();
-        currentItem = null;
+        setCurrentItem(null);
     }
 
     public void setCurrentPlayMode(PlayMode playMode){
@@ -89,40 +97,42 @@ public class QueueService implements TrackObserver {
      * dall'interfaccia secodndo il metodo di riporduzione.
      * @return
      */
-    public QueueItem nextItem(){
-        //il metodo chiede allo strategy quale deve essere il porssimo item
-        //perprima cosa gli passo allo startegy la mia coda attuale
+    public QueueItem nextItem() {
+        Optional<QueueItem> optionalItem =
+                playMode.nextItem(
+                        sharedState.getQueue(),
+                        getCurrentItem()
+                );
 
-        Optional<QueueItem> optionalItem= playMode.nextItem(sharedState.getQueue(),currentItem );
-
-        if (!optionalItem.isPresent())
+        if (optionalItem.isEmpty()) {
             throw new QueueException("The Queue is Empty.");
+        }
 
-        this.currentItem = optionalItem.get();
+        setCurrentItem(optionalItem.get());
 
-        return currentItem;
+        return getCurrentItem();
     }
 
 
 
-    public QueueItem skipCurrentPlaylist(){
-        // se il corrente non appartiene a una playlist, è un semplice next
-        if (currentItem == null || currentItem.getBelongsToPlaylist() == null) return nextItem();
+    public QueueItem skipCurrentPlaylist() {
+        QueueItem current = getCurrentItem();
 
-        UUID playlistID = currentItem.getBelongsToPlaylist();
-        UUID groupID = currentItem.getPlaylistProgressive();
+        if (current == null || current.getBelongsToPlaylist() == null) {
+            return nextItem();
+        }
 
-        // Rimuovi dalla coda OGNI item di questo gruppo, ovunque si trovi (anche sparpagliati da shuffle)
+        UUID playlistID = current.getBelongsToPlaylist();
+        UUID groupID = current.getPlaylistProgressive();
+
         sharedState.getQueue().removeIf(item ->
                 groupID != null
                         && groupID.equals(item.getPlaylistProgressive())
                         && playlistID.equals(item.getBelongsToPlaylist())
         );
 
-        // Il corrente era del gruppo: l'abbiamo appena tolto, quindi azzeriamo il cursore
-        currentItem = null;
+        setCurrentItem(null);
 
-        // Coda finita dopo aver tolto la playlist? Niente next, nessuna eccezione.
         if (sharedState.getQueue().isEmpty()) {
             return null;
         }
@@ -152,7 +162,6 @@ public class QueueService implements TrackObserver {
 
     @Override
     public void onTrackDeleted(UUID trackId) {
-
         if (trackId == null) {
             return;
         }
@@ -162,16 +171,103 @@ public class QueueService implements TrackObserver {
                         && track.getId().equals(trackId)
         );
 
-        if (currentItem != null
-                && currentItem.getPlayable() instanceof Track track
+        QueueItem current = getCurrentItem();
+
+        if (current != null
+                && current.getPlayable() instanceof Track track
                 && track.getId().equals(trackId)) {
-            currentItem = null;
+            setCurrentItem(null);
         }
     }
 
     /** Restituisce il prossimo item SENZA avanzare il cursore. Per la sola visualizzazione. */
-    public QueueItem peekNext(){
-        return playMode.nextItem(getQueueList(), currentItem).orElse(null);
+    public QueueItem peekNext() {
+        return playMode.nextItem(
+                getQueueList(),
+                getCurrentItem()
+        ).orElse(null);
     }
+
+    /**
+     * Sposta un elemento della coda in una nuova posizione.
+     *
+     * Il metodo modifica direttamente la ObservableList contenuta nello SharedState,
+     * quindi tutte le viste collegate alla coda vengono notificate automaticamente.
+     *
+     * @param item elemento della coda da spostare
+     * @param newIndex nuova posizione dell'elemento
+     */
+    public void moveQueueItem(QueueItem item, int newIndex) {
+
+        if (item == null) {
+            return;
+        }
+
+        javafx.collections.ObservableList<QueueItem> queue =
+                sharedState.getQueue();
+
+        int oldIndex = queue.indexOf(item);
+
+        if (oldIndex < 0 || queue.isEmpty()) {
+            return;
+        }
+
+        /*
+         * Il brano attualmente in riproduzione non deve essere spostato.
+         * Nella schermata "Next Tracks" normalmente non è visibile,
+         * ma questo controllo evita modifiche accidentali.
+         */
+        if (item == getCurrentItem()) {
+            return;
+        }
+
+        int safeIndex = Math.max(
+                0,
+                Math.min(newIndex, queue.size() - 1)
+        );
+
+        if (oldIndex == safeIndex) {
+            return;
+        }
+
+        queue.remove(oldIndex);
+
+        /*
+         * Dopo la rimozione la dimensione diminuisce di uno.
+         * L'indice massimo valido per l'inserimento coincide con queue.size().
+         */
+        safeIndex = Math.max(
+                0,
+                Math.min(safeIndex, queue.size())
+        );
+
+        queue.add(safeIndex, item);
+    }
+
+    /**
+     * Sposta un elemento della coda nella posizione occupata da un altro elemento.
+     * Questo metodo è particolarmente utile per il drag and drop della ListView.
+     *
+     * @param draggedItem elemento trascinato
+     * @param targetItem elemento sul quale viene rilasciato
+     */
+    public void moveQueueItem(QueueItem draggedItem, QueueItem targetItem) {
+
+        if (draggedItem == null
+                || targetItem == null
+                || draggedItem == targetItem) {
+            return;
+        }
+
+        int targetIndex =
+                sharedState.getQueue().indexOf(targetItem);
+
+        if (targetIndex < 0) {
+            return;
+        }
+
+        moveQueueItem(draggedItem, targetIndex);
+    }
+
 
 }
