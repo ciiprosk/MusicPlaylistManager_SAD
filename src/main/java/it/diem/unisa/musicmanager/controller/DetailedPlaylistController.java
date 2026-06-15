@@ -198,6 +198,10 @@ public class DetailedPlaylistController {
                                     toIndex
                             );
 
+                            if (queueService != null) {
+                                queueService.synchronizePlaylistOrder(playlist);
+                            }
+
                             loadTracks();
                             completed = true;
                         }

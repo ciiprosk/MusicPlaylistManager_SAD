@@ -189,6 +189,150 @@ public class QueueService implements TrackObserver {
     }
 
     /**
+     * Aggiorna nella coda le occorrenze di una playlist riordinata.
+     *
+     * Se la playlist è già in riproduzione, il brano corrente resta fermo
+     * e vengono riordinati solamente i brani successivi.
+     *
+     * Le altre occorrenze della playlist vengono riordinate completamente.
+     *
+     * @param playlist playlist appena riordinata
+     */
+    public void synchronizePlaylistOrder(Playlist playlist) {
+
+        if (playlist == null || playlist.getId() == null) {
+            return;
+        }
+
+        javafx.collections.ObservableList<QueueItem> queue =
+                sharedState.getQueue();
+
+        if (queue.isEmpty()) {
+            return;
+        }
+
+        QueueItem activeItem = getCurrentItem();
+
+        UUID activeGroupId = null;
+        int activeItemIndex = -1;
+
+        if (activeItem != null
+                && playlist.getId().equals(activeItem.getBelongsToPlaylist())) {
+
+            activeGroupId = activeItem.getPlaylistProgressive();
+            activeItemIndex = queue.indexOf(activeItem);
+        }
+
+        Set<UUID> playlistGroups = new LinkedHashSet<>();
+
+        for (QueueItem item : queue) {
+            if (playlist.getId().equals(item.getBelongsToPlaylist())
+                    && item.getPlaylistProgressive() != null) {
+
+                playlistGroups.add(item.getPlaylistProgressive());
+            }
+        }
+
+        for (UUID groupId : playlistGroups) {
+
+            boolean isActiveGroup =
+                    activeGroupId != null
+                            && activeGroupId.equals(groupId)
+                            && activeItemIndex >= 0;
+
+            if (isActiveGroup) {
+                reorderFutureItemsOfActiveGroup(
+                        queue,
+                        playlist,
+                        groupId,
+                        activeItemIndex
+                );
+            } else {
+                reorderEntirePlaylistGroup(
+                        queue,
+                        playlist,
+                        groupId
+                );
+            }
+        }
+    }
+
+    private void reorderFutureItemsOfActiveGroup(
+            javafx.collections.ObservableList<QueueItem> queue,
+            Playlist playlist,
+            UUID groupId,
+            int currentIndex
+    ) {
+        List<Integer> futureIndexes = new ArrayList<>();
+        List<QueueItem> futureItems = new ArrayList<>();
+
+        for (int index = currentIndex + 1; index < queue.size(); index++) {
+            QueueItem item = queue.get(index);
+
+            if (playlist.getId().equals(item.getBelongsToPlaylist())
+                    && groupId.equals(item.getPlaylistProgressive())) {
+
+                futureIndexes.add(index);
+                futureItems.add(item);
+            }
+        }
+
+        sortItemsByPlaylistOrder(futureItems, playlist);
+
+        for (int index = 0; index < futureIndexes.size(); index++) {
+            queue.set(
+                    futureIndexes.get(index),
+                    futureItems.get(index)
+            );
+        }
+    }
+
+    private void reorderEntirePlaylistGroup(
+            javafx.collections.ObservableList<QueueItem> queue,
+            Playlist playlist,
+            UUID groupId
+    ) {
+        List<Integer> groupIndexes = new ArrayList<>();
+        List<QueueItem> groupItems = new ArrayList<>();
+
+        for (int index = 0; index < queue.size(); index++) {
+            QueueItem item = queue.get(index);
+
+            if (playlist.getId().equals(item.getBelongsToPlaylist())
+                    && groupId.equals(item.getPlaylistProgressive())) {
+
+                groupIndexes.add(index);
+                groupItems.add(item);
+            }
+        }
+
+        sortItemsByPlaylistOrder(groupItems, playlist);
+
+        for (int index = 0; index < groupIndexes.size(); index++) {
+            queue.set(
+                    groupIndexes.get(index),
+                    groupItems.get(index)
+            );
+        }
+    }
+
+    private void sortItemsByPlaylistOrder(
+            List<QueueItem> items,
+            Playlist playlist
+    ) {
+        items.sort(Comparator.comparingInt(item -> {
+            UUID trackId = item.getPlayable().getId();
+
+            int playlistIndex =
+                    playlist.getTracks().indexOf(trackId);
+
+            return playlistIndex >= 0
+                    ? playlistIndex
+                    : Integer.MAX_VALUE;
+        }));
+    }
+
+    /**
      * Sposta un elemento della coda in una nuova posizione.
      *
      * Il metodo modifica direttamente la ObservableList contenuta nello SharedState,
