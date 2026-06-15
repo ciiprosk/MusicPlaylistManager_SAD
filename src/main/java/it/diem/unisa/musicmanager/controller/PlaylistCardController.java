@@ -20,6 +20,7 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import it.diem.unisa.musicmanager.command.CommandManager;
 /**
  * Controller di una card playlist (playlistCard.fxml).
  * Mostra nome e numero di tracce, e offre le azioni Play / Modifica / Menu.
@@ -43,6 +44,7 @@ public class PlaylistCardController {
 
     // La playlist mostrata da questa card.
     private Playlist playlist;
+    private CommandManager commandManager;
 
     /**
      * Imposta la playlist della card e riempie le etichette.
@@ -73,6 +75,10 @@ public class PlaylistCardController {
 
     public void setQueueService(QueueService queueService) {
         this.queueService = queueService;
+    }
+
+    public void setCommandManager(CommandManager commandManager) {
+        this.commandManager = commandManager;
     }
 
 
@@ -237,6 +243,7 @@ public class PlaylistCardController {
             ctrl.setPlayerService(playerService);
             ctrl.setQueueService(queueService);
             ctrl.setPlaylist(playlist);
+            ctrl.setCommandManager(commandManager);
 
         } catch (Exception e) {
             e.printStackTrace();

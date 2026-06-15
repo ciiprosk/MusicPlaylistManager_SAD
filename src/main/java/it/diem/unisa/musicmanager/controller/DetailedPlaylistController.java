@@ -24,6 +24,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
+import it.diem.unisa.musicmanager.command.CommandManager;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -54,7 +55,7 @@ public class DetailedPlaylistController {
     private PlayerService playerService;
     private QueueService queueService;
     private boolean isTrackListenerAttached = false;
-
+    private CommandManager commandManager;
     /**
      * Chiamato automaticamente da JavaFX appena la schermata e' pronta.
      * Definisce come mostrare ogni traccia: titolo, autore e durata.
@@ -111,7 +112,9 @@ public class DetailedPlaylistController {
     }
 
 
-
+    public void setCommandManager(CommandManager commandManager) {
+        this.commandManager = commandManager;
+    }
 
     private void updateTrackCount() {
         if (playlist == null) return;
@@ -237,6 +240,7 @@ public class DetailedPlaylistController {
             controller.setPlaylistService(playlistService);
             controller.setTrackService(trackService);
             controller.setPlaylist(playlist);
+            controller.setCommandManager(commandManager);
 
             // Quando la finestra di aggiunta salva e si chiude, rinfreschiamo la lista
             controller.setOnSaveCallback(() -> {

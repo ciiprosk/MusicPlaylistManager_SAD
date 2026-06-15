@@ -1,7 +1,9 @@
 package it.diem.unisa.musicmanager.controller;
 
+import it.diem.unisa.musicmanager.util.AlertUtil;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
+import it.diem.unisa.musicmanager.command.CommandManager;
 
 public class MainController {
 
@@ -18,6 +20,7 @@ public class MainController {
 
     private it.diem.unisa.musicmanager.service.QueueService queueService;
     private it.diem.unisa.musicmanager.service.PlaylistService playlistService;
+    private CommandManager commandManager;
 
 
     @FXML
@@ -68,6 +71,10 @@ public class MainController {
         this.playlistService = playlistService;
     }
 
+    public void setCommandManager(CommandManager commandManager) {
+        this.commandManager = commandManager;
+    }
+
     @FXML
     private void openQueue() {
         try {
@@ -97,4 +104,24 @@ public class MainController {
     public HomeController getHomePageController() {
         return homePageController;
     }
-}
+
+
+        @FXML
+        private void onUndo() {
+            if (commandManager == null || !commandManager.canUndo()) {
+                AlertUtil.showInfo("Nothing to undo", "There are no actions to undo.");
+                return;
+            }
+
+            String descrizione = commandManager.peekUndoDescription().orElse("l'ultima azione");
+
+            boolean conferma = AlertUtil.showConfirmation(
+                    "Undo",
+                    "Do you want to undo: " + descrizione + "?"
+            );
+
+            if (conferma) {
+                commandManager.undo();
+            }
+        }
+    }

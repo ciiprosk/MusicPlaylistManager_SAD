@@ -19,7 +19,7 @@
          <children>
             <Label styleClass="logo-text" text="MusicPlaylistManager" />
             <Region HBox.hgrow="ALWAYS" />
-            <Button mnemonicParsing="false" styleClass="btn-icon" text="↩" />
+            <Button mnemonicParsing="false" styleClass="btn-icon" text="↩" onAction="#onUndo" />
          </children>
       </HBox>
    </top>

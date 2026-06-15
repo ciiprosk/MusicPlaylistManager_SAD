@@ -1,5 +1,6 @@
 package it.diem.unisa.musicmanager;
 
+import it.diem.unisa.musicmanager.command.CommandManager;
 import it.diem.unisa.musicmanager.controller.MainController;
 import it.diem.unisa.musicmanager.dao.DAO;
 import it.diem.unisa.musicmanager.dao.JSONPlaylistDAO;
@@ -31,6 +32,7 @@ public class MusicPlaylistManager extends Application {
         TrackService trackService = new TrackService(trackDAO, sharedState);
         PlayerService playerService = new PlayerService();
         QueueService queueService = new QueueService(sharedState);
+        CommandManager commandManager = new CommandManager();
 
         playerService.setTrackService(trackService);
         playerService.setQueueService(queueService);
@@ -59,6 +61,7 @@ public class MusicPlaylistManager extends Application {
         MainController controller = fxmlLoader.getController();
         controller.setPlaylistService(playlistService);
         controller.setQueueService(queueService);
+        controller.setCommandManager(commandManager);
 
         // passo service a home
         controller.getHomePageController().setQueueService(queueService);
@@ -70,6 +73,7 @@ public class MusicPlaylistManager extends Application {
         controller.getPlaylistsPageController().setQueueService(queueService);
         controller.getPlaylistsPageController().setTrackService(trackService);
         controller.getPlaylistsPageController().setPlayerService(playerService);
+        controller.getPlaylistsPageController().setCommandManager(commandManager);
         controller.getPlaylistsPageController().setPlaylistService(playlistService);
         controller.getPlaylistsPageController().loadPlaylists();
 

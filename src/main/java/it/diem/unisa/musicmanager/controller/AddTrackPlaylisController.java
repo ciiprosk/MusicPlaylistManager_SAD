@@ -1,5 +1,8 @@
 package it.diem.unisa.musicmanager.controller;
 
+import it.diem.unisa.musicmanager.command.AddTrackToPlaylistCommand;
+import it.diem.unisa.musicmanager.command.Command;
+import it.diem.unisa.musicmanager.command.RemoveTrackFromPlaylistCommand;
 import it.diem.unisa.musicmanager.model.Playlist;
 import it.diem.unisa.musicmanager.model.Track;
 import it.diem.unisa.musicmanager.service.PlaylistService;
@@ -12,6 +15,7 @@ import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import it.diem.unisa.musicmanager.command.CommandManager;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -22,6 +26,7 @@ public class AddTrackPlaylisController {
     private Playlist playlist;
     private PlaylistService playlistService;
     private TrackService trackService;
+    private CommandManager commandManager;
 
     private List<RowTrackController> rowControllers = new ArrayList<>();
     @FXML private VBox trackList;
@@ -31,10 +36,20 @@ public class AddTrackPlaylisController {
         for (RowTrackController controller : rowControllers) {
             Track track = controller.getTrack();
 
-            if(controller.isSelected()){
-                playlistService.addTrackToPlaylist(playlist.getId(), track.getId());
-            }else{
-                playlistService.removeTrackFromPlaylist(playlist.getId(), track.getId());
+            boolean wasInPlaylist = playlist.containsTrack(track.getId());
+            boolean isSelectedNow = controller.isSelected();
+
+            if (isSelectedNow && !wasInPlaylist) {
+                Command cmd = new AddTrackToPlaylistCommand(
+                        playlistService, playlist.getId(), track.getId(),
+                        track.getTitle(), playlist.getName());        // ← due nomi in più
+                commandManager.executeCommand(cmd);
+
+            } else if (!isSelectedNow && wasInPlaylist) {
+                Command cmd = new RemoveTrackFromPlaylistCommand(
+                        playlistService, playlist.getId(), track.getId(),
+                        track.getTitle(), playlist.getName());        // ← due nomi in più
+                commandManager.executeCommand(cmd);
             }
         }
         WindowUtil.close((Node) actionEvent.getSource());
@@ -63,6 +78,9 @@ public class AddTrackPlaylisController {
     public void setTrackService(TrackService trackService) {
         this.trackService = trackService;
         checkLoading();
+    }
+    public void setCommandManager(CommandManager commandManager) {
+        this.commandManager = commandManager;
     }
 
     private void checkLoading(){

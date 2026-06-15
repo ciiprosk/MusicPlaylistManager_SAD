@@ -18,6 +18,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.FlowPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import it.diem.unisa.musicmanager.command.CommandManager;
 
 import java.io.IOException;
 
@@ -37,6 +38,7 @@ public class PlaylistController {
     private TrackService trackService;
     private QueueService queueService;
     private boolean isListenerAttached = false;
+    private CommandManager commandManager;
 
     @FXML
     public void initialize() throws IOException {
@@ -109,6 +111,11 @@ public class PlaylistController {
         checkReadyAndLoad();
     }
 
+    public void setCommandManager(CommandManager commandManager) {
+        this.commandManager = commandManager;
+        checkReadyAndLoad();
+    }
+
     /**
      * Carica le playlist dal service e le mostra come card.
      * @throws IOException
@@ -155,6 +162,7 @@ public class PlaylistController {
         controller.setPlayerService(playerService);
         controller.setQueueService(queueService);
         controller.setPlaylist(playlist); //gli passo la playlist ddi cui creare la card
+        controller.setCommandManager(commandManager);
 
         return card;
     }
@@ -171,5 +179,7 @@ public class PlaylistController {
     public void setQueueService(QueueService queueService) {
         this.queueService = queueService;
     }
+
+
 
 }
