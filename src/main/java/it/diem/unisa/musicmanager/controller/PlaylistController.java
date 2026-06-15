@@ -73,6 +73,7 @@ public class PlaylistController {
             // gli passiamo il service qui
             AddPlaylistController controller = loader.getController();
             controller.setPlaylistService(playlistService);
+            controller.setCommandManager(commandManager);
         } catch (Exception e) {
             e.printStackTrace();
         }

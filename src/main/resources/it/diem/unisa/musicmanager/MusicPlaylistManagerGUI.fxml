@@ -35,9 +35,9 @@
                   <Insets bottom="10.0" />
                </padding>
             </Label>
-            <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#openHome" styleClass="btn-menu" text="🏠 Home" alignment="BASELINE_LEFT" />
-            <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#openTracks" styleClass="btn-menu" text="🎵 Tracks" alignment="BASELINE_LEFT" />
-            <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#openPlaylists" styleClass="btn-menu" text="🎶 Playlists" alignment="BASELINE_LEFT" />
+            <Button fx:id="btnHome" maxWidth="Infinity" mnemonicParsing="false" onAction="#openHome" styleClass="btn-menu" text="🏠 Home" alignment="BASELINE_LEFT" />
+            <Button fx:id="btnTracks" maxWidth="Infinity" mnemonicParsing="false" onAction="#openTracks" styleClass="btn-menu" text="🎵 Tracks" alignment="BASELINE_LEFT" />
+            <Button fx:id="btnPlaylists" maxWidth="Infinity" mnemonicParsing="false" onAction="#openPlaylists" styleClass="btn-menu" text="🎶 Playlists" alignment="BASELINE_LEFT" />
          </children>
       </VBox>
    </left>

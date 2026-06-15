@@ -4,6 +4,7 @@ import it.diem.unisa.musicmanager.util.AlertUtil;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import it.diem.unisa.musicmanager.command.CommandManager;
+import javafx.scene.control.Button;
 
 public class MainController {
 
@@ -11,6 +12,9 @@ public class MainController {
     @FXML private Node homePage;
     @FXML private Node tracksPage;
     @FXML private Node playlistsPage;
+    @FXML private Button btnHome;
+    @FXML private Button btnTracks;
+    @FXML private Button btnPlaylists;
 
 
     @FXML private PlaylistController playlistsPageController;
@@ -26,6 +30,7 @@ public class MainController {
     @FXML
     public void initialize() {
         showPage(homePage);
+        setActiveMenu(btnHome);
     }
 
     @FXML
@@ -36,16 +41,19 @@ public class MainController {
         }
 
         showPage(homePage);
+        setActiveMenu(btnHome);
     }
 
     @FXML
     private void openTracks() {
         showPage(tracksPage);
+        setActiveMenu(btnTracks);
     }
 
     @FXML
     private void openPlaylists() {
         showPage(playlistsPage);
+        setActiveMenu(btnPlaylists);
     }
 
     private void showPage(Node pageToShow) {
@@ -56,6 +64,15 @@ public class MainController {
         if (pageToShow != null) {
             pageToShow.setVisible(true);
             pageToShow.toFront();
+        }
+    }
+
+    private void setActiveMenu(Button active) {
+        btnHome.getStyleClass().remove("btn-menu-active");
+        btnTracks.getStyleClass().remove("btn-menu-active");
+        btnPlaylists.getStyleClass().remove("btn-menu-active");
+        if (!active.getStyleClass().contains("btn-menu-active")) {
+            active.getStyleClass().add("btn-menu-active");
         }
     }
 

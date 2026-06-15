@@ -398,4 +398,31 @@ public class PlaylistService implements TrackObserver{
                 .limit(5)
                 .toList();
     }
+
+    /**
+     * Come createPlaylist, ma restituisce la playlist creata (per il pattern Command).
+     * @return la Playlist creata, oppure null se il nome è duplicato o invalido.
+     */
+    public Playlist createPlaylistReturning(String name) {
+        try {
+            Playlist playlist = new Playlist(name);
+            if (playlistDAO.isDuplicated(playlist)) {
+                return null;
+            }
+            playlistDAO.insert(playlist);
+            sharedState.getALlPlaylists().add(playlist);
+            return playlist;
+        } catch (PlaylistInfoException e) {
+            return null;
+        }
+    }
+    /**
+     * Reinserisce una playlist già costruita (con il suo id e le sue tracce),
+     * usato per annullare una cancellazione.
+     */
+    public void restorePlaylist(Playlist playlist) {
+        if (playlist == null) return;
+        playlistDAO.insert(playlist);
+        sharedState.getALlPlaylists().add(playlist);
+    }
 }

@@ -1,5 +1,7 @@
 package it.diem.unisa.musicmanager.controller;
 
+import it.diem.unisa.musicmanager.command.Command;
+import it.diem.unisa.musicmanager.command.DeletePlaylistCommand;
 import it.diem.unisa.musicmanager.model.Playlist;
 //import it.diem.unisa.musicmanager.service.PlaylistService;
 //import it.diem.unisa.musicmanager.service.TrackService;
@@ -402,7 +404,8 @@ public class DetailedPlaylistController {
 
         confirm.showAndWait().ifPresent(btn -> {
             if (btn == ButtonType.YES) {
-                playlistService.deletePlaylist(playlist.getId());
+                Command cmd = new DeletePlaylistCommand(playlistService, playlist.getId());
+                commandManager.executeCommand(cmd);
             }
         });
     }

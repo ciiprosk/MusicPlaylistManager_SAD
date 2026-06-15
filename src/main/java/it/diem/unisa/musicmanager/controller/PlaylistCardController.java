@@ -14,6 +14,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.scene.control.ContextMenu;
@@ -21,6 +22,14 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import it.diem.unisa.musicmanager.command.CommandManager;
+import it.diem.unisa.musicmanager.command.Command;
+import it.diem.unisa.musicmanager.command.DeletePlaylistCommand;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.WeakChangeListener;
+import it.diem.unisa.musicmanager.model.QueueItem;
+
+
+
 /**
  * Controller di una card playlist (playlistCard.fxml).
  * Mostra nome e numero di tracce, e offre le azioni Play / Modifica / Menu.
@@ -35,16 +44,27 @@ public class PlaylistCardController {
     private QueueService queueService;
 
 
-    @FXML private Label labelName;
-    @FXML private Label labelTracks;
-    @FXML private Label labelPlayCount;
-    @FXML private Button btnPlay;
-    @FXML private Button btnModify;
-    @FXML private Button btnMenu;
+    @FXML
+    private Label labelName;
+    @FXML
+    private Label labelTracks;
+    @FXML
+    private Label labelPlayCount;
+    @FXML
+    private Button btnPlay;
+    @FXML
+    private Button btnModify;
+    @FXML
+    private Button btnMenu;
+    @FXML
+    private VBox rootCard;
 
     // La playlist mostrata da questa card.
     private Playlist playlist;
     private CommandManager commandManager;
+    private boolean isListenerAttached = false;
+
+    private final ChangeListener<Object> playbackListener = (o, ov, nv) -> updatePlayingStyle();
 
     /**
      * Imposta la playlist della card e riempie le etichette.
@@ -59,22 +79,30 @@ public class PlaylistCardController {
         if (labelPlayCount != null) {
             labelPlayCount.setText(playlist.getPlayCount() + (playlist.getPlayCount() == 1 ? " Play" : " Plays"));
         }
+        updatePlayingStyle();
     }
 
     public void setPlaylistService(PlaylistService playlistService) {
         this.playlistService = playlistService;
     }
+
     public void setTrackService(TrackService trackService) {
         this.trackService = trackService;
     }
 
     public void setPlayerService(PlayerService playerService) {
         this.playerService = playerService;
-
+        if (!isListenerAttached && playerService != null) {
+            playerService.currentTrackProperty().addListener(new WeakChangeListener<>(playbackListener));
+            playerService.isPlayingProperty().addListener(new WeakChangeListener<>(playbackListener));
+            isListenerAttached = true;
+        }
+        updatePlayingStyle();
     }
 
     public void setQueueService(QueueService queueService) {
         this.queueService = queueService;
+        updatePlayingStyle();
     }
 
     public void setCommandManager(CommandManager commandManager) {
@@ -94,6 +122,22 @@ public class PlaylistCardController {
     private void handlePlay() {
         // Controllo di sicurezza per evitare crash se i dati non sono pronti
         if (playlist == null || playlist.getTracksList().isEmpty() || playerService == null) {
+            return;
+        }
+
+        // Se sto già suonando QUESTA playlist (stesso belongsToPlaylist nel currentItem),
+        // non riparto da capo: faccio solo toggle pausa/play sulla traccia corrente.
+        QueueItem current = queueService != null ? queueService.getCurrentItem() : null;
+        boolean thisPlaylistIsCurrent =
+                current != null && playlist.getId().equals(current.getBelongsToPlaylist());
+
+        if (thisPlaylistIsCurrent) {
+            // Sto già suonando questa playlist: pausa o resume SENZA toccare la coda
+            if (playerService.isPlayingProperty().get()) {
+                playerService.pause();
+            } else {
+                playerService.resume();
+            }
             return;
         }
 
@@ -174,7 +218,7 @@ public class PlaylistCardController {
         addQueueItem.setOnAction(e -> {
             if (queueService != null && playlist != null) {
                 queueService.addToQueue(playlist);
-                it.diem.unisa.musicmanager.util.AlertUtil.showInfo("Coda aggiornata", "La playlist '" + playlist.getName() + "' è stata aggiunta alla coda di riproduzione!");
+                it.diem.unisa.musicmanager.util.AlertUtil.showInfo("Queue Updated", "Playlist '" + playlist.getName() + "' has been added to the playback queue!");
             }
         });
 
@@ -196,7 +240,7 @@ public class PlaylistCardController {
     private void openEditPlaylist() {
         if (playlistService == null) return;
         try {
-            FXMLLoader loader = WindowUtil.openWindow("/it/diem/unisa/musicmanager/pages/editPlaylist.fxml", playlist.getName(),Modality.APPLICATION_MODAL);
+            FXMLLoader loader = WindowUtil.openWindow("/it/diem/unisa/musicmanager/pages/editPlaylist.fxml", playlist.getName(), Modality.APPLICATION_MODAL);
             EditPlaylistController ctrl = loader.getController();
 
             //
@@ -264,11 +308,38 @@ public class PlaylistCardController {
 
         confirm.showAndWait().ifPresent(btn -> {
             if (btn == ButtonType.YES) {
-                playlistService.deletePlaylist(playlist.getId());
+                Command cmd = new DeletePlaylistCommand(playlistService, playlist.getId());
+                commandManager.executeCommand(cmd);
+
             }
         });
     }
+
     private void openAddTrackToPlaylist() {
         //DA FAREE
+    }
+
+    private void updatePlayingStyle() {
+        if (rootCard == null) return;
+        rootCard.getStyleClass().remove("playlist-card-playing");
+
+        boolean thisPlaylistIsPlaying = false;
+
+        if (playlist != null && queueService != null && playerService != null) {
+            QueueItem current = queueService.getCurrentItem();
+
+            thisPlaylistIsPlaying =
+                    current != null
+                            && playlist.getId().equals(current.getBelongsToPlaylist())   // ← QUESTA playlist, non un'altra
+                            && playerService.isPlayingProperty().get();
+        }
+
+        if (thisPlaylistIsPlaying) {
+            rootCard.getStyleClass().add("playlist-card-playing");
+        }
+
+        if (btnPlay != null) {
+            btnPlay.setText(thisPlaylistIsPlaying ? "⏸" : "▶");
+        }
     }
 }

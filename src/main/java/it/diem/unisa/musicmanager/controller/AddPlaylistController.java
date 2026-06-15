@@ -7,6 +7,9 @@ import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import it.diem.unisa.musicmanager.command.CommandManager;
+import it.diem.unisa.musicmanager.command.Command;
+import it.diem.unisa.musicmanager.command.CreatePlaylistCommand;
 
 import java.util.Optional;
 
@@ -22,8 +25,10 @@ public class AddPlaylistController {
     @FXML private TextField fieldName;
     @FXML private Label lblError;
 
+
     // Service per la gestione delle playlist (passato da chi apre il popup).
     private PlaylistService playlistService;
+    private CommandManager commandManager;
 
     /**
      * Imposta il service da usare per creare la playlist.
@@ -32,6 +37,10 @@ public class AddPlaylistController {
      */
     public void setPlaylistService(PlaylistService playlistService) {
         this.playlistService = playlistService;
+    }
+
+    public void setCommandManager(CommandManager commandManager) {
+        this.commandManager = commandManager;
     }
 
     /**
@@ -57,8 +66,9 @@ public class AddPlaylistController {
             return;
         }
 
-        // Il service crea la playlist: Optional vuoto = ok, presente = errore.
-        Optional<String> error = playlistService.createPlaylist(name);
+        // Creazione tramite Command, così è annullabile.
+        Command cmd = new CreatePlaylistCommand(playlistService, name);
+        Optional<String> error = commandManager.executeCommand(cmd);
         if (error.isPresent()) {
             lblError.setText(error.get());
         } else {
