@@ -181,14 +181,17 @@ public class RowTrackController {
     @FXML
     public void handleDelete(ActionEvent actionEvent) {
         if (trackService != null && track != null) {
+            String title = parentPlaylist != null ? "Confirm Remove" : "Confirm Delete";
+            String message = parentPlaylist != null 
+                    ? "Are you sure you want to remove this track from the playlist?" 
+                    : "Are you sure you want to delete this track?";
 
-            boolean isConfirmed = AlertUtil.showConfirmation("Confirm Delete", "Are you sure you want to delete this track?");
+            boolean isConfirmed = AlertUtil.showConfirmation(title, message);
 
             if (isConfirmed && onDeleteAction != null) {
                 onDeleteAction.run();
             }
         }
-
     }
 
     @FXML
@@ -202,17 +205,19 @@ public class RowTrackController {
         MenuItem modifyItem = new MenuItem("Modify Track");
         modifyItem.setOnAction(e -> openEditTrack());
 
-        MenuItem deleteItem = new MenuItem("Delete Track");
+        String deleteText = parentPlaylist != null ? "Remove from Playlist" : "Delete Track";
+        MenuItem deleteItem = new MenuItem(deleteText);
         deleteItem.setOnAction(e -> handleDelete(null));
 
         MenuItem addQueueItem = new MenuItem("Add to Queue");
         addQueueItem.setOnAction(e -> {
             onAddQueue(e);
-            });
+        });
 
         menu.getItems().addAll(detailItem, modifyItem, deleteItem, addQueueItem);
         menu.show(buttonMenu, Side.BOTTOM, 0, 0);
     }
+
 
     private void openDetail() {
         try {
