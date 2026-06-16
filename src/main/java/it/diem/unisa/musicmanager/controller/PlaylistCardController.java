@@ -217,8 +217,20 @@ public class PlaylistCardController {
         MenuItem addQueueItem = new MenuItem("Add to Queue");
         addQueueItem.setOnAction(e -> {
             if (queueService != null && playlist != null) {
+                // 1. Controlla lo stato della coda e del player PRIMA di aggiungere
+                boolean isEmpty = queueService.getQueueList().isEmpty();
+                boolean isPlayingTrack = playerService != null && playerService.currentTrackProperty().get() != null;
+                // 2. Aggiunge la playlist alla coda
                 queueService.addToQueue(playlist);
-                it.diem.unisa.musicmanager.util.AlertUtil.showInfo("Queue Updated", "Playlist '" + playlist.getName() + "' has been added to the playback queue!");
+                // 3. Se la coda era vuota e non c'era riproduzione attiva, avvia automaticamente
+                if (isEmpty && !isPlayingTrack && playerService != null) {
+                    playerService.next();
+                } else {
+                    it.diem.unisa.musicmanager.util.AlertUtil.showInfo(
+                            "Queue Updated",
+                            "Playlist '" + playlist.getName() + "' has been added to the playback queue!"
+                    );
+                }
             }
         });
 

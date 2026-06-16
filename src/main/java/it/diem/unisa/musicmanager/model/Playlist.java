@@ -269,6 +269,24 @@ public class Playlist implements Playable{
         }
     }
 
+    /**
+     * Sostituisce i brani attuali della playlist con una nuova lista.
+     * Utilizzato per la sovrascrittura ed il ripristino con l'Undo.
+     */
+    public void replaceTracks(List<Track> newTracks) {
+        this.trackIDs.clear();
+        if (this.tracksList == null) {
+            this.tracksList = new ArrayList<>();
+        } else {
+            this.tracksList.clear();
+        }
+        if (newTracks != null) {
+            for (Track t : newTracks) {
+                this.addTrack(t);
+            }
+        }
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

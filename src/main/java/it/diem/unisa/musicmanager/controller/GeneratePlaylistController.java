@@ -198,6 +198,19 @@ public class GeneratePlaylistController {
         // Costruisci il nome automaticamente dai criteri selezionati
         String playlistName = buildPlaylistName();
 
+        // Verifica se la playlist esiste già
+        boolean exists = playlistService.getPlaylists().stream()
+                .anyMatch(p -> p.getName().equalsIgnoreCase(playlistName));
+        if (exists) {
+            boolean confirm = AlertUtil.showConfirmation(
+                    "Playlist Exists",
+                    "A playlist named \"" + playlistName + "\" already exists. Do you want to overwrite it with the new tracks?"
+            );
+            if (!confirm) {
+                return; // Interrompe se l'utente seleziona "No" / "Annulla"
+            }
+        }
+
         // creo l'oggetto command per la generazione delle playlist
         Command command = new GeneratePlaylistCommand(playlistService, playlistName, trackService.getAllTracks(), criteria);
 //        Optional<String> error = playlistService.generateAndSave(

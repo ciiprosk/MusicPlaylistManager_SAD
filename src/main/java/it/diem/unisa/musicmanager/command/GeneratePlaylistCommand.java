@@ -4,8 +4,8 @@ import it.diem.unisa.musicmanager.model.Playlist;
 import it.diem.unisa.musicmanager.model.Track;
 import it.diem.unisa.musicmanager.service.PlaylistService;
 import it.diem.unisa.musicmanager.specification.Specification;
-import java.util.Collection;
-import java.util.Optional;
+
+import java.util.*;
 
 /**
  * Classe che implementa l'interfaccia Command per la generazione di una playlist.
@@ -16,6 +16,11 @@ public class GeneratePlaylistCommand implements Command{
     private final Collection<Track> tracks;
     private final Specification<Track> criteria;
     private Playlist created;
+
+    // servono a gestire la sovrscizione dei brnai di una playlist qualora l'utnet volesse
+    private boolean isOverwrite;
+    private UUID overwrittenPlaylistId;
+    private List<Track> oldTracksSnapshot;
 
     public GeneratePlaylistCommand(PlaylistService service, String name, Collection<Track> tracks, Specification<Track> criteria) {
         this.service = service;
@@ -32,14 +37,33 @@ public class GeneratePlaylistCommand implements Command{
     @Override
     public Optional<String> execute() {
         // verifico un secondino se esite già una playlist con questo nome
-        Playlist playlist = new Playlist(this.name);
+        Optional<Playlist> existingOpt = service.getPlaylists().stream()
+                .filter(p -> p.getName().equalsIgnoreCase(name))
+                .findFirst();
 
-        created = service.generateAndSaveReturning(name, tracks, criteria);
+        if (existingOpt.isPresent()) {
+            Playlist existing = existingOpt.get();
+            isOverwrite = true;
+            overwrittenPlaylistId = existing.getId();
+            // Salva uno snapshot dei vecchi brani per l'Undo
+            oldTracksSnapshot = new ArrayList<>(existing.getTracksList());
 
-        if (created == null) {
-            return Optional.of("A playlist with this name already exists!");
+            // Genera la playlist temporanea con i nuovi brani filtrati
+            Playlist temp = service.generate(name, tracks, criteria);
+
+            // Sovrascrive i brani della playlist esistente
+            service.updatePlaylistTracks(existing.getId(), temp.getTracksList());
+            return Optional.empty();
+        } else {
+            isOverwrite = false;
+            created = service.generateAndSaveReturning(name, tracks, criteria);
+            if (created == null) {
+                return Optional.of("A playlist with this name already exists!");
+            }
+
+            return Optional.empty();
+
         }
-        return Optional.empty();
     }
 
     /**
@@ -48,8 +72,16 @@ public class GeneratePlaylistCommand implements Command{
      */
     @Override
     public void undo() {
-        if (created != null) {
-            service.deletePlaylist(created.getId());
+        if (isOverwrite) {
+            // Se avevamo sovrascritto, ripristiniamo i brani precedenti
+            if (overwrittenPlaylistId != null && oldTracksSnapshot != null) {
+                service.updatePlaylistTracks(overwrittenPlaylistId, oldTracksSnapshot);
+            }
+        } else {
+            // Se era una nuova playlist, la eliminiamo
+            if (created != null) {
+                service.deletePlaylist(created.getId());
+            }
         }
     }
 
@@ -58,6 +90,9 @@ public class GeneratePlaylistCommand implements Command{
      */
     @Override
     public String getDescription() {
+        if (isOverwrite) {
+            return "Overwrite playlist \"" + name + "\"";
+        }
         return "Generate playlist \"" + name + "\"";
     }
 }

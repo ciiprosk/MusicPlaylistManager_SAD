@@ -443,4 +443,16 @@ public class PlaylistService implements TrackObserver{
         sharedState.getALlPlaylists().add(playlist);
         return playlist;
     }
+
+    /**
+     * Aggiorna i brani di una playlist esistente nel DAO e nello stato condiviso.
+     */
+    public void updatePlaylistTracks(UUID playlistId, List<Track> newTracks) {
+        Playlist playlist = getPlaylistById(playlistId)
+                .orElseThrow(() -> new PlaylistInfoException("Playlist not found"));
+
+        playlist.replaceTracks(newTracks);
+        playlistDAO.update(playlist);
+        updateInState(playlist);
+    }
 }
