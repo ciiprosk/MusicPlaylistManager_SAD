@@ -162,7 +162,7 @@ public class HomeController {
                     Modality.APPLICATION_MODAL);
 
             GeneratePlaylistController ctrl = loader.getController();
-            ctrl.init(trackService, playlistService);
+            ctrl.init(trackService, playlistService, commandManager);
 
         } catch (IOException e) {
             e.printStackTrace();

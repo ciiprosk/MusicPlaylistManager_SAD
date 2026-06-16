@@ -341,6 +341,7 @@ public class PlaylistService implements TrackObserver{
     }
 
 
+
     /**
      * Cerca una traccia nello stato condiviso tramite il suo identificativo univoco.
      *
@@ -424,5 +425,22 @@ public class PlaylistService implements TrackObserver{
         if (playlist == null) return;
         playlistDAO.insert(playlist);
         sharedState.getALlPlaylists().add(playlist);
+    }
+
+    /**
+     * Come generateAndSave, ma restituisce la playlist generata (per il pattern Command).
+     * @param name nome della nuova playlist
+     * @param tracks tracce da inserire nella playlist
+     * @param criteria criterio di filtraggio
+     * @return
+     */
+    public Playlist generateAndSaveReturning(String name, Collection<Track> tracks, Specification<Track> criteria) {
+        if (playlistDAO.isDuplicated(new Playlist(name))) {
+            return null;
+        }
+        Playlist playlist = generate(name, tracks, criteria);
+        playlistDAO.insert(playlist);
+        sharedState.getALlPlaylists().add(playlist);
+        return playlist;
     }
 }

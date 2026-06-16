@@ -28,5 +28,9 @@ public interface Command {
      */
     void undo();
 
+    /**
+     * Metodo che restituisce una descrizione del comando.
+     * @return una stringa che descrive l'operazione eseguita dal comando
+     */
     String getDescription();
 }
