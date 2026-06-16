@@ -104,6 +104,7 @@ public class DetailSongController {
 
         if (isConfirmed) {
             trackService.deleteTrack(track.getId());  // scatena onTrackDeleted -> chiude
+            close(e);
         }
     }
 
