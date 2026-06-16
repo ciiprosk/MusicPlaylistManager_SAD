@@ -36,6 +36,13 @@ public class PlaylistService implements TrackObserver{
 
     private final SharedState sharedState;
 
+    private QueueService queueService;
+
+    public void setQueueService(QueueService queueService) {
+        this.queueService = queueService;
+    }
+
+
 
 
     /**
@@ -167,6 +174,10 @@ public class PlaylistService implements TrackObserver{
             playlist.addTrack(track);
             playlistDAO.update(playlist);
             updateInState(playlist);
+
+            if (queueService != null) {
+                queueService.synchronizeTrackAdded(playlistID, track);
+            }
         }
     }
 
@@ -188,8 +199,12 @@ public class PlaylistService implements TrackObserver{
             playlistDAO.update(playlist);
             updateInState(playlist);
 
+            if (queueService != null) {
+                queueService.synchronizeTrackRemoved(playlistID, trackID);
+            }
         }
     }
+
 
     /**
      * Sposta una traccia da una posizione a un'altra all'interno di una playlist.

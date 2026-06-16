@@ -225,7 +225,11 @@ public class GeneratePlaylistController {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Playlist Generated");
             alert.setHeaderText(null);
-            alert.setContentText("Playlist \"" + playlistName + "\" created!");
+            if (exists) {
+                alert.setContentText("Playlist \"" + playlistName + "\" updated!");
+            } else {
+                alert.setContentText("Playlist \"" + playlistName + "\" created!");
+            }
             alert.showAndWait();
             WindowUtil.close(btnGenerate);
         }

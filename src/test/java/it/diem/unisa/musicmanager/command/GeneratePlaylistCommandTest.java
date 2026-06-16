@@ -68,4 +68,39 @@ class GeneratePlaylistCommandTest {
 
         assertEquals(0, playlistService.getPlaylists().size());
     }
+
+    @Test
+    void testUndoOnOverwriteRestoresPreviousTracks() {
+        // Creazione di una playlist preesistente con lo stesso nome
+        Playlist existing = new Playlist(playlistName);
+        Track oldTrack = new Track(UUID.randomUUID(), "Old Song", "Artist", Genre.ROCK, "old.mp3", 120, "2010", EnumSet.noneOf(Tag.class));
+        existing.addTrack(oldTrack);
+        
+        // Aggiungiamo la playlist esistente allo stato
+        playlistService.getPlaylists().add(existing);
+        
+        // Nuova traccia nel catalogo che corrisponde alle specifiche
+        Track newTrack = new Track(UUID.randomUUID(), "New Rock Song", "Artist", Genre.ROCK, "new.mp3", 150, "2021", EnumSet.noneOf(Tag.class));
+        List<Track> newCatalog = List.of(newTrack);
+        
+        // Nuovo comando di generazione con lo stesso nome
+        GeneratePlaylistCommand overwriteCommand = new GeneratePlaylistCommand(playlistService, playlistName, newCatalog, criteria);
+        
+        // Esecuzione dell'overwrite
+        Optional<String> error = overwriteCommand.execute();
+        assertTrue(error.isEmpty());
+        
+        // Verifichiamo che la playlist contenga ora il nuovo brano
+        Playlist current = playlistService.getPlaylists().get(0);
+        assertEquals(1, current.getTracksList().size());
+        assertEquals(newTrack.getId(), current.getTracksList().get(0).getId());
+        
+        // Invocazione dell'Undo
+        overwriteCommand.undo();
+        
+        // Verifichiamo che i brani originali siano stati ripristinati
+        Playlist restored = playlistService.getPlaylists().get(0);
+        assertEquals(1, restored.getTracksList().size());
+        assertEquals(oldTrack.getId(), restored.getTracksList().get(0).getId());
+    }
 }

@@ -36,6 +36,7 @@ public class MusicPlaylistManager extends Application {
 
         playerService.setTrackService(trackService);
         playerService.setQueueService(queueService);
+        playlistService.setQueueService(queueService);
 
         trackService.addObserver(playlistService);
         trackService.addObserver(queueService);
@@ -61,6 +62,7 @@ public class MusicPlaylistManager extends Application {
         MainController controller = fxmlLoader.getController();
         controller.setPlaylistService(playlistService);
         controller.setQueueService(queueService);
+        controller.setPlayerService(playerService);
         controller.setCommandManager(commandManager);
 
         // passo service a home
