@@ -104,7 +104,7 @@ public class PlaylistSpecificationTest {
 
         List<Track> tracks = List.of(t1, t2, t3);
 
-        Specification<Track> tagSpec = new TagSpecification(EnumSet.of(Tag.EXPLICIT));
+        Specification<Track> tagSpec = new TagSpecification(Tag.EXPLICIT);
 
         List<Track> result = tracks.stream()
                 .filter(tagSpec::isSatisfiedBy)
