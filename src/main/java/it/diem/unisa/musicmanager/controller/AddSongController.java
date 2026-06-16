@@ -15,6 +15,8 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import it.diem.unisa.musicmanager.model.Tag;
 import it.diem.unisa.musicmanager.util.TagUtils;
+import it.diem.unisa.musicmanager.util.WindowUtil;
+
 
 import java.io.File;
 import java.time.Year;
@@ -248,8 +250,8 @@ public class AddSongController {
      * @param e evento da cui risalire alla finestra da chiudere
      */
     private void close(ActionEvent e) {
-        Stage stage = (Stage) ((Node) e.getSource()).getScene().getWindow();
-        stage.close();
+        WindowUtil.close((Node) e.getSource());
     }
+
 
 }

@@ -161,6 +161,10 @@ public class HomeController {
                     "Genera playlist",
                     Modality.APPLICATION_MODAL);
 
+            if (loader == null) {
+                return;
+            }
+
             GeneratePlaylistController ctrl = loader.getController();
             ctrl.init(trackService, playlistService, commandManager);
 
@@ -168,6 +172,7 @@ public class HomeController {
             e.printStackTrace();
         }
     }
+
 
     public void loadTopPlaylists() {
         if (playlistService == null

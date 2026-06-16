@@ -10,6 +10,8 @@ import javafx.stage.Stage;
 import it.diem.unisa.musicmanager.command.CommandManager;
 import it.diem.unisa.musicmanager.command.Command;
 import it.diem.unisa.musicmanager.command.CreatePlaylistCommand;
+import it.diem.unisa.musicmanager.util.WindowUtil;
+
 
 import java.util.Optional;
 
@@ -92,7 +94,7 @@ public class AddPlaylistController {
      * @param e evento da cui risalire alla finestra da chiudere
      */
     private void close(ActionEvent e) {
-        Stage stage = (Stage) ((Node) e.getSource()).getScene().getWindow();
-        stage.close();
+        WindowUtil.close((Node) e.getSource());
     }
+
 }

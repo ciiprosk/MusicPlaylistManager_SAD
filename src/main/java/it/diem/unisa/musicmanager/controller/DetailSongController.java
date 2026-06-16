@@ -118,9 +118,9 @@ public class DetailSongController {
 
     /** Chiude la finestra modale ricavando lo Stage dal bottone. */
     private void close(ActionEvent e) {
-        Stage stage = (Stage) ((Node) e.getSource()).getScene().getWindow();
-        stage.close();
+        WindowUtil.close((Node) e.getSource());
     }
+
 
 
     private String formatTags(Track track) {

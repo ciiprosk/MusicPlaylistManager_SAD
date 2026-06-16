@@ -105,6 +105,9 @@ public class MainController {
                     "Coda di Riproduzione",
                     javafx.stage.Modality.NONE
             );
+            if (loader == null) {
+                return;
+            }
             QueueViewController ctrl = loader.getController();
             ctrl.setPlaylistService(playlistService);
             ctrl.setQueueService(queueService);
@@ -112,7 +115,8 @@ public class MainController {
         } catch (java.io.IOException e) {
             e.printStackTrace();
         }
-    }
+     }
+
 
     public TracksController getTracksPageController()
     {

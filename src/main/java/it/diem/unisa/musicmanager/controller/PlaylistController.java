@@ -69,6 +69,9 @@ public class PlaylistController {
     private void handleAdd(ActionEvent actionEvent) {
         try {
             FXMLLoader loader = WindowUtil.openWindow("/it/diem/unisa/musicmanager/pages/addPlaylist.fxml", "Add Playlist", Modality.APPLICATION_MODAL);
+            if (loader == null) {
+                return;
+            }
 
             // gli passiamo il service qui
             AddPlaylistController controller = loader.getController();
@@ -77,8 +80,8 @@ public class PlaylistController {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
+
 
     // metodi setere da chiamare per passare i service
     public void setPlaylistService(PlaylistService playlistService) {

@@ -253,6 +253,9 @@ public class PlaylistCardController {
         if (playlistService == null) return;
         try {
             FXMLLoader loader = WindowUtil.openWindow("/it/diem/unisa/musicmanager/pages/editPlaylist.fxml", playlist.getName(), Modality.APPLICATION_MODAL);
+            if (loader == null) {
+                return;
+            }
             EditPlaylistController ctrl = loader.getController();
 
             //
@@ -260,6 +263,7 @@ public class PlaylistCardController {
             ctrl.setPlaylist(playlist);
             ctrl.setPlaylistService(playlistService);
             //ctrl.setPlayerService(playerService); non serve
+
 
             /*
             FXMLLoader loader = new FXMLLoader(
