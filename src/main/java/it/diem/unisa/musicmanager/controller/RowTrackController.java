@@ -34,7 +34,6 @@ public class RowTrackController {
     private QueueService queueService;
     private it.diem.unisa.musicmanager.service.PlaylistService playlistService;
     private it.diem.unisa.musicmanager.model.Playlist parentPlaylist;
-    private CommandManager commandManager;
 
     @FXML private Label lblTitle;
     @FXML private Label lblAuthor;
@@ -204,6 +203,7 @@ public class RowTrackController {
                     new DeleteTrackCommand(trackService, playlistService, track.getId())
             );
         }
+
     }
 
     @FXML
@@ -217,17 +217,19 @@ public class RowTrackController {
         MenuItem modifyItem = new MenuItem("Modify Track");
         modifyItem.setOnAction(e -> openEditTrack());
 
-        MenuItem deleteItem = new MenuItem("Delete Track");
+        String deleteText = parentPlaylist != null ? "Remove from Playlist" : "Delete Track";
+        MenuItem deleteItem = new MenuItem(deleteText);
         deleteItem.setOnAction(e -> handleDelete(null));
 
         MenuItem addQueueItem = new MenuItem("Add to Queue");
         addQueueItem.setOnAction(e -> {
             onAddQueue(e);
-            });
+        });
 
         menu.getItems().addAll(detailItem, modifyItem, deleteItem, addQueueItem);
         menu.show(buttonMenu, Side.BOTTOM, 0, 0);
     }
+
 
     private void openDetail() {
         try {
@@ -276,7 +278,10 @@ public class RowTrackController {
         return track;
     }
 
-
+    public void setOnDeleteAction(Runnable onDeleteAction) {
+        //AlertUtil.showConfirmation("Confirm Delete", "Are you sure you want to delete this track?");
+        this.onDeleteAction = onDeleteAction;
+    }
 
     private void updateCurrentTrackStyle() {
         rootContainer.getStyleClass().remove("brano-row-playing");

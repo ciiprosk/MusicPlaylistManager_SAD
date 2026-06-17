@@ -914,4 +914,41 @@ class PlaylistServiceTest {
 
         assertEquals(1, updatedPlaylist.getPlayCount());
     }
+
+    //TEST SPOSTAMENTO BRANO ALL'INTERNO DI UNA PLAYLIST (US14)
+    @Test
+    void moveTrackInPlaylistShouldChangeTracksOrderAndPersist() {
+        playlistService.createPlaylist("Rock");
+        Playlist playlist = sharedState.getALlPlaylists().get(0);
+
+        Track track1 = createTrack("Track1");
+        Track track2 = createTrack("Track2");
+        Track track3 = createTrack("Track3");
+
+        playlistService.addTrackToPlaylist(playlist.getId(), track1.getId());
+        playlistService.addTrackToPlaylist(playlist.getId(), track2.getId());
+        playlistService.addTrackToPlaylist(playlist.getId(), track3.getId());
+
+        // Ordine iniziale: Track1, Track2, Track3
+        assertEquals(track1.getId(), playlist.getTracks().get(0));
+        assertEquals(track2.getId(), playlist.getTracks().get(1));
+        assertEquals(track3.getId(), playlist.getTracks().get(2));
+
+        // Spostiamo Track1 (indice 0) in posizione 2
+        playlistService.moveTrackInPlaylist(playlist.getId(), 0, 2);
+
+        // Nuovo ordine atteso nello sharedState: Track2, Track3, Track1
+        Playlist updatedPlaylist = sharedState.getALlPlaylists().get(0);
+        assertEquals(track2.getId(), updatedPlaylist.getTracks().get(0));
+        assertEquals(track3.getId(), updatedPlaylist.getTracks().get(1));
+        assertEquals(track1.getId(), updatedPlaylist.getTracks().get(2));
+
+        // Verifica che la modifica sia stata persistita sul file tramite il DAO
+        DAO<Playlist> newPlaylistDAO = new JSONPlaylistDAO("test-data", "playlists-service-test.jsonl");
+        Optional<Playlist> persisted = newPlaylistDAO.searchById(playlist.getId());
+        assertTrue(persisted.isPresent());
+        assertEquals(track2.getId(), persisted.get().getTracks().get(0));
+        assertEquals(track3.getId(), persisted.get().getTracks().get(1));
+        assertEquals(track1.getId(), persisted.get().getTracks().get(2));
+    }
 }

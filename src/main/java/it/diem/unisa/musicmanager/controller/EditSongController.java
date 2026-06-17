@@ -9,6 +9,8 @@ import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
+import it.diem.unisa.musicmanager.util.WindowUtil;
+
 import java.util.EnumSet;
 import java.util.Set;
 
@@ -133,9 +135,9 @@ public class EditSongController {
 
     /** Chiude la finestra modale ricavando lo Stage dal bottone. */
     private void close(ActionEvent e) {
-        Stage stage = (Stage) ((Node) e.getSource()).getScene().getWindow();
-        stage.close();
+        WindowUtil.close((Node) e.getSource());
     }
+
 
     public void setOnSaved(Runnable onSaved) {
         this.onSaved = onSaved;

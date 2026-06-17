@@ -329,17 +329,13 @@ class QueueServiceTest {
 
         queueService.setCurrentItem(onlyItem);
 
-        QueueItem nextItem =
-                queueService.nextItem();
-
-        assertNull(
-                nextItem
+        // Ci aspettiamo che lanci QueueException quando la coda finisce
+        assertThrows(
+                it.diem.unisa.musicmanager.exception.QueueException.class,
+                () -> queueService.nextItem()
         );
 
-        assertNull(
-                queueService.getCurrentItem()
-        );
-
+        // La coda viene svuotata dalla strategia sequenziale
         assertTrue(
                 sharedState.getQueue().isEmpty()
         );
@@ -386,17 +382,13 @@ class QueueServiceTest {
                 thirdItem.getPlayable().getId()
         );
 
-        QueueItem endItem =
-                queueService.nextItem();
-
-        assertNull(
-                endItem
+        // All'ultimo elemento, la chiamata successiva solleverà QueueException
+        assertThrows(
+                it.diem.unisa.musicmanager.exception.QueueException.class,
+                () -> queueService.nextItem()
         );
 
-        assertNull(
-                queueService.getCurrentItem()
-        );
-
+        // E la coda viene svuotata
         assertTrue(
                 sharedState.getQueue().isEmpty()
         );

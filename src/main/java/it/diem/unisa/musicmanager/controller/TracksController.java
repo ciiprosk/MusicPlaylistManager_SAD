@@ -64,10 +64,14 @@ public class TracksController {
 
     public void handleAdd(ActionEvent actionEvent) throws IOException {
         FXMLLoader loader = WindowUtil.openWindow("/it/diem/unisa/musicmanager/pages/addSong.fxml", "Add Track",Modality.WINDOW_MODAL);
+        if (loader == null) {
+            return;
+        }
         AddSongController controller = loader.getController();
         controller.setTrackService(trackService);
         controller.setCommandManager(commandManager);
     }
+
 
 
     @FXML
@@ -158,6 +162,9 @@ public class TracksController {
                     "Track Details",
                     Modality.WINDOW_MODAL
             );
+            if (loader == null) {
+                return;
+            }
 
             DetailSongController controller = loader.getController();
             controller.setTrackService(trackService);
@@ -166,6 +173,7 @@ public class TracksController {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
     }
 
     public void setQueueService(QueueService queueService) {

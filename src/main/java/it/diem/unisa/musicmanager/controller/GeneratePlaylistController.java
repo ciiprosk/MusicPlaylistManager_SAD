@@ -25,6 +25,10 @@ import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.Optional;
 
+import it.diem.unisa.musicmanager.command.Command;
+import it.diem.unisa.musicmanager.command.CommandManager;
+import it.diem.unisa.musicmanager.command.GeneratePlaylistCommand;
+
 /**
  * Controller della schermata "Genera Playlist".
  * Usa CheckBox al posto di RadioButton: l'utente puo' selezionare piu' criteri.
@@ -41,6 +45,7 @@ public class GeneratePlaylistController {
     private TrackService trackService;
     private PlaylistService playlistService;
 
+    private CommandManager commandManager;
     /**
      * Inizializza il controller iniettando i servizi necessari e avviando
      * il popolamento dinamico dei componenti grafici della UI.
@@ -48,9 +53,10 @@ public class GeneratePlaylistController {
      * @param trackService    il servizio per la gestione e il recupero delle tracce musicali
      * @param playlistService il servizio per la generazione e il salvataggio delle playlist
      */
-    public void init(TrackService trackService, PlaylistService playlistService) {
+    public void init(TrackService trackService, PlaylistService playlistService, CommandManager commandManager) {
         this.trackService = trackService;
         this.playlistService = playlistService;
+        this.commandManager = commandManager;
         populateYears();
         populateGenres();
         populateTags();
@@ -192,18 +198,38 @@ public class GeneratePlaylistController {
         // Costruisci il nome automaticamente dai criteri selezionati
         String playlistName = buildPlaylistName();
 
-        Optional<String> error = playlistService.generateAndSave(
-                playlistName,
-                trackService.getAllTracks(),
-                criteria);
+        // Verifica se la playlist esiste già
+        boolean exists = playlistService.getPlaylists().stream()
+                .anyMatch(p -> p.getName().equalsIgnoreCase(playlistName));
+        if (exists) {
+            boolean confirm = AlertUtil.showConfirmation(
+                    "Playlist Exists",
+                    "A playlist named \"" + playlistName + "\" already exists. Do you want to overwrite it with the new tracks?"
+            );
+            if (!confirm) {
+                return; // Interrompe se l'utente seleziona "No" / "Annulla"
+            }
+        }
 
+        // creo l'oggetto command per la generazione delle playlist
+        Command command = new GeneratePlaylistCommand(playlistService, playlistName, trackService.getAllTracks(), criteria);
+//        Optional<String> error = playlistService.generateAndSave(
+//                playlistName,
+//                trackService.getAllTracks(),
+//                criteria);
+        // eseguo il comando e repureo il messaggio di ritorno
+        Optional<String> error = commandManager.executeCommand(command);
         if (error.isPresent()) {
             AlertUtil.showError("Error", error.get());
         } else {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Playlist Generated");
             alert.setHeaderText(null);
-            alert.setContentText("Playlist \"" + playlistName + "\" created!");
+            if (exists) {
+                alert.setContentText("Playlist \"" + playlistName + "\" updated!");
+            } else {
+                alert.setContentText("Playlist \"" + playlistName + "\" created!");
+            }
             alert.showAndWait();
             WindowUtil.close(btnGenerate);
         }

@@ -413,5 +413,85 @@ public class QueueService implements TrackObserver {
         moveQueueItem(draggedItem, targetIndex);
     }
 
+    /**
+     * Sincronizza la coda quando una traccia viene aggiunta a una playlist.
+     * Cerca ogni gruppo in coda che appartiene a tale playlist e inserisce la traccia
+     * subito dopo l'ultimo elemento di quel gruppo.
+     *
+     * @param playlistId identificatore della playlist modificata
+     * @param track traccia aggiunta
+     */
+    public void synchronizeTrackAdded(UUID playlistId, Track track) {
+        if (playlistId == null || track == null) {
+            return;
+        }
 
+        javafx.collections.ObservableList<QueueItem> queue = sharedState.getQueue();
+        if (queue.isEmpty()) {
+            return;
+        }
+
+        Set<UUID> groupIds = new LinkedHashSet<>();
+        for (QueueItem item : queue) {
+            if (playlistId.equals(item.getBelongsToPlaylist()) && item.getPlaylistProgressive() != null) {
+                groupIds.add(item.getPlaylistProgressive());
+            }
+        }
+
+        for (UUID groupId : groupIds) {
+            int lastIndex = -1;
+            for (int i = 0; i < queue.size(); i++) {
+                QueueItem item = queue.get(i);
+                if (playlistId.equals(item.getBelongsToPlaylist()) && groupId.equals(item.getPlaylistProgressive())) {
+                    lastIndex = i;
+                }
+            }
+            if (lastIndex != -1) {
+                QueueItem newItem = new QueueItem(track, playlistId, groupId);
+                queue.add(lastIndex + 1, newItem);
+            }
+        }
+    }
+
+    /**
+     * Sincronizza la coda quando una traccia viene rimossa da una playlist.
+     * Rimuove tutte le occorrenze di quella traccia in coda appartenenti a tale playlist.
+     * Se la traccia rimossa era quella attualmente in riproduzione, azzera l'item corrente.
+     *
+     * @param playlistId identificatore della playlist modificata
+     * @param trackId identificatore della traccia rimossa
+     */
+    public void synchronizeTrackRemoved(UUID playlistId, UUID trackId) {
+        if (playlistId == null || trackId == null) {
+            return;
+        }
+
+        javafx.collections.ObservableList<QueueItem> queue = sharedState.getQueue();
+        if (queue.isEmpty()) {
+            return;
+        }
+
+        QueueItem current = getCurrentItem();
+        boolean currentRemoved = false;
+
+        List<QueueItem> toRemove = new ArrayList<>();
+        for (QueueItem item : queue) {
+            if (playlistId.equals(item.getBelongsToPlaylist())
+                    && item.getPlayable() instanceof Track track
+                    && track.getId().equals(trackId)) {
+                toRemove.add(item);
+                if (item == current) {
+                    currentRemoved = true;
+                }
+            }
+        }
+
+        if (!toRemove.isEmpty()) {
+            queue.removeAll(toRemove);
+            if (currentRemoved) {
+                setCurrentItem(null);
+            }
+        }
+    }
 }
+

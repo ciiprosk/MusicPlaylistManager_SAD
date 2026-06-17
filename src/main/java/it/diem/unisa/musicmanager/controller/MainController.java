@@ -24,6 +24,7 @@ public class MainController {
 
     private it.diem.unisa.musicmanager.service.QueueService queueService;
     private it.diem.unisa.musicmanager.service.PlaylistService playlistService;
+    private it.diem.unisa.musicmanager.service.PlayerService playerService;
     private CommandManager commandManager;
 
 
@@ -84,6 +85,10 @@ public class MainController {
         this.queueService = queueService;
     }
 
+    public void setPlayerService(it.diem.unisa.musicmanager.service.PlayerService playerService) {
+        this.playerService = playerService;
+    }
+
     public void setPlaylistService(it.diem.unisa.musicmanager.service.PlaylistService playlistService) {
         this.playlistService = playlistService;
     }
@@ -100,13 +105,18 @@ public class MainController {
                     "Coda di Riproduzione",
                     javafx.stage.Modality.NONE
             );
+            if (loader == null) {
+                return;
+            }
             QueueViewController ctrl = loader.getController();
             ctrl.setPlaylistService(playlistService);
             ctrl.setQueueService(queueService);
+            ctrl.setPlayerService(playerService);
         } catch (java.io.IOException e) {
             e.printStackTrace();
         }
-    }
+     }
+
 
     public TracksController getTracksPageController()
     {

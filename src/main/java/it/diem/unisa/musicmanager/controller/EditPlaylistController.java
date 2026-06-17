@@ -8,6 +8,8 @@ import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import it.diem.unisa.musicmanager.util.WindowUtil;
+
 
 import java.util.Optional;
 
@@ -53,7 +55,7 @@ public class EditPlaylistController {
     }
 
     private void close(ActionEvent e) {
-        Stage stage = (Stage) ((Node) e.getSource()).getScene().getWindow();
-        stage.close();
+        WindowUtil.close((Node) e.getSource());
     }
+
 }
