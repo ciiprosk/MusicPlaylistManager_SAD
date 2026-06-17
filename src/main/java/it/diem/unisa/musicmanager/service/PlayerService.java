@@ -1,7 +1,9 @@
 package it.diem.unisa.musicmanager.service;
 
 import it.diem.unisa.musicmanager.exception.QueueException;
+import it.diem.unisa.musicmanager.model.Playable;
 import it.diem.unisa.musicmanager.model.QueueItem;
+import it.diem.unisa.musicmanager.model.QueueItemType;
 import it.diem.unisa.musicmanager.model.Track;
 import it.diem.unisa.musicmanager.playmode.PlayMode;
 import it.diem.unisa.musicmanager.playmode.SequentialMode;
@@ -202,32 +204,32 @@ public class PlayerService implements TrackObserver {
      * Se la traccia è già in esecuzione, viene messa in pausa.
      * Se era in pausa, riprende. Se è un brano nuovo, lo fa partire.
      */
-    public void togglePlay(Track track) {
-        if (track == null) return;
-
-        Track current = currentTrack.get();
-
-        if (current != null
-                && track.getId().equals(current.getId())
-                && isPlaying.get()) {
-            pause();
-        } else {
-            if (queueService != null) {
-                queueService.clearQueue();
-
-                //Aggiunge la traccia alla coda come QueueItem
-                List<QueueItem> items = queueService.addToQueue(track);
-
-                // Imposta il currentItem così LoopMode sa cosa sta suonando
-                if (items != null && !items.isEmpty()) {
-                    queueService.setCurrentItem(items.get(0));
-                }
-            }
-
-            // false: non azzerare il currentItem che abbiamo appena impostato
-            play(track, false, false);
-        }
-    }
+//    public void togglePlay(Track track) {
+//        if (track == null) return;
+//
+//        Track current = currentTrack.get();
+//
+//        if (current != null
+//                && track.getId().equals(current.getId())
+//                && isPlaying.get()) {
+//            pause();
+//        } else {
+//            if (queueService != null) {
+//                queueService.clearQueue();
+//
+//                //Aggiunge la traccia alla coda come QueueItem
+//                List<QueueItem> items = queueService.addToQueue(track);
+//
+//                // Imposta il currentItem così LoopMode sa cosa sta suonando
+//                if (items != null && !items.isEmpty()) {
+//                    queueService.setCurrentItem(items.get(0));
+//                }
+//            }
+//
+//            // false: non azzerare il currentItem che abbiamo appena impostato
+//            play(track, false, false);
+//        }
+//    }
 
     public void next() {
         if (queueService == null) {
@@ -352,5 +354,63 @@ public class PlayerService implements TrackObserver {
             }
         }
     }
+
+    public void playPlayable(Playable playable) {
+        if (playable == null) return;
+
+        stopCurrent();
+        loadedTrack = null;
+
+        if (queueService != null) {
+            queueService.clearQueue();
+            List<QueueItem> items = queueService.addToQueue(playable);
+            if (items != null && !items.isEmpty()) {
+                queueService.setCurrentItem(items.get(0));
+            }
+        }
+
+        List<Track> tracksToPlay = playable.getTracksToPlay();
+        if (!tracksToPlay.isEmpty()) {
+            play(tracksToPlay.get(0), false, true);
+        }
+    }
+
+    public void togglePlay(Playable playable) {
+        if (playable == null) return;
+
+        Track current = currentTrack.get();
+        boolean isCurrentlyPlayingThisPlayable = false;
+
+        if (current != null && isPlaying.get()) {
+            if (playable.getType() == QueueItemType.TRACK && playable.getId().equals(current.getId())) {
+                // Se ho passato una Track ed è quella in esecuzione
+                isCurrentlyPlayingThisPlayable = true;
+            } else if (playable.getType() == QueueItemType.PLAYLIST && queueService != null && queueService.getCurrentItem() != null) {
+                // Se ho passato una Playlist e la traccia attuale fa parte di QUELLA playlist in coda
+                if (playable.getId().equals(queueService.getCurrentItem().getBelongsToPlaylist())) {
+                    isCurrentlyPlayingThisPlayable = true;
+                }
+            }
+        }
+
+        if (isCurrentlyPlayingThisPlayable) {
+            pause();
+        } else {
+            // Logica per far partire la riproduzione (Track o Playlist)
+            if (queueService != null) {
+                queueService.clearQueue();
+                List<QueueItem> items = queueService.addToQueue(playable);
+                if (items != null && !items.isEmpty()) {
+                    queueService.setCurrentItem(items.get(0));
+                }
+            }
+
+            List<Track> tracksToPlay = playable.getTracksToPlay();
+            if (!tracksToPlay.isEmpty()) {
+                play(tracksToPlay.get(0), false, false);
+            }
+        }
+    }
+
 
 }

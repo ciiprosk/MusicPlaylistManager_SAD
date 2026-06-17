@@ -283,12 +283,16 @@ public class DetailedPlaylistController {
             playlistService.incrementPlayCount(playlist.getId());
         }
 
-        if (queueService != null && playerService != null) {
-            queueService.clearQueue();
-            queueService.addToQueue(playlist);
-            playerService.next();
-        } else if (playerService != null) {
-            playerService.play(playlist.getTracksList().get(0), false, true);
+//        if (queueService != null && playerService != null) {
+//            queueService.clearQueue();
+//            queueService.addToQueue(playlist);
+//            playerService.next();
+//        } else if (playerService != null) {
+//            playerService.play(playlist.getTracksList().get(0), false, true);
+//        }
+
+        if (playerService != null) {
+            playerService.playPlayable(playlist);
         }
     }
 
@@ -344,11 +348,9 @@ public class DetailedPlaylistController {
         }
         if (playlistService != null) playlistService.incrementPlayCount(playlist.getId());
         if (queueService != null && playerService != null) {
-            queueService.clearQueue();
-            queueService.setCurrentPlayMode(new SequentialMode());
-            queueService.addToQueue(playlist);
-            playerService.next();
-            updateModeButtons(buttonSequential);
+            queueService.setCurrentPlayMode(new SequentialMode()); // o LoopMode/SequentialMode
+            playerService.playPlayable(playlist);
+            updateModeButtons(buttonShuffle);
         }
     }
 
@@ -360,11 +362,9 @@ public class DetailedPlaylistController {
         }
         if (playlistService != null) playlistService.incrementPlayCount(playlist.getId());
         if (queueService != null && playerService != null) {
-            queueService.clearQueue();
-            queueService.setCurrentPlayMode(new LoopMode());
-            queueService.addToQueue(playlist);
-            playerService.next();
-            updateModeButtons(buttonLoop);
+            queueService.setCurrentPlayMode(new LoopMode()); // o LoopMode/SequentialMode
+            playerService.playPlayable(playlist);
+            updateModeButtons(buttonShuffle);
         }
     }
 
@@ -378,14 +378,19 @@ public class DetailedPlaylistController {
         if (playlistService != null)
             playlistService.incrementPlayCount(playlist.getId());
 
+//        if (queueService != null && playerService != null) {
+//
+//            queueService.clearQueue();
+//            queueService.setCurrentPlayMode(new ShuffleMode());
+//            queueService.addToQueue(playlist);
+//            playerService.next();
+//            updateModeButtons(buttonShuffle);
+//
+//        }
         if (queueService != null && playerService != null) {
-
-            queueService.clearQueue();
-            queueService.setCurrentPlayMode(new ShuffleMode());
-            queueService.addToQueue(playlist);
-            playerService.next();
+            queueService.setCurrentPlayMode(new ShuffleMode()); // o LoopMode/SequentialMode
+            playerService.playPlayable(playlist);
             updateModeButtons(buttonShuffle);
-
         }
     }
 

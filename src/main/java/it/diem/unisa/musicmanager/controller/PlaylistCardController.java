@@ -120,59 +120,70 @@ public class PlaylistCardController {
      */
     @FXML
     private void handlePlay() {
-        // Controllo di sicurezza per evitare crash se i dati non sono pronti
-        if (playlist == null || playerService == null) {
-            return;
-        }
+        if (playlist == null || playerService == null) return;
+
         if (playlist.getTracksList().isEmpty()) {
             it.diem.unisa.musicmanager.util.AlertUtil.showInfo("Empty Playlist", "To play this playlist, you must first add a track.");
             return;
         }
-
-        // Se sto già suonando QUESTA playlist (stesso belongsToPlaylist nel currentItem),
-        // non riparto da capo: faccio solo toggle pausa/play sulla traccia corrente.
-        QueueItem current = queueService != null ? queueService.getCurrentItem() : null;
-        boolean thisPlaylistIsCurrent =
-                current != null && playlist.getId().equals(current.getBelongsToPlaylist());
-
-        if (thisPlaylistIsCurrent) {
-            // Sto già suonando questa playlist: pausa o resume SENZA toccare la coda
-            if (playerService.isPlayingProperty().get()) {
-                playerService.pause();
-            } else {
-                playerService.resume();
-            }
-            return;
-        }
-
-        // Recuperiamo la prima traccia della playlist che vogliamo ascoltare
-        Track firstTrack = playlist.getTracksList().get(0);
-
-        // Incrementiamo il contatore dei "Plays" della playlist tramite il service
         if (playlistService != null) {
             playlistService.incrementPlayCount(playlist.getId());
         }
-
-        if (queueService != null) {
-            // 1. Svuotiamo completamente la vecchia coda d'ascolto attiva
-            queueService.clearQueue();
-
-            // 2. Aggiungiamo l'intera nuova playlist alla coda
-            queueService.addToQueue(playlist);
-
-            // 3. AGGIORNAMENTO CRUCIALE: Forziamo il player a suonare DIRETTAMENTE la prima traccia.
-            // Passando true come terzo parametro (forceRestart), indichiamo al PlayerService di
-            // stoppare immediatamente la vecchia canzone e avviare la nuova senza esitazioni.
-            //playerService.play(firstTrack, false, true);
-
-            // 4. Allineiamo la coda indicando qual è il brano attualmente in riproduzione
-            //queueService.setCurrentItem(queueService.getQueueList().isEmpty() ? null : queueService.getQueueList().get(0));
-            playerService.next();
-        } else {
-            // Fallback di sicurezza nel caso in cui il QueueService non fosse iniettato
-            //playerService.play(firstTrack, false, true);
-            playerService.play(playlist.getTracksList().get(0), false, true);
-        }
+        // Qui la magia: il PlayerService fa tutto da solo!
+        playerService.togglePlay(playlist);
+//        // Controllo di sicurezza per evitare crash se i dati non sono pronti
+//        if (playlist == null || playerService == null) {
+//            return;
+//        }
+//        if (playlist.getTracksList().isEmpty()) {
+//            it.diem.unisa.musicmanager.util.AlertUtil.showInfo("Empty Playlist", "To play this playlist, you must first add a track.");
+//            return;
+//        }
+//
+//        // Se sto già suonando QUESTA playlist (stesso belongsToPlaylist nel currentItem),
+//        // non riparto da capo: faccio solo toggle pausa/play sulla traccia corrente.
+//        QueueItem current = queueService != null ? queueService.getCurrentItem() : null;
+//        boolean thisPlaylistIsCurrent =
+//                current != null && playlist.getId().equals(current.getBelongsToPlaylist());
+//
+//        if (thisPlaylistIsCurrent) {
+//            // Sto già suonando questa playlist: pausa o resume SENZA toccare la coda
+//            if (playerService.isPlayingProperty().get()) {
+//                playerService.pause();
+//            } else {
+//                playerService.resume();
+//            }
+//            return;
+//        }
+//
+//        // Recuperiamo la prima traccia della playlist che vogliamo ascoltare
+//        Track firstTrack = playlist.getTracksList().get(0);
+//
+//        // Incrementiamo il contatore dei "Plays" della playlist tramite il service
+//        if (playlistService != null) {
+//            playlistService.incrementPlayCount(playlist.getId());
+//        }
+//
+//        if (queueService != null) {
+//            // 1. Svuotiamo completamente la vecchia coda d'ascolto attiva
+//            queueService.clearQueue();
+//
+//            // 2. Aggiungiamo l'intera nuova playlist alla coda
+//            queueService.addToQueue(playlist);
+//
+//            // 3. AGGIORNAMENTO CRUCIALE: Forziamo il player a suonare DIRETTAMENTE la prima traccia.
+//            // Passando true come terzo parametro (forceRestart), indichiamo al PlayerService di
+//            // stoppare immediatamente la vecchia canzone e avviare la nuova senza esitazioni.
+//            //playerService.play(firstTrack, false, true);
+//
+//            // 4. Allineiamo la coda indicando qual è il brano attualmente in riproduzione
+//            //queueService.setCurrentItem(queueService.getQueueList().isEmpty() ? null : queueService.getQueueList().get(0));
+//            playerService.next();
+//        } else {
+//            // Fallback di sicurezza nel caso in cui il QueueService non fosse iniettato
+//            //playerService.play(firstTrack, false, true);
+//            playerService.play(playlist.getTracksList().get(0), false, true);
+//        }
     }
 
     /**
