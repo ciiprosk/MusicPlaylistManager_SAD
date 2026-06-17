@@ -6,16 +6,27 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Classe che implementa il modo di riproduzione loop.
+ * Strategia di riproduzione in loop (ciclica) della coda.
+ * Quando un brano termina, viene rimosso dalla sua posizione corrente e riaccodato alla fine
+ * della lista. In questo modo, la coda continua a ruotare indefinitamente finché contiene almeno un elemento.
  */
 public class LoopMode implements PlayMode {
 
     /**
-     * Il metodo che restituisce il prossimo brano della playlist.
+     * Costruttore di default.
+     */
+    public LoopMode() {
+        // Costruttore di default
+    }
+
+    /**
+     * Restituisce il brano in testa alla coda ed inserisce il brano corrente consumato in fondo ad essa.
+     * Consente la rotazione ciclica degli elementi della coda.
      *
-     * @param queue       una lista di elementi della coda.
-     * @param currentItem elemento corrente della coda.
-     * @return un Optional contenente l'elemento successivo nella coda, se presente.
+     * @param queue       La lista degli elementi correntemente in coda.
+     * @param currentItem L'elemento attualmente in riproduzione.
+     * @return Un {@link Optional} contenente il prossimo {@link QueueItem} da riprodurre (in testa),
+     * oppure {@link Optional#empty()} se la coda è vuota.
      */
     @Override
     public Optional<QueueItem> nextItem(List<QueueItem> queue, QueueItem currentItem) {
@@ -31,17 +42,16 @@ public class LoopMode implements PlayMode {
     }
 
     /**
-     * Verifica se ci sono elementi nella coda.
+     * Verifica se sono presenti elementi nella coda per continuare la riproduzione in loop.
+     * La riproduzione può continuare indefinitamente purché la coda non sia vuota.
      *
-     * @param queue       una lista di elementi della coda.
-     * @param currentItem elemento corrente della coda.
-     * @return true se ci sono elementi nella coda, false altrimenti.
+     * @param queue       La lista degli elementi in coda.
+     * @param currentItem L'elemento attualmente in riproduzione.
+     * @return {@code true} se la coda contiene almeno un elemento, {@code false} altrimenti.
      */
     @Override
     public boolean hasNext(List<QueueItem> queue, QueueItem currentItem) {
-
         return !queue.isEmpty();
-
     }
 
 }

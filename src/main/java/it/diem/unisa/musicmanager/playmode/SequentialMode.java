@@ -6,16 +6,28 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * È la classe che implementa il modo di riproduzione sequenziale.
+ * Strategia di riproduzione sequenziale della coda (standard).
+ * I brani vengono riprodotti nell'ordine in cui compaiono nella lista. Una volta riprodotto,
+ * il brano viene rimosso (consumato) dalla coda e la riproduzione termina dopo l'ultimo elemento.
  */
 public class SequentialMode implements PlayMode {
 
     /**
-     * Il metodo che restituisce il prossimo brano della playlist.
+     * Costruttore di default.
+     */
+    public SequentialMode() {
+        // Costruttore di default
+    }
+
+    /**
+     * Restituisce il brano successivo nella coda seguendo l'ordine sequenziale.
+     * Consuma (rimuove) il brano corrente se presente nella coda e restituisce la nuova testa.
+     * Se il brano corrente non è in coda, restituisce il primo elemento disponibile senza rimuoverlo.
      *
-     * @param queue       è la coda dei brani.
-     * @param currentItem è il brano corrente.
-     * @return il prossimo brano della playlist.
+     * @param queue       La lista degli elementi correntemente in coda.
+     * @param currentItem L'elemento attualmente in riproduzione.
+     * @return Un {@link Optional} contenente il prossimo {@link QueueItem} da riprodurre,
+     * oppure {@link Optional#empty()} se la coda è esaurita.
      */
     @Override
     public Optional<QueueItem> nextItem(List<QueueItem> queue, QueueItem currentItem) {
@@ -34,19 +46,17 @@ public class SequentialMode implements PlayMode {
         } else {
             // Il brano attuale non è nella coda, peschiamo il primo!
             QueueItem next = queue.get(0);
-            // Rimuoviamo il primo per "consumarlo"
-            // Wait, se lo rimuoviamo subito sparisce dalla coda prima di finire?
-            // Per ora lasciamolo in coda per vederlo. Lo rimuoveremo quando passerà al successivo!
             return Optional.of(next);
         }
     }
 
     /**
-     * Verifica se ci sono elementi nella coda.
+     * Verifica se sono presenti altri elementi da riprodurre in coda dopo quello corrente.
      *
-     * @param queue       una lista di elementi della coda.
-     * @param currentItem elemento corrente della coda.
-     * @return true se ci sono elementi nella coda, false altrimenti.
+     * @param queue       La lista degli elementi correntemente in coda.
+     * @param currentItem L'elemento attualmente in riproduzione.
+     * @return {@code true} se la coda non è vuota e vi sono elementi successivi a quello corrente;
+     * {@code false} se la coda è vuota o se l'elemento corrente è l'ultimo.
      */
     @Override
     public boolean hasNext(List<QueueItem> queue, QueueItem currentItem) {

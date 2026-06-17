@@ -7,18 +7,32 @@ import java.util.Optional;
 import java.util.Random;
 
 /**
- * Classe che implementa il modo di riproduzione shuffle.
+ * Strategia di riproduzione casuale (shuffle) della coda.
+ * Consuma il brano corrente rimuovendolo e seleziona in modo casuale il prossimo elemento
+ * tra quelli rimanenti nella coda, posizionandolo all'indice 0 (testa) per l'interazione con la GUI.
  */
 public class ShuffleMode implements PlayMode {
 
+    /**
+     * Generatore di numeri casuali utilizzato per selezionare il prossimo brano.
+     */
     private final Random random = new Random();
 
     /**
-     * Il metodo che restituisce il prossimo brano della playlist.
+     * Costruttore di default.
+     */
+    public ShuffleMode() {
+        // Costruttore di default
+    }
+
+    /**
+     * Estrae in modo casuale il brano successivo tra quelli rimanenti in coda.
+     * Rimuove il brano corrente dalla coda e posiziona la traccia estratta all'indice 0 della lista.
      *
-     * @param queue       una lista di elementi della coda.
-     * @param currentItem elemento corrente della coda.
-     * @return un Optional contenente l'elemento successivo nella coda, se presente.
+     * @param queue       La lista degli elementi correntemente in coda.
+     * @param currentItem L'elemento attualmente in riproduzione.
+     * @return Un {@link Optional} contenente il prossimo {@link QueueItem} estratto casualmente,
+     * oppure {@link Optional#empty()} se la coda è esaurita.
      */
     @Override
     public Optional<QueueItem> nextItem(List<QueueItem> queue, QueueItem currentItem) {
@@ -48,11 +62,12 @@ public class ShuffleMode implements PlayMode {
     }
 
     /**
-     * Verifica se ci sono elementi nella coda.
+     * Verifica se sono presenti altri elementi da riprodurre casualmente oltre a quello corrente.
      *
-     * @param queue       una lista di elementi della coda.
-     * @param currentItem elemento corrente della coda.
-     * @return true se ci sono elementi nella coda, false altrimenti.
+     * @param queue       La lista degli elementi correntemente in coda.
+     * @param currentItem L'elemento attualmente in riproduzione.
+     * @return {@code true} se la coda contiene almeno un elemento (se non si è ancora partiti)
+     * oppure se contiene almeno un elemento oltre a quello corrente; {@code false} altrimenti.
      */
     @Override
     public boolean hasNext(List<QueueItem> queue, QueueItem currentItem) {
