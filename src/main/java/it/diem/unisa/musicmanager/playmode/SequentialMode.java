@@ -41,6 +41,12 @@ public class SequentialMode implements PlayMode {
         }
     }
 
+    /**
+     * Verifica se ci sono elementi nella coda.
+     * @param queue una lista di elementi della coda.
+     * @param currentItem elemento corrente della coda.
+     * @return true se ci sono elementi nella coda, false altrimenti.
+     */
     @Override
     public boolean hasNext(List<QueueItem> queue, QueueItem currentItem) {
         if (queue.isEmpty()) return false;

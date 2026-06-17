@@ -6,10 +6,19 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
+/**
+ * Classe che implementa il modo di riproduzione shuffle.
+ */
 public class ShuffleMode implements PlayMode {
 
     private final Random random = new Random();
 
+    /**
+     * Il metodo che restituisce il prossimo brano della playlist.
+     * @param queue una lista di elementi della coda.
+     * @param currentItem elemento corrente della coda.
+     * @return un Optional contenente l'elemento successivo nella coda, se presente.
+     */
     @Override
     public Optional<QueueItem> nextItem(List<QueueItem> queue, QueueItem currentItem) {
         if (queue.isEmpty())
@@ -37,6 +46,12 @@ public class ShuffleMode implements PlayMode {
         return Optional.of(next);
     }
 
+    /**
+     * Verifica se ci sono elementi nella coda.
+     * @param queue una lista di elementi della coda.
+     * @param currentItem elemento corrente della coda.
+     * @return true se ci sono elementi nella coda, false altrimenti.
+     */
     @Override
     public boolean hasNext(List<QueueItem> queue, QueueItem currentItem) {
 

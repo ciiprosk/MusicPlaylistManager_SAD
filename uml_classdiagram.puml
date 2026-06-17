@@ -1,0 +1,619 @@
+@startuml
+
+class it.diem.unisa.musicmanager.dao.JSONPlaylistDAO {
+- String filePath
+- Gson json
++ <<Create>> JSONPlaylistDAO(String,String)
++ List<Playlist> selectAll()
++ void insert(Playlist)
++ void update(Playlist)
++ void delete(UUID)
++ Optional<Playlist> searchById(UUID)
++ boolean isDuplicated(Playlist)
+- boolean updateFile(Playlist,boolean)
+- boolean exists()
+}
+
+
+class it.diem.unisa.musicmanager.dao.JSONTrackDAO {
+- String filePath
+- Gson json
++ <<Create>> JSONTrackDAO(String,String)
++ List<Track> selectAll()
++ void insert(Track)
++ void update(Track)
++ void delete(UUID)
++ Optional<Track> searchById(UUID)
++ boolean isDuplicated(Track)
+- boolean fileExists()
+- void updateFile(Track,boolean)
+}
+
+
+class it.diem.unisa.musicmanager.testMain.PlaylistSystemTest {
++ {static} void main(String[])
+}
+
+class it.diem.unisa.musicmanager.controller.AddPlaylistController {
+- TextField fieldName
+- Label lblError
+- PlaylistService playlistService
++ void setPlaylistService(PlaylistService)
+- void onCreate(ActionEvent)
+- void onCancel(ActionEvent)
+- void close(ActionEvent)
+}
+
+
+class it.diem.unisa.musicmanager.controller.TracksController {
+- ListView<Track> tracksList
+- TextField searchBar
+- TrackService trackService
+- PlayerService playerService
+- boolean isListenerAttached
+- VBox trackList
++ void setTrackService(TrackService)
++ void handleAdd(ActionEvent)
++ void loadTracks()
+- Node createTrackRow(Track)
+- void createTrackListener()
++ void setPlayerService(PlayerService)
+}
+
+
+class it.diem.unisa.musicmanager.MusicPlaylistManager {
++ void start(Stage)
+}
+
+class it.diem.unisa.musicmanager.state.SharedState {
+- ObservableList<Track> allTracks
+- ObservableList<Playlist> allPlaylists
+- ObjectProperty<Track> currentTrack
+- BooleanProperty isPlaying
+- DoubleProperty progress
++ ObservableList<Track> getALlTracks()
++ ObservableList<Playlist> getALlPlaylists()
++ ObjectProperty<Track> getCurrentTrack()
++ BooleanProperty getIsPlaying()
++ DoubleProperty getProgress()
+}
+
+
+abstract class it.diem.unisa.musicmanager.dao.JSONAbstractDAO {
+# void createFileJSON(String,String)
+}
+
+class it.diem.unisa.musicmanager.controller.PlaylistCardController {
+- PlaylistService playlistService
+- PlayerService playerService
+- TrackService trackService
+- Label labelName
+- Label labelTracks
+- Button btnPlay
+- Button btnModify
+- Button btnMenu
+- Playlist playlist
++ void setPlaylist(Playlist)
++ void setPlaylistService(PlaylistService)
++ void setTrackService(TrackService)
++ void setPlayerService(PlayerService)
+- void handlePlay()
+- void handleModify()
+- void handleMenu()
+- void openEditPlaylist()
+- void openDetail()
+- void deletePlaylist()
+- void openAddTrackToPlaylist()
+}
+
+
+class it.diem.unisa.musicmanager.exception.JSONFileException {
++ <<Create>> JSONFileException(String)
+}
+
+class it.diem.unisa.musicmanager.service.PlaylistService {
+- DAO<Playlist> playlistDAO
+- SharedState sharedState
++ <<Create>> PlaylistService(DAO<Playlist>,SharedState)
++ void onTrackDeleted(UUID)
++ ObservableList<Playlist> getPlaylists()
++ Optional<String> createPlaylist(String)
++ void deletePlaylist(UUID)
++ Optional<String> renamePlaylist(UUID,String)
++ void addTrackToPlaylist(UUID,UUID)
++ void removeTrackFromPlaylist(UUID,UUID)
+- void updateInState(Playlist)
++ Optional<Playlist> getPlaylistById(UUID)
++ List<UUID> getTracksFromPlaylist(UUID)
+}
+
+
+class it.diem.unisa.musicmanager.exception.TrackInfoException {
++ <<Create>> TrackInfoException(String)
+}
+
+class it.diem.unisa.musicmanager.service.PlayerService {
+- ObjectProperty<Track> currentTrack
+- BooleanProperty isPlaying
+- DoubleProperty progress
+- MediaPlayer mediaPlayer
+- Track loadedTrack
++ ReadOnlyObjectProperty<Track> currentTrackProperty()
++ ReadOnlyBooleanProperty isPlayingProperty()
++ ReadOnlyDoubleProperty progressProperty()
++ void play(Track)
++ void pause()
++ void resume()
+- void stopCurrent()
++ void seek(double)
++ void togglePlay(Track)
+}
+
+
+class it.diem.unisa.musicmanager.model.Playlist {
+- String name
+- UUID id
+- List<UUID> trackIDs
+- List<Track> tracksList
+- int playCount
++ <<Create>> Playlist(String)
++ <<Create>> Playlist(UUID,String,List<UUID>)
++ <<Create>> Playlist(UUID,String)
++ List<Track> getTracksToPlay()
++ QueueItemType getType()
++ String getName()
++ UUID getId()
++ void setName(String)
++ void addTrack(UUID)
++ void removeTrack(UUID)
++ List<UUID> getTracks()
++ boolean containsTrack(UUID)
++ int numberOfTracks()
+- boolean checkRulesName(String)
++ void addTrack(Track)
++ void addTrackAtPosition(Track, int)
++ void removeTrack(Track)
++ void moveTrack(int, int)
++ List<Track> getTracksList()
++ void resolveTracks(List<Track>)
++ void replaceTracks(List<Track>)
++ boolean equals(Object)
++ int hashCode()
++ int getPlayCount()
++ void incrementPlayCount()
+}
+
+
+class it.diem.unisa.musicmanager.controller.HomeController {
+}
+class it.diem.unisa.musicmanager.controller.AddSongController {
+- TextField fieldTitolo
+- TextField fieldAutore
+- TextField fieldAnno
+- TextField fieldDurata
+- ComboBox<Genre> comboGenere
+- Button btnCarica
+- Label lblFilePath
+- Label lblError
+- Button btnCrea
+- TrackService trackService
+- String audioPath
+- int songLengthSeconds
++ void setTrackService(TrackService)
+- void initialize()
+- void onLoadAudio(ActionEvent)
+- void readDuration(File)
+- String formatDuration(Duration)
+- Genre getSelectedGenre()
+- void onSave(ActionEvent)
+- void onCancel(ActionEvent)
+- void close(ActionEvent)
+}
+
+
+class it.diem.unisa.musicmanager.controller.PlayerController {
+- PlayerService playerService
+- MediaPlayer mediaPlayer
+- Track loadedTrack
+- Button buttonPlay
+- Button buttonNext
+- Button buttonSkipPlaylist
+- Button buttonMode
+- Button buttonQueue
+- Label labelTrack
+- Label labelAuthor
+- Label labelTime
+- Label labelDuration
+- Slider sliderProgress
+- boolean userIsSeeking
+- boolean isListenerAttached
++ void setPlayerService(PlayerService)
++ void handlePlayPause(ActionEvent)
++ void handleNext(ActionEvent)
++ void handleSkipPlaylist(ActionEvent)
++ void handleChangeMode(ActionEvent)
++ void handleQueue(ActionEvent)
+- void bind()
+- void updateTrackInfo(Track)
+- void updatePlayButton(boolean)
+- void updateElapsed(double)
+- String format(long)
+}
+
+
+class it.diem.unisa.musicmanager.model.Track {
+- UUID id
+- String title
+- String author
+- Genre genre
+- int songLength
+- String songPath
+- String year
+- int playCount
+- Set<Tag> tags
++ <<Create>> Track(String,String,Genre,String,int,String,Set<Tag>)
++ <<Create>> Track(UUID,String,String,Genre,String,int,String,EnumSet<Tag>)
++ <<Create>> Track(UUID)
++ List<Track> getTracksToPlay()
++ QueueItemType getType()
++ UUID getId()
++ int getSongLength()
++ String getTitle()
++ Genre getGenre()
++ String getYear()
++ String getAuthor()
++ String getSongPath()
++ Set<Tag> getTags()
++ void addTag(Tag)
++ void removeTag(Tag)
++ boolean hasTag(Tag)
++ void setTags(Set<Tag>)
++ void setTitle(String)
++ void setAuthor(String)
++ void setGenre(Genre)
++ void setYear(String)
++ boolean isDuplicate(Track)
+- String validateTitle(String)
+- String validateAuthor(String)
+- int validateSongLength(int)
+- String validateYear(String)
++ int getPlayCount()
++ void incrementPlayCount()
++ boolean equals(Object)
++ int hashCode()
+}
+
+
+enum it.diem.unisa.musicmanager.model.Genre {
++  POP
++  ROCK
++  HIPHOP
++  EDM
++  JAZZ
++  CLASSICAL
++  REGGAE
++  DISCO
++  METAL
++  FUNK
++  INDIE
++  COUNTRY
++  RAP
++  PUNK
++  UNKNOWN
+}
+
+class it.diem.unisa.musicmanager.exception.PlaylistInfoException {
++ <<Create>> PlaylistInfoException(String)
+}
+
+class it.diem.unisa.musicmanager.util.PopUpUtil {
+- <<Create>> PopUpUtil()
++ {static} C openModal(String,String,Consumer<C>)
+}
+
+class it.diem.unisa.musicmanager.service.TrackService {
+- DAO<Track> trackDAO
+- SharedState sharedState
+- List<TrackObserver> observers
++ <<Create>> TrackService(DAO<Track>,SharedState)
++ ObservableList<Track> getAllTracks()
++ Optional<Track> searchTrackById(UUID)
++ Optional<String> addTrack(String,String,Genre,String,int,String)
++ Optional<String> updateTrack(UUID,String,String,Genre,String)
++ void addObserver(TrackObserver)
++ void deleteTrack(UUID)
+- void updateInState(Track)
+}
+
+
+class it.diem.unisa.musicmanager.service.PersistenceService {
+- DAO<Track> trackDAO
+- DAO<Playlist> playlistDAO
+- SharedState sharedState
++ <<Create>> PersistenceService(DAO<Track>,DAO<Playlist>,SharedState)
++ void load()
+}
+
+
+class it.diem.unisa.musicmanager.controller.AddTrackPlaylisController {
+- Playlist playlist
+- PlaylistService playlistService
+- TrackService trackService
+- List<RowTrackController> rowControllers
+- VBox trackList
++ void onSave(ActionEvent)
++ void setPlaylist(Playlist)
++ void setPlaylistService(PlaylistService)
++ void setTrackService(TrackService)
+- void checkLoading()
+- void loadAllTracks()
+}
+
+
+class it.diem.unisa.musicmanager.exception.FilePathException {
++ <<Create>> FilePathException(String)
+}
+
+class it.diem.unisa.musicmanager.HelloController {
+- Label welcomeText
+# void onHelloButtonClick()
+}
+
+
+class it.diem.unisa.musicmanager.Launcher {
++ {static} void main(String[])
+}
+
+class it.diem.unisa.musicmanager.controller.EditSongController {
+- TextField fieldTitle
+- TextField fieldAuthor
+- TextField fieldYear
+- TextField fieldDuration
+- ComboBox<Genre> comboGenre
+- Label lblFilePath
+- Label lblError
+- Button btnSave
+- TrackService trackService
+- Track track
++ void setTrackService(TrackService)
++ void setTrack(Track)
+- void initialize()
+- String formatDuration(int)
+- Genre getSelectedGenre()
+- void onSave(ActionEvent)
+- void onCancel(ActionEvent)
+- void close(ActionEvent)
+}
+
+
+class it.diem.unisa.musicmanager.controller.MainController {
+- Node homePage
+- Node tracksPage
+- Node playlistsPage
+- PlaylistController playlistsPageController
+- TracksController tracksPageController
+- PlayerController playerController
++ void initialize()
+- void openHome()
+- void openTracks()
+- void openPlaylists()
+- void showPage(Node)
++ PlaylistController getPlaylistsPageController()
++ TracksController getTracksPageController()
++ PlayerController getPlayerController()
+}
+
+
+class it.diem.unisa.musicmanager.util.WindowUtil {
++ {static} FXMLLoader openWindow(String,String,Modality)
++ {static} void close(Node)
+}
+
+interface it.diem.unisa.musicmanager.dao.DAO {
+~ List<T> selectAll()
+~ void insert(T)
+~ void update(T)
+~ void delete(UUID)
+~ Optional<T> searchById(UUID)
+~ boolean isDuplicated(T)
+}
+
+class it.diem.unisa.musicmanager.testMain.MusicSystemIntegrationTest {
++ {static} void main(String[])
+}
+
+class it.diem.unisa.musicmanager.controller.DetailSongController {
+- Label lblTitle
+- Label lblAuthor
+- Label lblGenre
+- Label lblYear
+- Label lblDuration
+- Label lblFilePath
+- Track track
+- TrackService trackService
++ void setTrack(Track)
++ void setTrackService(TrackService)
+- String formatDuration(int)
+- void handleEdit(ActionEvent)
+- void handleDelete(ActionEvent)
+- void onClose(ActionEvent)
+- void close(ActionEvent)
+}
+
+
+class it.diem.unisa.musicmanager.controller.EditPlaylistController {
+- Playlist playlist
+- PlaylistService playlistService
+- TextField fieldName
+- Label lblError
++ void setPlaylist(Playlist)
++ void setPlaylistService(PlaylistService)
++ void onCancel(ActionEvent)
++ void onUpdate(ActionEvent)
+- void close(ActionEvent)
+}
+
+
+interface it.diem.unisa.musicmanager.service.TrackObserver {
+~ void onTrackDeleted(UUID)
+}
+
+class it.diem.unisa.musicmanager.util.AlertUtil {
++ {static} void showError(String,String)
++ {static} boolean showConfirmation(String,String)
+}
+
+class it.diem.unisa.musicmanager.controller.RowTrackController {
+- Track track
+- TrackService trackService
+- PlayerService playerService
+- Label lblTitle
+- Label lblAuthor
+- Label lblDuration
+- Button buttonMenu
+- Button btnModify
+- Button btnPlay
+- CheckBox checkkSelect
+- boolean isListenerAttached
+- Runnable onDeleteAction
++ void setSelectionMode(boolean,boolean)
++ boolean isSelected()
++ void setTrack(Track)
++ void setTrackService(TrackService)
++ void setPlayerService(PlayerService)
+- void updateButtonState()
++ void handlePlay(ActionEvent)
++ void handleModify(ActionEvent)
++ void handleDelete(ActionEvent)
++ void handleMenu(ActionEvent)
+- void openDetail()
+- void openEditTrack()
+- void deleteTrackAction()
++ Track getTrack()
++ void setOnDeleteAction(Runnable)
+}
+
+
+class it.diem.unisa.musicmanager.controller.PlaylistController {
+- TextField searchBar
+- FlowPane playlistsGrid
+- PlaylistService playlistService
+- PlayerService playerService
+- TrackService trackService
+- boolean isListenerAttached
++ void initialize()
+- void handleAdd(ActionEvent)
++ void setPlaylistService(PlaylistService)
++ void setPlayerService(PlayerService)
++ void setTrackService(TrackService)
++ void loadPlaylists()
+- Node createPlaylistCard(Playlist)
+- void checkReadyAndLoad()
+}
+
+
+class it.diem.unisa.musicmanager.controller.DetailedPlaylistController {
+- Label labelName
+- Label lblTrackCount
+- VBox trackList
+- Playlist playlist
+- TrackService trackService
+- PlaylistService playlistService
+- PlayerService playerService
+- void initialize()
++ void setPlaylist(Playlist)
++ void setPlaylistService(PlaylistService)
++ void setTrackService(TrackService)
++ void setPlayerService(PlayerService)
+- void updateTrackCount()
+- void loadTracks()
++ void onModify(ActionEvent)
++ void onAddTrack(ActionEvent)
++ void onDelete(ActionEvent)
+- void deletePlaylist()
+}
+
+
+
+
+it.diem.unisa.musicmanager.dao.DAO <|.. it.diem.unisa.musicmanager.dao.JSONPlaylistDAO
+it.diem.unisa.musicmanager.dao.JSONAbstractDAO <|-- it.diem.unisa.musicmanager.dao.JSONPlaylistDAO
+it.diem.unisa.musicmanager.dao.DAO <|.. it.diem.unisa.musicmanager.dao.JSONTrackDAO
+it.diem.unisa.musicmanager.dao.JSONAbstractDAO <|-- it.diem.unisa.musicmanager.dao.JSONTrackDAO
+javafx.application.Application <|-- it.diem.unisa.musicmanager.MusicPlaylistManager
+it.diem.unisa.musicmanager.exception.RuntimeException <|-- it.diem.unisa.musicmanager.exception.JSONFileException
+it.diem.unisa.musicmanager.service.TrackObserver <|.. it.diem.unisa.musicmanager.service.PlaylistService
+it.diem.unisa.musicmanager.exception.RuntimeException <|-- it.diem.unisa.musicmanager.exception.TrackInfoException
+it.diem.unisa.musicmanager.exception.RuntimeException <|-- it.diem.unisa.musicmanager.exception.PlaylistInfoException
+it.diem.unisa.musicmanager.exception.RuntimeException <|-- it.diem.unisa.musicmanager.exception.FilePathException
+
+class it.diem.unisa.musicmanager.service.QueueService {
+  - SharedState sharedState
+  - PlayMode playMode
+  + List<QueueItem> addToQueue(Playable)
+  + void clearQueue()
+  + QueueItem nextItem()
+  + QueueItem skipCurrentPlaylist()
+  + void moveQueueItem(QueueItem, int)
+}
+class it.diem.unisa.musicmanager.service.SearchService {
+  - TrackService trackService
+  - PlaylistService playlistService
+  + List<Track> searchTracks(String)
+  + List<Playlist> searchPlaylists(String)
+}
+
+interface it.diem.unisa.musicmanager.command.Command {
+  + Optional<String> execute()
+  + void undo()
+  + String getDescription()
+}
+class it.diem.unisa.musicmanager.command.CommandManager {
+  - Stack<Command> undoStack
+  - Stack<Command> redoStack
+  + Optional<String> executeCommand(Command)
+  + void undo()
+  + boolean canUndo()
+}
+class it.diem.unisa.musicmanager.command.AddTrackCommand {}
+class it.diem.unisa.musicmanager.command.DeleteTrackCommand {}
+class it.diem.unisa.musicmanager.command.CreatePlaylistCommand {}
+class it.diem.unisa.musicmanager.command.DeletePlaylistCommand {}
+class it.diem.unisa.musicmanager.command.AddTrackToPlaylistCommand {}
+class it.diem.unisa.musicmanager.command.RemoveTrackFromPlaylistCommand {}
+class it.diem.unisa.musicmanager.command.GeneratePlaylistCommand {}
+
+interface it.diem.unisa.musicmanager.playmode.PlayMode {
+  + Optional<QueueItem> nextItem(List<QueueItem>, QueueItem)
+  + boolean hasNext(List<QueueItem>, QueueItem)
+}
+class it.diem.unisa.musicmanager.playmode.SequentialMode {}
+class it.diem.unisa.musicmanager.playmode.ShuffleMode {}
+class it.diem.unisa.musicmanager.playmode.LoopMode {}
+
+interface it.diem.unisa.musicmanager.specification.PlaylistSpecification {
+  + boolean isSatisfiedBy(Track)
+}
+class it.diem.unisa.musicmanager.specification.SpecificationComposite {}
+class it.diem.unisa.musicmanager.specification.TagSpecification {}
+class it.diem.unisa.musicmanager.specification.YearSpecification {}
+class it.diem.unisa.musicmanager.specification.GenreSpecification {}
+
+it.diem.unisa.musicmanager.command.Command <|.. it.diem.unisa.musicmanager.command.AddTrackCommand
+it.diem.unisa.musicmanager.command.Command <|.. it.diem.unisa.musicmanager.command.DeleteTrackCommand
+it.diem.unisa.musicmanager.command.Command <|.. it.diem.unisa.musicmanager.command.CreatePlaylistCommand
+it.diem.unisa.musicmanager.command.Command <|.. it.diem.unisa.musicmanager.command.DeletePlaylistCommand
+it.diem.unisa.musicmanager.command.Command <|.. it.diem.unisa.musicmanager.command.AddTrackToPlaylistCommand
+it.diem.unisa.musicmanager.command.Command <|.. it.diem.unisa.musicmanager.command.RemoveTrackFromPlaylistCommand
+it.diem.unisa.musicmanager.command.Command <|.. it.diem.unisa.musicmanager.command.GeneratePlaylistCommand
+
+it.diem.unisa.musicmanager.playmode.PlayMode <|.. it.diem.unisa.musicmanager.playmode.SequentialMode
+it.diem.unisa.musicmanager.playmode.PlayMode <|.. it.diem.unisa.musicmanager.playmode.ShuffleMode
+it.diem.unisa.musicmanager.playmode.PlayMode <|.. it.diem.unisa.musicmanager.playmode.LoopMode
+
+it.diem.unisa.musicmanager.specification.PlaylistSpecification <|.. it.diem.unisa.musicmanager.specification.SpecificationComposite
+it.diem.unisa.musicmanager.specification.PlaylistSpecification <|.. it.diem.unisa.musicmanager.specification.TagSpecification
+it.diem.unisa.musicmanager.specification.PlaylistSpecification <|.. it.diem.unisa.musicmanager.specification.YearSpecification
+it.diem.unisa.musicmanager.specification.PlaylistSpecification <|.. it.diem.unisa.musicmanager.specification.GenreSpecification
+
+@enduml
