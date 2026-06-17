@@ -4,13 +4,9 @@ import it.diem.unisa.musicmanager.dao.DAO;
 import it.diem.unisa.musicmanager.exception.PlaylistInfoException;
 import it.diem.unisa.musicmanager.model.Playlist;
 import it.diem.unisa.musicmanager.model.Track;
+import it.diem.unisa.musicmanager.specification.Specification;
 import it.diem.unisa.musicmanager.state.SharedState;
 import javafx.collections.ObservableList;
-
-import it.diem.unisa.musicmanager.model.Genre;
-import it.diem.unisa.musicmanager.model.Tag;
-import it.diem.unisa.musicmanager.specification.Specification;
-
 
 import java.util.Collection;
 import java.util.List;
@@ -30,7 +26,7 @@ import java.util.stream.IntStream;
 //1. leggere o modificare l'oggetto da state o dao
 // 2. fare operazioni con dao
 //3. aggiornare lo stato globale
-public class PlaylistService implements TrackObserver{
+public class PlaylistService implements TrackObserver {
     // serve a gestire le operazioni crud sulle playlist
     private final DAO<Playlist> playlistDAO;
 
@@ -38,15 +34,9 @@ public class PlaylistService implements TrackObserver{
 
     private QueueService queueService;
 
-    public void setQueueService(QueueService queueService) {
-        this.queueService = queueService;
-    }
-
-
-
-
     /**
      * Costruttore della classe PlaylistService.
+     *
      * @param playlistDAO: è l'oggetto DAO che gestisce le operazioni CRUD sulle playlist.
      * @param sharedState: è l'oggetto SharedState che gestisce lo stato globale delle applicazioni.
      */
@@ -54,6 +44,91 @@ public class PlaylistService implements TrackObserver{
         this.playlistDAO = playlistDAO;
         this.sharedState = sharedState;
 
+    }
+
+    public void setQueueService(QueueService queueService) {
+        this.queueService = queueService;
+    }
+
+    /**
+     * Metodo che restituisce tutte le playlist presenti nel file JSON. Usa una lista observable per gestire le modifiche.
+     *
+     * @return una lista di playlist.
+     */
+    public ObservableList<Playlist> getPlaylists() {
+        return sharedState.getALlPlaylists();
+    }
+
+    /**
+     * Recupera una playlist specifica dal sistema tramite il suo identificatore univoco.
+     *
+     * @param playlistID l'identificatore UUID della playlist da cercare.
+     * @return un Optional contenente la playlist se presente nel sistema,
+     * oppure Optional.empty() se non esiste alcuna playlist con l'ID specificato.
+     */
+
+    public Optional<Playlist> getPlaylistById(UUID playlistID) {
+        return sharedState.getALlPlaylists().stream()
+                .filter(p -> p.getId().equals(playlistID))
+                .findFirst();
+    }
+
+    /**
+     * Restituisce l'elenco delle tracce contenute in una specifica playlist.
+     *
+     * @param playlistID l'identificatore UUID della playlist.
+     * @return una lista contenente gli identificatori delle tracce presenti nella playlist.
+     * @throws PlaylistInfoException se la playlist richiesta non esiste nel sistema.
+     */
+
+    public List<Track> getTracksFromPlaylist(UUID playlistID) {
+        Playlist playlist = sharedState.getALlPlaylists().stream()
+                .filter(p -> p.getId().equals(playlistID))
+                .findFirst()
+                .orElseThrow(() -> new PlaylistInfoException("Playlist not found"));
+        return playlist.getTracksList();
+    }
+
+    /**
+     * Restituisce le prime 5 playlist con il maggior numero di riproduzioni.
+     * Recupera tutte le playlist dallo stato condiviso, le ordina in ordine
+     * decrescente in base al contatore delle riproduzioni e ne seleziona al massimo 5.
+     *
+     * @return una List contenente le 5 playlist più ascoltate, ordinate dal numero
+     * maggiore al minore di riproduzioni
+     */
+    public List<Playlist> getTop5MostPlayedPlaylists() {
+        return sharedState.getALlPlaylists()
+                .stream()
+                .sorted((p1, p2) -> Integer.compare(p2.getPlayCount(), p1.getPlayCount()))
+                .limit(5)
+                .toList();
+    }
+
+    /**
+     * Metodo che aggiorna l'elenco di playlist nello stato globale.
+     *
+     * @param playlist è la playlist da aggiornare nello stato globale.
+     */
+    private void updateInState(Playlist playlist) {
+        ObservableList<Playlist> playlists = sharedState.getALlPlaylists();
+
+        //ho ricevuuto tute le playlists ma le devo modificare con i nuovi aggiornameni rispetto alla playlist ricevuto come paramet
+        IntStream.range(0, playlists.size())
+                .filter(index -> playlists.get(index).getId().equals(playlist.getId()))
+                .findFirst().ifPresent(index -> playlists.set(index, playlist));
+
+    }
+
+    /**
+     * Cerca una traccia nello stato condiviso tramite il suo identificativo univoco.
+     *
+     * @param trackId l'UUID della traccia da cercare
+     * @return la Track trovata
+     * @throws PlaylistInfoException se nessuna traccia corrisponde all'ID fornito
+     */
+    private Track searchTrackById(UUID trackId) {
+        return sharedState.getALlTracks().stream().filter(t -> t.getId().equals(trackId)).findFirst().orElseThrow(() -> new PlaylistInfoException("Track not found"));
     }
 
     @Override
@@ -73,43 +148,37 @@ public class PlaylistService implements TrackObserver{
     }
 
     /**
-     * Metodo che restituisce tutte le playlist presenti nel file JSON. Usa una lista observable per gestire le modifiche.
-     * @return una lista di playlist.
-     */
-    public ObservableList<Playlist> getPlaylists() {
-        return sharedState.getALlPlaylists();
-    }
-
-    /**
      * Metodo che crea una playlist:
-     * 1. eriifca i dati ed eventuali doppioni
+     * 1. Veriifca i dati ed eventuali doppioni
      * 2. inseirisce peersistenza
      * 3. cambia lo stato di shared state
-     * @param name
-     * @return
+     *
+     * @param name della playlist da creare.
+     * @return un valore di tipo Optional, che serve a catturare eventuali errori durante la creazione della playlist.
      */
     public Optional<String> createPlaylist(String name) {
-            Playlist playlist = null;
-            try {
-                playlist = new Playlist(name);
+        Playlist playlist = null;
+        try {
+            playlist = new Playlist(name);
 
-                if(playlistDAO.isDuplicated(playlist))
-                    return Optional.of("Playlist name already exists");
+            if (playlistDAO.isDuplicated(playlist))
+                return Optional.of("Playlist name already exists");
 
-                // ora posso inserrie la playlist nel file dao
-                playlistDAO.insert(playlist);
-                sharedState.getALlPlaylists().add(playlist);
+            // ora posso inserrie la playlist nel file dao
+            playlistDAO.insert(playlist);
+            sharedState.getALlPlaylists().add(playlist);
 
 
-            }catch(PlaylistInfoException e){
-                return Optional.of(e.getMessage()); // in questo modo posso gestire i vari tipi di messaggi di errore nel controller
-            }
+        } catch (PlaylistInfoException e) {
+            return Optional.of(e.getMessage()); // in questo modo posso gestire i vari tipi di messaggi di errore nel controller
+        }
         return Optional.empty();
 
     }
 
     /**
      * Metodo che elimina una playlist dal file JSON.
+     *
      * @param playlistID è l'identificatore univoco della playlist da cancellare.
      */
     public void deletePlaylist(UUID playlistID) {
@@ -122,8 +191,9 @@ public class PlaylistService implements TrackObserver{
      * 1. Cerca la playlist nel file JSON utilizzando l'identificatore univoco.
      * 2. Se la playlist non esiste, restituisce Optional.of("Playlist not found").
      * 3. Se la playlist esiste, restituisce Optional.empty() dopo aver aggiornato il nome della playlist nel file JSON.
+     *
      * @param playlistID è l'identificatore univoco della playlist da aggiornare.
-     * @param newName è il nuovo nome della playlist.
+     * @param newName    è il nuovo nome della playlist.
      * @return un Optional<String> contenente un messaggio di errore se la playlist non esiste, altrimenti ritorna Optional.empty().
      */
     public Optional<String> renamePlaylist(UUID playlistID, String newName) {
@@ -138,37 +208,38 @@ public class PlaylistService implements TrackObserver{
             return Optional.empty();
         }
 
-       try {
-           Playlist newPlaylist = new Playlist(playlistID, newName); //in questo modo faccio verifiche su business rules
+        try {
+            Playlist newPlaylist = new Playlist(playlistID, newName); //in questo modo faccio verifiche su business rules
 
-           //controllo che il nuovo nome sia univoco
-           if(playlistDAO.isDuplicated(newPlaylist))
-               return Optional.of("Playlist name already exists");
+            //controllo che il nuovo nome sia univoco
+            if (playlistDAO.isDuplicated(newPlaylist))
+                return Optional.of("Playlist name already exists");
 
-           playlist.setName(newName);
-           playlistDAO.update(playlist);
-           updateInState(playlist);
+            playlist.setName(newName);
+            playlistDAO.update(playlist);
+            updateInState(playlist);
 
-        }catch (PlaylistInfoException e){
-           return Optional.of(e.getMessage());
-       }
+        } catch (PlaylistInfoException e) {
+            return Optional.of(e.getMessage());
+        }
 
         return Optional.empty();
     }
 
     /**
      * Metodo che aggiunge una traccia a una playlist.
+     *
      * @param playlistID è l'identificatore univoco della playlist a cui aggiungere la traccia.
-     * @param trackID è l'identificatore univoco della traccia da aggiungere.
+     * @param trackID    è l'identificatore univoco della traccia da aggiungere.
      */
     public void addTrackToPlaylist(UUID playlistID, UUID trackID) {
         Playlist playlist = sharedState.getALlPlaylists().stream()
                 .filter(p -> p.getId().equals(playlistID))
                 .findFirst()
-                .orElseThrow(()-> new PlaylistInfoException("Playlist not found"));
+                .orElseThrow(() -> new PlaylistInfoException("Playlist not found"));
 
 
-        if(!playlist.containsTrack(trackID)){
+        if (!playlist.containsTrack(trackID)) {
             //se la playlist non contiene la trccia allora la devo inserire con update del dao
             Track track = searchTrackById(trackID);
             playlist.addTrack(track);
@@ -183,8 +254,9 @@ public class PlaylistService implements TrackObserver{
 
     /**
      * Metodo che aggiunge una traccia a una playlist, in una certa posizione.
+     *
      * @param playlistId è l'identificatore univoco della playlist a cui aggiungere la traccia.
-     * @param track è l'identificatore univoco della traccia da aggiungere.
+     * @param track      è l'identificatore univoco della traccia da aggiungere.
      */
     public void addTrackToPlaylistAtPosition(UUID playlistId, Track track, int position) {
         Playlist playlist = sharedState.getALlPlaylists().stream()
@@ -199,17 +271,18 @@ public class PlaylistService implements TrackObserver{
 
     /**
      * Metodo che rimuove una traccia da una playlist.
+     *
      * @param playlistID è l'identificatore univoco della playlist da cui rimuovere la traccia.
-     * @param trackID è l'identificatore univoco della traccia da rimuovere.
+     * @param trackID    è l'identificatore univoco della traccia da rimuovere.
      */
 
     public void removeTrackFromPlaylist(UUID playlistID, UUID trackID) {
         Playlist playlist = sharedState.getALlPlaylists().stream()
                 .filter(p -> p.getId().equals(playlistID))
                 .findFirst()
-                .orElseThrow(()-> new PlaylistInfoException("Playlist not found"));
+                .orElseThrow(() -> new PlaylistInfoException("Playlist not found"));
 
-        if(playlist.containsTrack(trackID)){ //se la playlist contie la traccia la eliminizmao
+        if (playlist.containsTrack(trackID)) { //se la playlist contie la traccia la eliminizmao
             Track track = searchTrackById(trackID);
             playlist.removeTrack(track);
             playlistDAO.update(playlist);
@@ -221,14 +294,13 @@ public class PlaylistService implements TrackObserver{
         }
     }
 
-
     /**
      * Sposta una traccia da una posizione a un'altra all'interno di una playlist.
      * Il nuovo ordine viene salvato nel file JSON e aggiornato nello SharedState.
      *
      * @param playlistID identificatore della playlist da modificare
-     * @param fromIndex posizione iniziale della traccia
-     * @param toIndex nuova posizione della traccia
+     * @param fromIndex  posizione iniziale della traccia
+     * @param toIndex    nuova posizione della traccia
      */
     public void moveTrackInPlaylist(
             UUID playlistID,
@@ -280,52 +352,8 @@ public class PlaylistService implements TrackObserver{
     }
 
     /**
-     * Metodo che aggiorna l'elenco di playlist nello stato globale.
-     * @param playlist è la playlist da aggiornare nello stato globale.
-     */
-    private void updateInState(Playlist playlist) {
-        ObservableList<Playlist> playlists = sharedState.getALlPlaylists();
-
-        //ho ricevuuto tute le playlists ma le devo modificare con i nuovi aggiornameni rispetto alla playlist ricevuto come paramet
-        IntStream.range(0, playlists.size())
-                .filter(index -> playlists.get(index).getId().equals(playlist.getId()))
-                .findFirst().ifPresent(index -> playlists.set(index, playlist));
-
-    }
-
-    /**
-     * Recupera una playlist specifica dal sistema tramite il suo identificatore univoco.
-     *
-     * @param playlistID l'identificatore UUID della playlist da cercare.
-     * @return un Optional contenente la playlist se presente nel sistema,
-     *         oppure Optional.empty() se non esiste alcuna playlist con l'ID specificato.
-     */
-
-    public Optional<Playlist> getPlaylistById(UUID playlistID) {
-        return sharedState.getALlPlaylists().stream()
-                .filter(p -> p.getId().equals(playlistID))
-                .findFirst();
-    }
-
-    /**
-     * Restituisce l'elenco delle tracce contenute in una specifica playlist.
-     *
-     * @param playlistID l'identificatore UUID della playlist.
-     * @return una lista contenente gli identificatori delle tracce presenti nella playlist.
-     * @throws PlaylistInfoException se la playlist richiesta non esiste nel sistema.
-     */
-
-    public List<Track> getTracksFromPlaylist(UUID playlistID) {
-        Playlist playlist = sharedState.getALlPlaylists().stream()
-                .filter(p -> p.getId().equals(playlistID))
-                .findFirst()
-                .orElseThrow(() -> new PlaylistInfoException("Playlist not found"));
-        return playlist.getTracksList();
-    }
-
-    /**
      * Crea un oggetto Playlist filtrando una collezione di tracce in base a una specifica.
-
+     * <p>
      * Metodo puro che non applica persistenza: istanzia la nuova playlist e vi aggiunge
      * tutte le tracce che soddisfano il criterio {@link Specification#isSatisfiedBy(Object)}.
      *
@@ -344,7 +372,7 @@ public class PlaylistService implements TrackObserver{
 
     /**
      * Genera una nuova playlist filtrando le tracce fornite tramite la specifica e la salva.
-     *
+     * <p>
      * Verifica preventivamente che non esista già una playlist con lo stesso nome. In caso
      * positivo, persiste la playlist su file tramite DAO e aggiorna lo stato in memoria.
      *
@@ -357,9 +385,9 @@ public class PlaylistService implements TrackObserver{
     public Optional<String> generateAndSave(String name, Collection<Track> tracks, Specification<Track> criteria) {
 
         // devo stare attaenta perché playlost lancai eccezioniiiiiii
-        try{
+        try {
 
-            if(playlistDAO.isDuplicated(new Playlist(name))){
+            if (playlistDAO.isDuplicated(new Playlist(name))) {
                 return Optional.of("Error: A playlist with this name already exists!");
             }
 
@@ -368,28 +396,15 @@ public class PlaylistService implements TrackObserver{
             sharedState.getALlPlaylists().add(playlist);
             return Optional.empty();
 
-        }catch(PlaylistInfoException e){
+        } catch (PlaylistInfoException e) {
             return Optional.of(e.getMessage());
         }
 
     }
 
-
-
-    /**
-     * Cerca una traccia nello stato condiviso tramite il suo identificativo univoco.
-     *
-     * @param trackId l'UUID della traccia da cercare
-     * @return la Track trovata
-     * @throws PlaylistInfoException se nessuna traccia corrisponde all'ID fornito
-     */
-    private Track searchTrackById(UUID trackId) {
-        return sharedState.getALlTracks().stream().filter(t -> t.getId().equals(trackId)).findFirst().orElseThrow(()-> new PlaylistInfoException("Track not found"));
-    }
-
     /**
      * Incrementa il contatore delle riproduzioni di una playlist e aggiorna i dati.
-     *
+     * <p>
      * Cerca la playlist per ID: se esiste, incrementa il suo playCount,
      * persiste la modifica nel database tramite DAO e aggiorna lo stato in memoria.
      *
@@ -419,23 +434,8 @@ public class PlaylistService implements TrackObserver{
     }
 
     /**
-     * Restituisce le prime 5 playlist con il maggior numero di riproduzioni.
-     * Recupera tutte le playlist dallo stato condiviso, le ordina in ordine
-     * decrescente in base al contatore delle riproduzioni e ne seleziona al massimo 5.
-     *
-     * @return una List contenente le 5 playlist più ascoltate, ordinate dal numero
-     * maggiore al minore di riproduzioni
-     */
-    public List<Playlist> getTop5MostPlayedPlaylists() {
-        return sharedState.getALlPlaylists()
-                .stream()
-                .sorted((p1, p2) -> Integer.compare(p2.getPlayCount(), p1.getPlayCount()))
-                .limit(5)
-                .toList();
-    }
-
-    /**
      * Come createPlaylist, ma restituisce la playlist creata (per il pattern Command).
+     *
      * @return la Playlist creata, oppure null se il nome è duplicato o invalido.
      */
     public Playlist createPlaylistReturning(String name) {
@@ -447,6 +447,7 @@ public class PlaylistService implements TrackObserver{
         sharedState.getALlPlaylists().add(playlist);
         return playlist;
     }
+
     /**
      * Reinserisce una playlist già costruita (con il suo id e le sue tracce),
      * usato per annullare una cancellazione.
@@ -459,8 +460,9 @@ public class PlaylistService implements TrackObserver{
 
     /**
      * Come generateAndSave, ma restituisce la playlist generata (per il pattern Command).
-     * @param name nome della nuova playlist
-     * @param tracks tracce da inserire nella playlist
+     *
+     * @param name     nome della nuova playlist
+     * @param tracks   tracce da inserire nella playlist
      * @param criteria criterio di filtraggio
      * @return
      */
@@ -477,6 +479,7 @@ public class PlaylistService implements TrackObserver{
 
     /**
      * Aggiorna i brani di una playlist esistente nel DAO e nello stato condiviso.
+     *
      * @param playlistId identificatore della playlist da aggiornare
      *
      */

@@ -1,7 +1,5 @@
 package it.diem.unisa.musicmanager.service;
 
-import it.diem.unisa.musicmanager.model.Track;
-
 import java.util.UUID;
 
 /**
@@ -11,6 +9,7 @@ import java.util.UUID;
 public interface TrackObserver {
     /**
      * Metodo chiamato quando una traccia viene eliminata.
+     *
      * @param trackId è l'identificatore univoco della traccia eliminata.
      */
     void onTrackDeleted(UUID trackId);

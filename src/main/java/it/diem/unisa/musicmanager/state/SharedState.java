@@ -17,12 +17,26 @@ public class SharedState {
 
     //uso il costruttore di default
 
+    /**
+     * Restituisce una lista osservabile di tutte le tracce.
+     * @return la lista di tutte le tracce.
+     */
     public ObservableList<Track> getALlTracks(){
         return allTracks;
     }
+
+    /**
+     * Restituisce una lista osservabile di tutte le playlist.
+     * @return una lista di tutte le playlist.
+     */
     public ObservableList<Playlist> getALlPlaylists(){
         return allPlaylists;
     }
+
+    /**
+     * Restituisce la coda osservabile di riproduzione.
+     * @return la coda di riproduzione.
+     */
     public ObservableList<QueueItem> getQueue(){
             return queue;
         }
