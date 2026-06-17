@@ -24,6 +24,24 @@ import java.io.IOException;
  * grafica (GUI) tramite file FXML, iniettando i servizi nei rispettivi controller.
 */
 public class MusicPlaylistManager extends Application {
+
+    /**
+     * Inizializza e avvia lo stage principale dell'applicazione JavaFX.
+     * In particolare, questo metodo esegue le seguenti operazioni:
+     * <ul>
+     *   <li>Crea lo stato condiviso {@link SharedState} e i DAO per la persistenza su file JSON.</li>
+     *   <li>Carica le tracce e le playlist precedentemente salvate mediante {@link PersistenceService}.</li>
+     *   <li>Inizializza i servizi applicativi ({@link PlaylistService}, {@link TrackService}, {@link PlayerService}, {@link QueueService}, {@link CommandManager}) e configura le loro dipendenze.</li>
+     *   <li>Registra i servizi e gli osservatori sul {@link TrackService} per reagire alle modifiche sulle tracce.</li>
+     *   <li>Carica l'interfaccia utente principale tramite il file {@code MusicPlaylistManagerGUI.fxml}.</li>
+     *   <li>Passa i riferimenti dei servizi (Dependency Injection) al {@link MainController} e, tramite quest'ultimo, ai sotto-controller delle pagine (Home, Playlists, Tracks e Player).</li>
+     *   <li>Configura i vincoli di dimensione, il titolo e mostra la finestra ({@link Stage}) dell'applicazione.</li>
+     * </ul>
+     *
+     * @param stage Lo stage principale dell'applicazione fornito dal framework JavaFX.
+     * @throws IOException Se si verifica un errore durante il caricamento del file FXML dell'interfaccia.
+     */
+
     @Override
     public void start(Stage stage) throws IOException {
         //chiamo i dao e shared
