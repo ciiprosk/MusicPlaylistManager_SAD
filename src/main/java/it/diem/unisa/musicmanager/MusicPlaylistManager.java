@@ -16,6 +16,13 @@ import javafx.stage.Stage;
 import it.diem.unisa.musicmanager.model.Track;
 import java.io.IOException;
 
+/**
+ * Classe principale dell'applicazione MusicPlaylistManager.
+ * Estende la classe Application di JavaFX ed è responsabile dell'inizializzazione
+ * dello stato condiviso, dei componenti di accesso ai dati (DAO), dei servizi di business,
+ * del collegamento tra di essi tramite il pattern Observer e del caricamento dell'interfaccia
+ * grafica (GUI) tramite file FXML, iniettando i servizi nei rispettivi controller.
+*/
 public class MusicPlaylistManager extends Application {
     @Override
     public void start(Stage stage) throws IOException {
