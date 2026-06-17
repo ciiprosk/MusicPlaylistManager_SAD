@@ -371,38 +371,6 @@ public class PlaylistService implements TrackObserver {
     }
 
     /**
-     * Genera una nuova playlist filtrando le tracce fornite tramite la specifica e la salva.
-     * <p>
-     * Verifica preventivamente che non esista già una playlist con lo stesso nome. In caso
-     * positivo, persiste la playlist su file tramite DAO e aggiorna lo stato in memoria.
-     *
-     * @param name     il nome da assegnare alla playlist
-     * @param tracks   la collezione di tutte le tracce disponibili da filtrare
-     * @param criteria la specifica contenente i criteri di filtraggio logici
-     * @return un Optional vuoto se l'operazione ha successo, oppure un Optional
-     * contenente il messaggio di errore se il nome della playlist è duplicato
-     */
-    public Optional<String> generateAndSave(String name, Collection<Track> tracks, Specification<Track> criteria) {
-
-        // devo stare attaenta perché playlost lancai eccezioniiiiiii
-        try {
-
-            if (playlistDAO.isDuplicated(new Playlist(name))) {
-                return Optional.of("Error: A playlist with this name already exists!");
-            }
-
-            Playlist playlist = generate(name, tracks, criteria);
-            playlistDAO.insert(playlist);
-            sharedState.getALlPlaylists().add(playlist);
-            return Optional.empty();
-
-        } catch (PlaylistInfoException e) {
-            return Optional.of(e.getMessage());
-        }
-
-    }
-
-    /**
      * Incrementa il contatore delle riproduzioni di una playlist e aggiorna i dati.
      * <p>
      * Cerca la playlist per ID: se esiste, incrementa il suo playCount,
