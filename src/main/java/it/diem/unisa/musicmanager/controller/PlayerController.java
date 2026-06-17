@@ -64,6 +64,9 @@ public class PlayerController {
         }
     }
 
+    /**
+     * @param queueService il service di coda di riproduzione
+     */
     public void setQueueService(QueueService queueService) {
 
         this.queueService = queueService;
@@ -77,6 +80,9 @@ public class PlayerController {
         updateSkipPlaylistButton();
     }
 
+    /**
+     * @param playlistService il service delle playlist di tracce
+     */
     public void setPlaylistService(it.diem.unisa.musicmanager.service.PlaylistService playlistService) {
         this.playlistService = playlistService;
     }
@@ -95,17 +101,27 @@ public class PlayerController {
         }
 
     }
+
+    /**
+     * Pulsante Next: salta la traccia in riproduzione, passa alla successiva
+     */
     @FXML
     public void handleNext(ActionEvent actionEvent) {
         //chiamo il service
         playerService.next();
     }
 
+    /**
+     * Pulsante Skip Playlist: salta la playlist in riproduzione, passa al prossimo elemento in coda di ascolto
+     */
     @FXML
     public void handleSkipPlaylist(ActionEvent actionEvent) {
         playerService.skipPlaylist();
     }
 
+    /**
+     *PlayMode: cambia modalità di ascolto della coda (shuffle, loop e sequenziale)
+     */
     @FXML
     public void handleChangeMode(ActionEvent actionEvent) {
         //cicla tra le modalità e le setta nella queue service
@@ -115,6 +131,9 @@ public class PlayerController {
 
     }
 
+    /**
+     * Pulsante PlayMode: aggiorna visivamente il tasto in base alla modalità di ascolto
+     */
     private void updateModeButton(){
         switch (currentPlayModeIndex){
             case 0 -> {
@@ -132,6 +151,12 @@ public class PlayerController {
         }
     }
 
+    /**
+     * Gestisce l'apertura della finestra per la visualizzazione della coda di riproduzione.
+     * Carica il file FXML associato, inietta i service nel nuovo controller e previene
+     * l'apertura di finestre duplicate.
+     * * @param actionEvent l'evento generato dal click sul bottone della coda.
+     */
     public void handleQueue(ActionEvent actionEvent) {
         try {
             javafx.fxml.FXMLLoader loader = it.diem.unisa.musicmanager.util.WindowUtil.openWindow(
@@ -152,6 +177,11 @@ public class PlayerController {
         }
     }
 
+    /**
+     * Collega le proprietà osservabili dei Service ai componenti grafici della View.
+     * Imposta i listener per l'aggiornamento automatico dei metadati del brano,
+     * dello stato del pulsante play/pausa e della posizione dello slider in base al tempo.
+     */
     private void bind() {
         // 1. Ascolta il cambio del brano dal Service e aggiorna info + pulsante skip playlist
         playerService.currentTrackProperty().addListener((o, ov, track) -> {
@@ -195,12 +225,23 @@ public class PlayerController {
 
     }
 
+    /**
+     * Aggiorna lo stato di abilitazione del pulsante "Salta Playlist".
+     * Il pulsante è attivo solo se la traccia correntemente in esecuzione
+     * appartiene a una playlist.
+     */
     private void updateSkipPlaylistButton() {
         if (queueService == null) return;
         QueueItem current = queueService.getCurrentItem();
         boolean belongsToPlaylist = current != null && current.getBelongsToPlaylist() != null;
         buttonSkipPlaylist.setDisable(!belongsToPlaylist);
     }
+
+    /**
+     * Aggiorna le etichette testuali (titolo, autore, durata) con le informazioni
+     * del brano correntemente in esecuzione. Ripristina i valori di default se la traccia è null.
+     * * @param track la traccia di cui visualizzare i dettagli.
+     */
     private void updateTrackInfo(Track track) {
         if (track == null) {
             labelTrack.setText("Track");
@@ -213,20 +254,39 @@ public class PlayerController {
         labelAuthor.setText(track.getAuthor());
         labelDuration.setText(format((long) track.getSongLength()));
     }
+
+    /**
+     * Aggiorna l'icona testuale del pulsante Play/Pausa in base allo stato fornito.
+     * * @param playing true se è in corso la riproduzione, false altrimenti.
+     */
     private void updatePlayButton(boolean playing) {
         buttonPlay.setText(playing ? "⏸" : "▶");
     }
 
+    /**
+     * Calcola e aggiorna l'etichetta del tempo trascorso in base alla percentuale
+     * di avanzamento dello slider e alla durata totale del brano corrente.
+     * * @param progress valore compreso tra 0.0 e 1.0 che rappresenta l'avanzamento.
+     */
     private void updateElapsed(double progress) {
         Track track = playerService.currentTrackProperty().get();
         long elapsed = (track == null) ? 0 : Math.round(track.getSongLength() * progress);
         labelTime.setText(format(elapsed));
     }
 
+    /**
+     * Formatta una quantità di tempo in secondi nel formato MM:SS.
+     * * @param totalSeconds il totale dei secondi da formattare.
+     * @return una stringa formattata (es. "03:45").
+     */
     private String format(long totalSeconds) {
         return String.format("%02d:%02d", totalSeconds / 60, totalSeconds % 60);
     }
 
+    /**
+     * Aggiorna lo stato di abilitazione del pulsante Next.
+     * Il pulsante viene disabilitato se non ci sono tracce caricate nel player.
+     */
     private void updateNextButton() {
         // Disattiva il pulsante Next solo se il player è completamente fermo (nessuna traccia caricata)
         buttonNext.setDisable(playerService.currentTrackProperty().get() == null);
