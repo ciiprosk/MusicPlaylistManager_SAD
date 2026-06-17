@@ -102,7 +102,7 @@ public class MainController {
         try {
             javafx.fxml.FXMLLoader loader = it.diem.unisa.musicmanager.util.WindowUtil.openWindow(
                     "/it/diem/unisa/musicmanager/pages/queueView.fxml",
-                    "Coda di Riproduzione",
+                    "Playback Queue",
                     javafx.stage.Modality.NONE
             );
             if (loader == null) {
@@ -140,7 +140,7 @@ public class MainController {
                 return;
             }
 
-            String descrizione = commandManager.peekUndoDescription().orElse("l'ultima azione");
+            String descrizione = commandManager.peekUndoDescription().orElse("the last action");
 
             boolean conferma = AlertUtil.showConfirmation(
                     "Undo",

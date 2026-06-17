@@ -275,7 +275,7 @@ public class DetailedPlaylistController {
     public void onPlay(ActionEvent actionEvent) {
         if (playlist == null) return;
         if (playlist.getTracksList().isEmpty()) {
-            AlertUtil.showInfo("Playlist Vuota", "Per riprodurre questa playlist, devi prima inserire una traccia.");
+            AlertUtil.showInfo("Empty Playlist", "To play this playlist, you must first add a track.");
             return;
         }
 
@@ -339,7 +339,7 @@ public class DetailedPlaylistController {
     public void onSequential(ActionEvent actionEvent) {
         if (playlist == null) return;
         if (playlist.getTracksList().isEmpty()) {
-            AlertUtil.showInfo("Playlist Vuota", "Per riprodurre questa playlist, devi prima inserire una traccia.");
+            AlertUtil.showInfo("Empty Playlist", "To play this playlist, you must first add a track.");
             return;
         }
         if (playlistService != null) playlistService.incrementPlayCount(playlist.getId());
@@ -355,7 +355,7 @@ public class DetailedPlaylistController {
     public void onLoop(ActionEvent actionEvent) {
         if (playlist == null) return;
         if (playlist.getTracksList().isEmpty()) {
-            AlertUtil.showInfo("Playlist Vuota", "Per riprodurre questa playlist, devi prima inserire una traccia.");
+            AlertUtil.showInfo("Empty Playlist", "To play this playlist, you must first add a track.");
             return;
         }
         if (playlistService != null) playlistService.incrementPlayCount(playlist.getId());
@@ -372,7 +372,7 @@ public class DetailedPlaylistController {
 
         if (playlist == null) return;
         if (playlist.getTracksList().isEmpty()) {
-            AlertUtil.showInfo("Playlist Vuota", "Per riprodurre questa playlist, devi prima inserire una traccia.");
+            AlertUtil.showInfo("Empty Playlist", "To play this playlist, you must first add a track.");
             return;
         }
         if (playlistService != null)
@@ -433,6 +433,10 @@ public class DetailedPlaylistController {
     @FXML
     public void onAddToQueue(ActionEvent actionEvent) {
         if(queueService !=null && playlist != null) {
+            if (playlist.getTracksList().isEmpty()) {
+                AlertUtil.showInfo("Empty Playlist", "To play this playlist, you must first add a track.");
+                return;
+            }
             //vedio se la coda d ascolto è vuota
             boolean isEmpty = queueService.getQueueList().isEmpty();
 

@@ -125,7 +125,7 @@ public class PlaylistCardController {
             return;
         }
         if (playlist.getTracksList().isEmpty()) {
-            it.diem.unisa.musicmanager.util.AlertUtil.showInfo("Playlist Vuota", "Per riprodurre questa playlist, devi prima inserire una traccia.");
+            it.diem.unisa.musicmanager.util.AlertUtil.showInfo("Empty Playlist", "To play this playlist, you must first add a track.");
             return;
         }
 
@@ -221,6 +221,13 @@ public class PlaylistCardController {
         MenuItem addQueueItem = new MenuItem("Add to Queue");
         addQueueItem.setOnAction(e -> {
             if (queueService != null && playlist != null) {
+                if (playlist.getTracksList().isEmpty()) {
+                    it.diem.unisa.musicmanager.util.AlertUtil.showInfo(
+                            "Empty Playlist", 
+                            "To play this playlist, you must first add a track."
+                    );
+                    return;
+                }
                 // 1. Controlla lo stato della coda e del player PRIMA di aggiungere
                 boolean isEmpty = queueService.getQueueList().isEmpty();
                 boolean isPlayingTrack = playerService != null && playerService.currentTrackProperty().get() != null;
