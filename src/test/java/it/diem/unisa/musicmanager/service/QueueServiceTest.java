@@ -393,4 +393,39 @@ class QueueServiceTest {
                 sharedState.getQueue().isEmpty()
         );
     }
+
+    // TEST CORRETTO RIORDINAMENTO DELLE TRACCE DURANTE LA RIPRODUZIONE (US15)
+
+    @Test
+    void moveQueueItemShouldReorderQueueCorrectly() {
+
+        Track firstTrack = createTrack("First Track");
+        Track secondTrack = createTrack("Second Track");
+        Track thirdTrack = createTrack("Third Track");
+
+        queueService.addToQueue(firstTrack);
+        queueService.addToQueue(secondTrack);
+        queueService.addToQueue(thirdTrack);
+
+        List<QueueItem> queue = sharedState.getQueue();
+        QueueItem itemToMove = queue.get(0);
+        QueueItem targetItem = queue.get(2);
+
+        queueService.moveQueueItem(itemToMove, targetItem);
+
+        assertEquals(
+                secondTrack.getId(),
+                queue.get(0).getPlayable().getId()
+        );
+
+        assertEquals(
+                thirdTrack.getId(),
+                queue.get(1).getPlayable().getId()
+        );
+
+        assertEquals(
+                firstTrack.getId(),
+                queue.get(2).getPlayable().getId()
+        );
+    }
 }
