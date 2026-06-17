@@ -15,12 +15,21 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * DAO per la gestione delle tracce in formato JSON.
+ * Implementa il DAO per gestire le operazioni CRUD su tracce.
+ */
 public class JSONTrackDAO extends JSONAbstractDAO implements DAO<Track> {
 
     private final String filePath;
 
     private Gson json;
 
+    /**
+     * Costruttore della classe JSONTrackDAO.
+     * @param folderPath cartella in cui si trova il file JSON
+     * @param fileName nome del file JSON
+     */
     public JSONTrackDAO(String folderPath, String fileName) {
 
         this.filePath = folderPath + File.separator + fileName;
@@ -29,7 +38,8 @@ public class JSONTrackDAO extends JSONAbstractDAO implements DAO<Track> {
     }
 
     /**
-     * @return
+     * Metodo che restituisce tutte le tracce presenti nel file JSON.
+     * @return una lista di tracce.
      */
     @Override
     public List<Track> selectAll() {
@@ -68,7 +78,8 @@ public class JSONTrackDAO extends JSONAbstractDAO implements DAO<Track> {
     }
 
     /**
-     * @param track
+     * Metodo che inserisce una traccia nel file JSON.
+     * @param track la traccia da inserire.
      */
     @Override
     public void insert(Track track) {
@@ -87,7 +98,8 @@ public class JSONTrackDAO extends JSONAbstractDAO implements DAO<Track> {
     }
 
     /**
-     * @param track
+     * Metodo che aggiorna una traccia nel file JSON.
+     * @param track la traccia da aggiornare.
      */
     @Override
     public void update(Track track) {
@@ -95,7 +107,8 @@ public class JSONTrackDAO extends JSONAbstractDAO implements DAO<Track> {
     }
 
     /**
-     * @param id
+     * Metodo che cancella una traccia dal file JSON.
+     * @param id identificatore univoco della traccia da cancellare.
      */
     @Override
     public void delete(UUID id) {
@@ -107,8 +120,9 @@ public class JSONTrackDAO extends JSONAbstractDAO implements DAO<Track> {
     }
 
     /**
-     * @param id
-     * @return
+     * Metodo che cerca una traccia nel file JSON.
+     * @param id identificatore univoco della traccia da cercare.
+     * @return un Optional che contiene la traccia se trovata, altrimenti Optional.empty().
      */
     @Override
     public Optional<Track> searchById(UUID id) {
@@ -122,8 +136,9 @@ public class JSONTrackDAO extends JSONAbstractDAO implements DAO<Track> {
     }
 
     /**
-     * @param track
-     * @return
+     * Metodo che verifica se una traccia è presente nel file JSON.
+     * @param track la traccia da verificare.
+     * @return true se esiste, false altrimenti.
      */
     @Override
     public boolean isDuplicated(Track track) {
@@ -133,10 +148,20 @@ public class JSONTrackDAO extends JSONAbstractDAO implements DAO<Track> {
                         && t.getAuthor().equals(track.getAuthor()));
     }
 
+    /**
+     * Metodo che verifica se il file JSON esiste.
+     * @return true se esiste, false altrimenti.
+     */
     private boolean fileExists() {
         return Files.exists(Paths.get(filePath));
     }
 
+    /**
+     * * Metodo privato di utilità che aggiorna il file jsonlines
+     * @param track è la traccia da aggiornare (modificare o cancellare)
+     * @param delete è un booleano che indica se la playlist deve essere cancellata
+     * @return false se l'operazione non è andata a buon fine, true altrimenti
+     */
     private void updateFile(Track track, boolean delete){
         if (!fileExists()){
             return;

@@ -7,9 +7,18 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 
+/**
+ * Classe astratta per i DAO che utilizzano JSON.
+ * Ha un solo metodo per la creazione del file JSON.
+ */
 
 public abstract class JSONAbstractDAO {
 
+    /**
+     * Metodo che crea il file JSON se non esiste. È un metodo protetto per evitare che venga chiamato direttamente.
+     * @param filePath è il percorso del file JSON.
+     * @param pathFolder è il percorso della cartella in cui si trova il file JSON.
+     */
         protected void createFileJSON(String filePath, String pathFolder) {
             File file = new File(filePath);
             File folder = new File(pathFolder);

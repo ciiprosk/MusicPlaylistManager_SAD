@@ -14,6 +14,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * DAO per la gestione delle playlist in formato JSON.
+ * Implementa il DAO per gestire le operazioni CRUD su playlist.
+ */
 public class JSONPlaylistDAO  extends JSONAbstractDAO implements DAO<Playlist> {
     private final String filePath;
     private Gson json;
@@ -88,7 +92,8 @@ public class JSONPlaylistDAO  extends JSONAbstractDAO implements DAO<Playlist> {
     }
 
     /**
-     * @param playlist
+     * Metodo che aggiorna una playlist nel file JSON.
+     * @param playlist la playlist da aggiornare.
      */
     @Override
     public void update(Playlist playlist) {
