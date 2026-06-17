@@ -28,14 +28,14 @@ enum Genre {
 +  UNKNOWN
 }
 
-' --- COMPOSITE PATTERN: Component ---
+' --- Interfaccia Playable ---
 interface Playable {
 ~ List<Track> getTracksToPlay()
 ~ QueueItemType getType()
 ~ UUID getId()
 }
 
-' --- COMPOSITE PATTERN: Composite ---
+' --- Playlist ---
 class Playlist {
 - String name
 - UUID id
@@ -66,7 +66,7 @@ class Playlist {
 + void incrementPlayCount()
 }
 
-' --- COMPOSITE PATTERN: Leaf ---
+' --- Track ---
 class Track {
 - UUID id
 - String title
