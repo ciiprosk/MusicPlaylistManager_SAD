@@ -20,7 +20,7 @@ public class PersistenceService {
     /**
      * Costruttore della classe PersistenceService. Riceve i DAO e lo stato condiviso.
      *
-     * @param trackDAO interfaccia DAO per le tracce
+     * @param trackDAO    interfaccia DAO per le tracce
      * @param playlistDAO interfaccia DAO per le playlist
      * @param sharedState lo stato condiviso globale, usato per condividere informazioni tra i componenti
      */

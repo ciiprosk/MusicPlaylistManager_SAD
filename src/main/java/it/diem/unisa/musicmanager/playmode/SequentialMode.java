@@ -4,7 +4,6 @@ import it.diem.unisa.musicmanager.model.QueueItem;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Queue;
 
 /**
  * È la classe che implementa il modo di riproduzione sequenziale.
@@ -13,7 +12,8 @@ public class SequentialMode implements PlayMode {
 
     /**
      * Il metodo che restituisce il prossimo brano della playlist.
-     * @param queue è la coda dei brani.
+     *
+     * @param queue       è la coda dei brani.
      * @param currentItem è il brano corrente.
      * @return il prossimo brano della playlist.
      */
@@ -43,7 +43,8 @@ public class SequentialMode implements PlayMode {
 
     /**
      * Verifica se ci sono elementi nella coda.
-     * @param queue una lista di elementi della coda.
+     *
+     * @param queue       una lista di elementi della coda.
      * @param currentItem elemento corrente della coda.
      * @return true se ci sono elementi nella coda, false altrimenti.
      */

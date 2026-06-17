@@ -14,7 +14,7 @@ import java.util.*;
 
 /**
  * Servizio per la gestione e la manipolazione della coda di riproduzione.
- * Gestisce l'aggiunta di brani singoli o intere playlist, gestisce la navigazione della coda 
+ * Gestisce l'aggiunta di brani singoli o intere playlist, gestisce la navigazione della coda
  * in base alla modalità di riproduzione corrente ({@link PlayMode}), e assicura la sincronizzazione
  * automatica della coda quando le playlist in archivio vengono modificate (es. tracce aggiunte, rimosse o riordinate).
  * Implementa l'interfaccia {@link TrackObserver} per rimuovere automaticamente le tracce eliminate dal sistema.
@@ -39,7 +39,7 @@ public class QueueService implements TrackObserver {
     /**
      * Costruisce un nuovo {@code QueueService} associandovi lo stato condiviso.
      * Inizializza la modalità di riproduzione di default in modalità sequenziale ({@link SequentialMode}).
-     * 
+     *
      * @param sharedState Lo stato condiviso globale dell'applicazione.
      */
     public QueueService(SharedState sharedState) {
@@ -49,7 +49,7 @@ public class QueueService implements TrackObserver {
 
     /**
      * Restituisce l'elemento della coda attualmente in riproduzione.
-     * 
+     *
      * @return L'oggetto {@link QueueItem} corrente, o {@code null} se nessun elemento è in riproduzione.
      */
     public QueueItem getCurrentItem() {
@@ -58,7 +58,7 @@ public class QueueService implements TrackObserver {
 
     /**
      * Imposta l'elemento corrente della coda.
-     * 
+     *
      * @param queueItem Il nuovo elemento {@link QueueItem} da impostare come corrente.
      */
     public void setCurrentItem(QueueItem queueItem) {
@@ -67,7 +67,7 @@ public class QueueService implements TrackObserver {
 
     /**
      * Restituisce la lista osservabile degli elementi attualmente in coda.
-     * 
+     *
      * @return La lista osservabile {@link ObservableList} di {@link QueueItem}.
      */
     public ObservableList<QueueItem> getQueueList() {
@@ -76,7 +76,7 @@ public class QueueService implements TrackObserver {
 
     /**
      * Imposta la modalità di riproduzione corrente (es. sequenziale, shuffle).
-     * 
+     *
      * @param playMode La nuova modalità {@link PlayMode} da applicare.
      */
     public void setCurrentPlayMode(PlayMode playMode) {
@@ -85,7 +85,7 @@ public class QueueService implements TrackObserver {
 
     /**
      * Riordina le tracce future (non ancora riprodotte) all'interno del gruppo playlist attivo.
-     * 
+     *
      * @param queue        La coda degli elementi.
      * @param playlist     La playlist da cui attingere l'ordine aggiornato delle tracce.
      * @param groupId      L'identificativo del gruppo playlist in coda.
@@ -123,7 +123,7 @@ public class QueueService implements TrackObserver {
 
     /**
      * Riordina tutti gli elementi appartenenti ad un intero gruppo playlist in coda.
-     * 
+     *
      * @param queue    La coda degli elementi.
      * @param playlist La playlist da cui attingere l'ordine aggiornato delle tracce.
      * @param groupId  L'identificativo del gruppo playlist in coda.
@@ -159,14 +159,14 @@ public class QueueService implements TrackObserver {
 
     /**
      * Ordina una lista di elementi della coda basandosi sull'ordine reale delle tracce nella playlist specificata.
-     * 
+     *
      * @param items    La lista degli elementi da ordinare.
      * @param playlist La playlist di riferimento.
      */
     private void sortItemsByPlaylistOrder(
             List<QueueItem> items,
             Playlist playlist
-        ) {
+    ) {
         items.sort(Comparator.comparingInt(item -> {
             UUID trackId = item.getPlayable().getId();
 
@@ -183,7 +183,7 @@ public class QueueService implements TrackObserver {
      * Aggiunge un oggetto riproducibile (una singola traccia o una playlist intera) in coda.
      * Se l'oggetto è una playlist, viene spacchettata in singoli elementi `QueueItem` per ciascuna traccia,
      * mantenendo un riferimento all'ID della playlist d'origine e a un ID progressivo di gruppo.
-     * 
+     *
      * @param playable L'oggetto {@link Playable} da inserire in coda.
      * @return La lista di {@link QueueItem} generati e inseriti in coda.
      */
@@ -218,7 +218,7 @@ public class QueueService implements TrackObserver {
 
     /**
      * Restituisce la proprietà di sola lettura per l'elemento corrente della coda.
-     * 
+     *
      * @return La proprietà {@link ReadOnlyObjectProperty} per l'elemento corrente.
      */
     public ReadOnlyObjectProperty<QueueItem> currentItemProperty() {
@@ -227,7 +227,7 @@ public class QueueService implements TrackObserver {
 
     /**
      * Verifica se esiste un elemento successivo nella coda in base alla modalità di riproduzione.
-     * 
+     *
      * @return true se è presente un elemento successivo, false altrimenti.
      */
     public boolean hasNext() {
@@ -246,7 +246,7 @@ public class QueueService implements TrackObserver {
     /**
      * Restituisce e imposta come corrente il prossimo elemento della coda,
      * calcolato in base alla modalità di riproduzione ({@link PlayMode}) attiva.
-     * 
+     *
      * @return Il prossimo {@link QueueItem} impostato come corrente.
      * @throws QueueException Se la coda è vuota.
      */
@@ -270,7 +270,7 @@ public class QueueService implements TrackObserver {
      * Salta l'intera playlist dell'elemento correntemente in riproduzione.
      * Rimuove tutti gli elementi della stessa playlist associati a quel gruppo progressivo
      * e avanza al prossimo elemento in coda.
-     * 
+     *
      * @return Il prossimo {@link QueueItem} da riprodurre, oppure {@code null} se la coda è vuota.
      */
     public QueueItem skipCurrentPlaylist() {
@@ -301,7 +301,7 @@ public class QueueService implements TrackObserver {
     /**
      * Avvia la riproduzione di una playlist partendo da una specifica traccia al suo interno.
      * Svuota la coda, inserisce la playlist e scorre gli elementi finché non raggiunge la traccia cliccata.
-     * 
+     *
      * @param playable        La playlist da mettere in coda.
      * @param trackInPlaylist La traccia all'interno della playlist da cui far partire la riproduzione.
      * @return L'elemento {@link QueueItem} corrispondente alla traccia da cui avviare la riproduzione.
@@ -310,7 +310,7 @@ public class QueueService implements TrackObserver {
         if (playable == null || trackInPlaylist == null) return null;
 
         clearQueue();
-        addToQueue(playable); 
+        addToQueue(playable);
 
         QueueItem queueItem = nextItem();
         //dobbiamo scartare le canzoni fino a quella su cui abbiamo cliccato play
@@ -326,7 +326,7 @@ public class QueueService implements TrackObserver {
      * Gestisce la cancellazione di una traccia dal sistema.
      * Rimuove tutte le occorrenze della traccia dalla coda e resetta l'elemento corrente
      * se corrispondeva alla traccia eliminata.
-     * 
+     *
      * @param trackId L'ID della traccia eliminata.
      */
     @Override
@@ -352,7 +352,7 @@ public class QueueService implements TrackObserver {
     /**
      * Restituisce il prossimo elemento in coda senza far avanzare il cursore di riproduzione.
      * Utilizzato esclusivamente per scopi di sola visualizzazione (es. mostrare il brano successivo nella GUI).
-     * 
+     *
      * @return Il prossimo {@link QueueItem} calcolato, o {@code null} se non vi sono altri elementi.
      */
     public QueueItem peekNext() {
@@ -365,9 +365,9 @@ public class QueueService implements TrackObserver {
 
     /**
      * Sincronizza la coda quando una playlist viene riordinata all'interno dell'applicazione.
-     * Mantiene fermo il brano corrente in riproduzione e riordina i brani successivi, 
+     * Mantiene fermo il brano corrente in riproduzione e riordina i brani successivi,
      * mentre riordina completamente gli altri gruppi in coda associati alla stessa playlist.
-     * 
+     *
      * @param playlist La playlist che è stata riordinata.
      */
     public void synchronizePlaylistOrder(Playlist playlist) {
@@ -433,7 +433,7 @@ public class QueueService implements TrackObserver {
      * Sposta un elemento all'interno della coda di riproduzione in una nuova posizione specificata.
      * Modifica direttamente la lista osservabile in modo da notificare automaticamente le viste della GUI.
      * Il brano correntemente in riproduzione non può essere spostato.
-     * 
+     *
      * @param item     L'elemento {@link QueueItem} da spostare.
      * @param newIndex L'indice di destinazione nella coda.
      */
@@ -487,7 +487,7 @@ public class QueueService implements TrackObserver {
     /**
      * Sposta un elemento della coda nella posizione occupata da un altro elemento.
      * Questo metodo è particolarmente utile per il drag and drop della ListView della coda.
-     * 
+     *
      * @param draggedItem L'elemento trascinato.
      * @param targetItem  L'elemento sul quale viene rilasciato.
      */
@@ -513,7 +513,7 @@ public class QueueService implements TrackObserver {
      * Sincronizza la coda quando una traccia viene aggiunta a una playlist nel sistema.
      * Cerca ogni gruppo in coda che appartiene a tale playlist e vi inserisce la traccia
      * subito dopo l'ultimo elemento di quel gruppo.
-     * 
+     *
      * @param playlistId L'identificatore della playlist modificata.
      * @param track      La traccia aggiunta alla playlist.
      */
@@ -553,7 +553,7 @@ public class QueueService implements TrackObserver {
      * Sincronizza la coda quando una traccia viene rimossa da una playlist nel sistema.
      * Rimuove tutte le occorrenze in coda della traccia specificata appartenenti a tale playlist.
      * Se la traccia rimossa era quella attualmente in riproduzione, azzera l'elemento corrente.
-     * 
+     *
      * @param playlistId L'identificatore della playlist modificata.
      * @param trackId    L'identificatore della traccia rimossa dalla playlist.
      */

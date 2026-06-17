@@ -26,7 +26,7 @@ public class QueueItem {
 
     /**
      * Costruttore della classe QueueItem.
-     * 
+     *
      * @param playable            La traccia o playlist associata.
      * @param belongsToPlaylist   L'identificativo della playlist a cui appartiene.
      * @param playlistProgressive L'identificativo progressivo dell'elemento.
@@ -39,7 +39,7 @@ public class QueueItem {
 
     /**
      * Restituisce l'oggetto {@link Playable} (traccia o playlist) racchiuso in questo elemento.
-     * 
+     *
      * @return L'oggetto Playable.
      */
     public Playable getPlayable() {
@@ -48,7 +48,7 @@ public class QueueItem {
 
     /**
      * Restituisce l'identificatore della playlist a cui appartiene l'elemento.
-     * 
+     *
      * @return L'UUID della playlist di appartenenza.
      */
     public UUID getBelongsToPlaylist() {
@@ -57,30 +57,30 @@ public class QueueItem {
 
     /**
      * Restituisce l'identificatore progressivo dell'elemento.
-     * 
+     *
      * @return L'UUID del progressivo.
      */
-    public UUID getPlaylistProgressive() { 
+    public UUID getPlaylistProgressive() {
         return playlistProgressive;
     }
 
     /**
      * Verifica se l'elemento racchiuso corrisponde ad una playlist.
-     * 
+     *
      * @return true se l'elemento è di tipo PLAYLIST, false altrimenti.
      */
-    public boolean isPlaylist(){
-        if(playable.getType() != QueueItemType.PLAYLIST) return false;
+    public boolean isPlaylist() {
+        if (playable.getType() != QueueItemType.PLAYLIST) return false;
         return true;
     }
 
     /**
      * Verifica se l'elemento racchiuso corrisponde ad una singola traccia.
-     * 
+     *
      * @return true se l'elemento è di tipo TRACK, false altrimenti.
      */
-    public boolean isTrack(){
-        if(playable.getType() != QueueItemType.TRACK) return false;
+    public boolean isTrack() {
+        if (playable.getType() != QueueItemType.TRACK) return false;
         return true;
     }
 }

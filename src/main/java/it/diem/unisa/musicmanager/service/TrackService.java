@@ -36,7 +36,7 @@ public class TrackService {
 
     /**
      * Costruisce un nuovo {@code TrackService} con i riferimenti al DAO e allo stato condiviso.
-     * 
+     *
      * @param trackDAO    Il DAO per la gestione della persistenza delle tracce.
      * @param sharedState Lo stato condiviso globale dell'applicazione.
      */
@@ -47,7 +47,7 @@ public class TrackService {
 
     /**
      * Restituisce la lista osservabile di tutte le tracce caricate nell'applicazione.
-     * 
+     *
      * @return L'{@link ObservableList} di {@link Track} presente nello stato condiviso.
      */
     public ObservableList<Track> getAllTracks() {
@@ -58,7 +58,7 @@ public class TrackService {
      * Restituisce la lista delle 5 tracce più ascoltate caricate nello stato condiviso,
      * ordinate in modo decrescente in base al numero di riproduzioni.
      * Se le tracce totali sono meno di 5, vengono restituite tutte quelle disponibili.
-     * 
+     *
      * @return Una lista di massimo 5 oggetti {@link Track} più riprodotti.
      */
     public List<Track> getTop5MostPlayedTracks() {
@@ -72,7 +72,7 @@ public class TrackService {
     /**
      * Sostituisce una traccia all'interno della lista osservabile dello stato condiviso
      * per forzare l'aggiornamento grafico dei componenti legati ad essa.
-     * 
+     *
      * @param track La traccia aggiornata da reinserire nello stato condiviso.
      */
     private void updateInState(Track track) {
@@ -88,7 +88,7 @@ public class TrackService {
 
     /**
      * Cerca una traccia nel sistema di persistenza tramite il suo ID univoco.
-     * 
+     *
      * @param trackId L'ID (UUID) della traccia da cercare.
      * @return Un {@link Optional} contenente la traccia se trovata, altrimenti un Optional vuoto.
      */
@@ -99,7 +99,7 @@ public class TrackService {
     /**
      * Crea, valida e aggiunge una nuova traccia musicale sia nella persistenza che nello stato condiviso.
      * Verifica preventivamente che non esista già una traccia con lo stesso titolo e autore.
-     * 
+     *
      * @param title      Il titolo della traccia.
      * @param author     L'autore o l'artista.
      * @param genre      Il genere musicale.
@@ -108,7 +108,7 @@ public class TrackService {
      * @param year       L'anno di pubblicazione.
      * @param tags       L'insieme dei tag da associare.
      * @return Un {@link Optional} vuoto se l'aggiunta ha successo; un Optional contenente
-     *         il messaggio d'errore se la traccia è duplicata o se fallisce la validazione dei dati.
+     * il messaggio d'errore se la traccia è duplicata o se fallisce la validazione dei dati.
      */
     public Optional<String> addTrack(String title, String author, Genre genre, String songPath, int songLength, String year,
                                      Set<Tag> tags) {
@@ -146,7 +146,7 @@ public class TrackService {
     /**
      * Aggiorna le informazioni di una traccia esistente identificata dal suo ID.
      * Convalida i nuovi valori tramite un'istanza temporanea e verifica che non si creino duplicati.
-     * 
+     *
      * @param trackId   L'identificativo univoco della traccia da aggiornare.
      * @param newTitle  Il nuovo titolo.
      * @param newAuthor Il nuovo autore.
@@ -154,7 +154,7 @@ public class TrackService {
      * @param newYear   Il nuovo anno di pubblicazione.
      * @param newTags   Il nuovo set di tag da associare.
      * @return Un {@link Optional} vuoto in caso di successo; un Optional contenente
-     *         il messaggio d'errore se la traccia non è trovata, se è duplicata o se fallisce la validazione.
+     * il messaggio d'errore se la traccia non è trovata, se è duplicata o se fallisce la validazione.
      */
     public Optional<String> updateTrack(UUID trackId, String newTitle, String newAuthor, Genre newGenre, String newYear, Set<Tag> newTags) {
         //come parametri del metodo, tutte le info che possono cambiare di una traccia + Id perché ci serve per cercare nel DAO
@@ -205,7 +205,7 @@ public class TrackService {
     /**
      * Cerca le tracce i cui titoli o autori contengono la parola chiave specificata (case-insensitive).
      * Se la parola chiave è nulla o vuota, restituisce una copia dell'intera lista di tracce.
-     * 
+     *
      * @param keyword La parola chiave da cercare.
      * @return La lista delle tracce che corrispondono ai criteri di ricerca.
      */
@@ -222,7 +222,7 @@ public class TrackService {
 
     /**
      * Registra un osservatore per ricevere gli eventi relativi al ciclo di vita delle tracce.
-     * 
+     *
      * @param observer L'osservatore {@link TrackObserver} da registrare.
      */
     public void addObserver(TrackObserver observer) {
@@ -235,7 +235,7 @@ public class TrackService {
      * Elimina in modo permanente una traccia dal sistema tramite il suo ID.
      * Notifica preventivamente tutti gli osservatori registrati e rimuove la traccia dal DAO
      * e dallo stato condiviso.
-     * 
+     *
      * @param trackId L'ID della traccia da eliminare.
      */
     public void deleteTrack(UUID trackId) {
@@ -252,7 +252,7 @@ public class TrackService {
     /**
      * Ripristina una traccia musicale precedentemente rimossa (utilizzato per la funzionalità di Undo).
      * Reinserisce l'oggetto sia nella persistenza che nello stato condiviso.
-     * 
+     *
      * @param track La traccia da ripristinare.
      */
     public void restoreTrack(Track track) {
@@ -264,10 +264,10 @@ public class TrackService {
     /**
      * Incrementa il numero di ascolti di una determinata traccia, aggiornandola nella persistenza
      * e nello stato condiviso per aggiornare la GUI.
-     * 
+     *
      * @param trackId L'identificatore univoco (UUID) della traccia da incrementare.
      * @return Un {@link Optional} vuoto se l'operazione ha successo, o contenente un messaggio d'errore
-     *         se la traccia non viene trovata.
+     * se la traccia non viene trovata.
      */
     public Optional<String> incrementPlayCount(UUID trackId) {
 

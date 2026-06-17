@@ -12,7 +12,8 @@ public interface PlayMode {
 
     /**
      * Restituisce l'elemento successivo nella coda.
-     * @param queue una lista di elementi della coda.
+     *
+     * @param queue       una lista di elementi della coda.
      * @param currentItem elemento corrente della coda.
      * @return un Optional contenente l'elemento successivo nella coda, se presente.
      */
@@ -20,7 +21,8 @@ public interface PlayMode {
 
     /**
      * Restituisce un booleano che indica se la coda contiene elementi successivi.
-     * @param queue una lista di elementi della coda.
+     *
+     * @param queue       una lista di elementi della coda.
      * @param currentItem elemento corrente della coda.
      * @return true se la coda contiene elementi successivi, false altrimenti.
      */

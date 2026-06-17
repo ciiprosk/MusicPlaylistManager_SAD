@@ -5,35 +5,65 @@ package it.diem.unisa.musicmanager.model;
  */
 public enum Genre {
 
-    /** Genere Pop. */
+    /**
+     * Genere Pop.
+     */
     POP,
-    /** Genere Rock. */
+    /**
+     * Genere Rock.
+     */
     ROCK,
-    /** Genere Hip-Hop. */
+    /**
+     * Genere Hip-Hop.
+     */
     HIPHOP,
-    /** Genere Electronic Dance Music (EDM). */
+    /**
+     * Genere Electronic Dance Music (EDM).
+     */
     EDM,
-    /** Genere Jazz. */
+    /**
+     * Genere Jazz.
+     */
     JAZZ,
-    /** Genere Musica Classica. */
+    /**
+     * Genere Musica Classica.
+     */
     CLASSICAL,
-    /** Genere Reggae. */
+    /**
+     * Genere Reggae.
+     */
     REGGAE,
-    /** Genere Disco. */
+    /**
+     * Genere Disco.
+     */
     DISCO,
-    /** Genere Metal. */
+    /**
+     * Genere Metal.
+     */
     METAL,
-    /** Genere Funk. */
+    /**
+     * Genere Funk.
+     */
     FUNK,
-    /** Genere Indie. */
+    /**
+     * Genere Indie.
+     */
     INDIE,
-    /** Genere Country. */
+    /**
+     * Genere Country.
+     */
     COUNTRY,
-    /** Genere Rap. */
+    /**
+     * Genere Rap.
+     */
     RAP,
-    /** Genere Punk. */
+    /**
+     * Genere Punk.
+     */
     PUNK,
-    /** Genere Sconosciuto / Non Specificato. */
+    /**
+     * Genere Sconosciuto / Non Specificato.
+     */
     UNKNOWN
 
 }

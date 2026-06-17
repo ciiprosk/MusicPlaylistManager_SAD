@@ -12,7 +12,8 @@ public class LoopMode implements PlayMode {
 
     /**
      * Il metodo che restituisce il prossimo brano della playlist.
-     * @param queue una lista di elementi della coda.
+     *
+     * @param queue       una lista di elementi della coda.
      * @param currentItem elemento corrente della coda.
      * @return un Optional contenente l'elemento successivo nella coda, se presente.
      */
@@ -31,7 +32,8 @@ public class LoopMode implements PlayMode {
 
     /**
      * Verifica se ci sono elementi nella coda.
-     * @param queue una lista di elementi della coda.
+     *
+     * @param queue       una lista di elementi della coda.
      * @param currentItem elemento corrente della coda.
      * @return true se ci sono elementi nella coda, false altrimenti.
      */

@@ -25,12 +25,12 @@ public class Playlist implements Playable {
      * L'identificativo univoco della playlist.
      */
     private UUID id;
-    
+
     /**
      * Lista degli UUID delle tracce per il salvataggio nel file JSON.
      */
     private List<UUID> trackIDs;
-    
+
     /**
      * Lista in memoria degli oggetti Track. Non viene serializzata nel JSON.
      */
@@ -43,7 +43,7 @@ public class Playlist implements Playable {
 
     /**
      * Costruttore della playlist. Inizializza gli identificativi e le liste.
-     * 
+     *
      * @param name Il nome della playlist.
      * @throws PlaylistInfoException Se il nome non soddisfa le regole di validazione.
      */
@@ -57,7 +57,7 @@ public class Playlist implements Playable {
 
     /**
      * Costruttore della playlist utilizzato per il recupero di una playlist dal file JSON (persistenza).
-     * 
+     *
      * @param id       L'identificatore univoco della playlist.
      * @param name     Il nome della playlist.
      * @param trackIDs Una lista di tracce identificate dai loro UUID.
@@ -74,7 +74,7 @@ public class Playlist implements Playable {
     /**
      * Costruttore della playlist utilizzato per creare temporaneamente una copia
      * per operazioni come l'aggiornamento del nome.
-     * 
+     *
      * @param playlistID L'identificatore univoco della playlist.
      * @param name       Il nuovo nome della playlist.
      * @throws PlaylistInfoException Se il nome non soddisfa le regole di validazione.
@@ -89,7 +89,7 @@ public class Playlist implements Playable {
 
     /**
      * Restituisce la lista di tracce associate a questa playlist per la riproduzione.
-     * 
+     *
      * @return La lista degli oggetti {@link Track} in memoria.
      */
     @Override
@@ -99,7 +99,7 @@ public class Playlist implements Playable {
 
     /**
      * Restituisce il tipo di elemento della coda di riproduzione.
-     * 
+     *
      * @return Il valore {@link QueueItemType#PLAYLIST}.
      */
     @Override
@@ -109,7 +109,7 @@ public class Playlist implements Playable {
 
     /**
      * Getter per l'identificatore univoco della playlist.
-     * 
+     *
      * @return L'identificatore univoco (UUID) della playlist.
      */
     @Override
@@ -119,7 +119,7 @@ public class Playlist implements Playable {
 
     /**
      * Restituisce il nome della playlist.
-     * 
+     *
      * @return Il nome della playlist.
      */
     public String getName() {
@@ -128,12 +128,12 @@ public class Playlist implements Playable {
 
     /**
      * Setter per il nome della playlist. Valida il nome prima dell'assegnazione.
-     * 
+     *
      * @param name Il nuovo nome da impostare per la playlist.
      * @throws PlaylistInfoException Se il nome è vuoto o supera i 50 caratteri.
      */
     public void setName(String name) {
-        if(checkRulesName(name.trim())) this.name = name.trim();
+        if (checkRulesName(name.trim())) this.name = name.trim();
     }
 
     /*
@@ -156,6 +156,48 @@ public class Playlist implements Playable {
     }
 
     */
+
+    /**
+     * Metodo che ritorna una copia non modificabile della lista degli UUID delle tracce presenti.
+     *
+     * @return Una lista non modificabile di UUID delle tracce.
+     */
+    public List<UUID> getTracks() {
+        return Collections.unmodifiableList(trackIDs);
+    }
+
+    /**
+     * Ritorna la lista degli oggetti Track reali contenuti nella playlist.
+     * Questa lista è popolata in fase di caricamento dal PersistenceService.
+     *
+     * @return Una lista non modificabile degli oggetti {@link Track} presenti nella playlist.
+     */
+    public List<Track> getTracksList() {
+        return Collections.unmodifiableList(tracksList);
+    }
+
+    /**
+     * Restituisce il conteggio delle riproduzioni della playlist.
+     *
+     * @return Il numero di volte in cui la playlist è stata riprodotta.
+     */
+    public int getPlayCount() {
+        return playCount;
+    }
+
+    /**
+     * Valida le business rules per il nome della playlist.
+     * Si assicura che il nome non sia vuoto e che non superi i 50 caratteri.
+     *
+     * @param name Il nome della playlist da verificare.
+     * @return true se il nome soddisfa le business rules.
+     * @throws PlaylistInfoException Se il nome è nullo, vuoto o supera i 50 caratteri.
+     */
+    private boolean checkRulesName(String name) throws PlaylistInfoException {
+        if (name == null || name.isEmpty()) throw new PlaylistInfoException("The name cannot be empty");
+        if (name.length() > 50) throw new PlaylistInfoException("The name cannot be longer than 50 characters");
+        return true;
+    }
 
     /**
      * Metodo legacy per l'aggiunta di una traccia tramite UUID.
@@ -190,17 +232,8 @@ public class Playlist implements Playable {
     }
 
     /**
-     * Metodo che ritorna una copia non modificabile della lista degli UUID delle tracce presenti.
-     * 
-     * @return Una lista non modificabile di UUID delle tracce.
-     */
-    public List<UUID> getTracks() {
-        return Collections.unmodifiableList(trackIDs);
-    }
-
-    /**
      * Verifica se la playlist contiene una determinata traccia tramite il suo ID.
-     * 
+     *
      * @param trackID L'identificatore univoco della traccia da cercare.
      * @return true se la playlist contiene la traccia con quell'ID, false altrimenti.
      */
@@ -210,7 +243,7 @@ public class Playlist implements Playable {
 
     /**
      * Ritorna il numero di tracce contenute nella playlist.
-     * 
+     *
      * @return Il numero totale di tracce presenti nella playlist.
      */
     public int numberOfTracks() {
@@ -218,22 +251,8 @@ public class Playlist implements Playable {
     }
 
     /**
-     * Valida le business rules per il nome della playlist.
-     * Si assicura che il nome non sia vuoto e che non superi i 50 caratteri.
-     *
-     * @param name Il nome della playlist da verificare.
-     * @return true se il nome soddisfa le business rules.
-     * @throws PlaylistInfoException Se il nome è nullo, vuoto o supera i 50 caratteri.
-     */
-    private boolean checkRulesName(String name) throws PlaylistInfoException {
-        if(name == null || name.isEmpty()) throw new PlaylistInfoException("The name cannot be empty");
-        if(name.length() > 50) throw new PlaylistInfoException("The name cannot be longer than 50 characters");
-        return true;
-    }
-
-    /**
      * Aggiunge una traccia alla playlist, aggiornando sia la lista in memoria che la lista per il salvataggio JSON.
-     * 
+     *
      * @param track L'oggetto {@link Track} da aggiungere.
      */
     public void addTrack(Track track) {
@@ -246,7 +265,7 @@ public class Playlist implements Playable {
     /**
      * Aggiunge una traccia alla playlist in una determinata posizione, aggiornando sia la lista in memoria
      * che la lista per il salvataggio JSON.
-     * 
+     *
      * @param track    L'oggetto {@link Track} da aggiungere.
      * @param position La posizione all'interno della playlist in cui inserire la traccia.
      */
@@ -265,7 +284,7 @@ public class Playlist implements Playable {
 
     /**
      * Rimuove una traccia dalla playlist, aggiornando sia la lista in memoria che la lista per il salvataggio JSON.
-     * 
+     *
      * @param track L'oggetto {@link Track} da rimuovere.
      */
     public void removeTrack(Track track) {
@@ -305,19 +324,9 @@ public class Playlist implements Playable {
     }
 
     /**
-     * Ritorna la lista degli oggetti Track reali contenuti nella playlist.
-     * Questa lista è popolata in fase di caricamento dal PersistenceService.
-     * 
-     * @return Una lista non modificabile degli oggetti {@link Track} presenti nella playlist.
-     */
-    public List<Track> getTracksList() {
-        return Collections.unmodifiableList(tracksList);
-    }
-
-    /**
      * Risolve gli UUID caricati dal JSON e popola la lista degli oggetti Track in memoria.
      * Da chiamare all'avvio dopo il caricamento dal PersistenceService.
-     * 
+     *
      * @param allTracks La lista di tutte le tracce presenti nel sistema da cui attingere per la risoluzione.
      */
     public void resolveTracks(List<Track> allTracks) {
@@ -335,7 +344,7 @@ public class Playlist implements Playable {
     /**
      * Sostituisce i brani attuali della playlist con una nuova lista.
      * Utilizzato per la sovrascrittura ed il ripristino con l'Undo.
-     * 
+     *
      * @param newTracks La nuova lista di oggetti {@link Track} da impostare.
      */
     public void replaceTracks(List<Track> newTracks) {
@@ -355,7 +364,7 @@ public class Playlist implements Playable {
     /**
      * Verifica l'uguaglianza tra questa playlist ed un altro oggetto.
      * Due playlist sono considerate uguali se hanno lo stesso nome (case-insensitive).
-     * 
+     *
      * @param o L'oggetto da confrontare.
      * @return true se gli oggetti sono uguali, false altrimenti.
      */
@@ -369,21 +378,12 @@ public class Playlist implements Playable {
 
     /**
      * Restituisce l'hashcode basato sul nome della playlist.
-     * 
+     *
      * @return L'hashcode calcolato.
      */
     @Override
     public int hashCode() {
         return name != null ? name.hashCode() : 0;
-    }
-
-    /**
-     * Restituisce il conteggio delle riproduzioni della playlist.
-     * 
-     * @return Il numero di volte in cui la playlist è stata riprodotta.
-     */
-    public int getPlayCount() {
-        return playCount;
     }
 
     /**

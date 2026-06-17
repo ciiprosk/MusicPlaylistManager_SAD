@@ -11,21 +11,21 @@ public interface Playable {
 
     /**
      * Restituisce la lista di tracce da riprodurre per questo elemento.
-     * 
+     *
      * @return Una lista di oggetti {@link Track}.
      */
     List<Track> getTracksToPlay();
 
     /**
      * Restituisce il tipo specifico di elemento della coda (TRACK o PLAYLIST).
-     * 
+     *
      * @return Il {@link QueueItemType} corrispondente.
      */
     QueueItemType getType();
 
     /**
      * Restituisce l'identificativo univoco dell'elemento.
-     * 
+     *
      * @return L'UUID associato.
      */
     UUID getId();
