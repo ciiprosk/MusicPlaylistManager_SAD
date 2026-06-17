@@ -356,19 +356,22 @@ public class PlaylistService implements TrackObserver{
      */
     public Optional<String> generateAndSave(String name, Collection<Track> tracks, Specification<Track> criteria) {
 
-        // 1. Controllo preventivo sul nome (ottimizzazione)
-        if (playlistDAO.isDuplicated(new Playlist(name))) {
-            return Optional.of("Error: A playlist with this name already exists!");
+        // devo stare attaenta perché playlost lancai eccezioniiiiiii
+        try{
+
+            if(playlistDAO.isDuplicated(new Playlist(name))){
+                return Optional.of("Error: A playlist with this name already exists!");
+            }
+
+            Playlist playlist = generate(name, tracks, criteria);
+            playlistDAO.insert(playlist);
+            sharedState.getALlPlaylists().add(playlist);
+            return Optional.empty();
+
+        }catch(PlaylistInfoException e){
+            return Optional.of(e.getMessage());
         }
 
-        // 2. Delega della logica algoritmica al metodo puro
-        Playlist playlist = generate(name, tracks, criteria);
-
-        // 3. Persistenza ed effetti collaterali
-        playlistDAO.insert(playlist);
-        sharedState.getALlPlaylists().add(playlist);
-
-        return Optional.empty();
     }
 
 
@@ -436,17 +439,13 @@ public class PlaylistService implements TrackObserver{
      * @return la Playlist creata, oppure null se il nome è duplicato o invalido.
      */
     public Playlist createPlaylistReturning(String name) {
-        try {
-            Playlist playlist = new Playlist(name);
-            if (playlistDAO.isDuplicated(playlist)) {
-                return null;
-            }
-            playlistDAO.insert(playlist);
-            sharedState.getALlPlaylists().add(playlist);
-            return playlist;
-        } catch (PlaylistInfoException e) {
-            return null;
+        Playlist playlist = new Playlist(name);
+        if (playlistDAO.isDuplicated(playlist)) {
+            throw new PlaylistInfoException("A playlist with this name already exists!");
         }
+        playlistDAO.insert(playlist);
+        sharedState.getALlPlaylists().add(playlist);
+        return playlist;
     }
     /**
      * Reinserisce una playlist già costruita (con il suo id e le sue tracce),
@@ -466,8 +465,9 @@ public class PlaylistService implements TrackObserver{
      * @return
      */
     public Playlist generateAndSaveReturning(String name, Collection<Track> tracks, Specification<Track> criteria) {
-        if (playlistDAO.isDuplicated(new Playlist(name))) {
-            return null;
+        Playlist testPlaylist = new Playlist(name);
+        if (playlistDAO.isDuplicated(testPlaylist)) {
+            throw new PlaylistInfoException("A playlist with this name already exists!");
         }
         Playlist playlist = generate(name, tracks, criteria);
         playlistDAO.insert(playlist);

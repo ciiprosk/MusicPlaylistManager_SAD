@@ -56,12 +56,12 @@ public class GeneratePlaylistCommand implements Command{
             return Optional.empty();
         } else {
             isOverwrite = false;
-            created = service.generateAndSaveReturning(name, tracks, criteria);
-            if (created == null) {
-                return Optional.of("A playlist with this name already exists!");
+            try {
+                created = service.generateAndSaveReturning(name, tracks, criteria);
+                return Optional.empty();
+            } catch (it.diem.unisa.musicmanager.exception.PlaylistInfoException e) {
+                return Optional.of(e.getMessage());
             }
-
-            return Optional.empty();
 
         }
     }

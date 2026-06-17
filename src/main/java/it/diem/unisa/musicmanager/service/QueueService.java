@@ -8,6 +8,7 @@ import it.diem.unisa.musicmanager.state.SharedState;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.ObservableList;
 
 import java.util.*;
 
@@ -70,7 +71,7 @@ public class QueueService implements TrackObserver {
         return currentItem;
     }
 
-    public javafx.collections.ObservableList<QueueItem> getQueueList() {
+    public ObservableList<QueueItem> getQueueList() {
         return sharedState.getQueue();
     }
 
@@ -182,8 +183,9 @@ public class QueueService implements TrackObserver {
 
     /** Restituisce il prossimo item SENZA avanzare il cursore. Per la sola visualizzazione. */
     public QueueItem peekNext() {
+        List<QueueItem> dummyQueue = new ArrayList<>(getQueueList());
         return playMode.nextItem(
-                getQueueList(),
+                dummyQueue,
                 getCurrentItem()
         ).orElse(null);
     }

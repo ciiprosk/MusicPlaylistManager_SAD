@@ -273,7 +273,9 @@ public class DetailedPlaylistController {
     }
 
     public void onPlay(ActionEvent actionEvent) {
-        if (playlist == null || playlist.getTracksList().isEmpty()) {
+        if (playlist == null) return;
+        if (playlist.getTracksList().isEmpty()) {
+            AlertUtil.showInfo("Playlist Vuota", "Per riprodurre questa playlist, devi prima inserire una traccia.");
             return;
         }
 
@@ -335,7 +337,11 @@ public class DetailedPlaylistController {
     }
 
     public void onSequential(ActionEvent actionEvent) {
-        if (playlist == null || playlist.getTracksList().isEmpty()) return;
+        if (playlist == null) return;
+        if (playlist.getTracksList().isEmpty()) {
+            AlertUtil.showInfo("Playlist Vuota", "Per riprodurre questa playlist, devi prima inserire una traccia.");
+            return;
+        }
         if (playlistService != null) playlistService.incrementPlayCount(playlist.getId());
         if (queueService != null && playerService != null) {
             queueService.clearQueue();
@@ -347,7 +353,11 @@ public class DetailedPlaylistController {
     }
 
     public void onLoop(ActionEvent actionEvent) {
-        if (playlist == null || playlist.getTracksList().isEmpty()) return;
+        if (playlist == null) return;
+        if (playlist.getTracksList().isEmpty()) {
+            AlertUtil.showInfo("Playlist Vuota", "Per riprodurre questa playlist, devi prima inserire una traccia.");
+            return;
+        }
         if (playlistService != null) playlistService.incrementPlayCount(playlist.getId());
         if (queueService != null && playerService != null) {
             queueService.clearQueue();
@@ -360,8 +370,11 @@ public class DetailedPlaylistController {
 
     public void onShuffle(ActionEvent actionEvent) {
 
-        if (playlist == null || playlist.getTracksList().isEmpty())
+        if (playlist == null) return;
+        if (playlist.getTracksList().isEmpty()) {
+            AlertUtil.showInfo("Playlist Vuota", "Per riprodurre questa playlist, devi prima inserire una traccia.");
             return;
+        }
         if (playlistService != null)
             playlistService.incrementPlayCount(playlist.getId());
 

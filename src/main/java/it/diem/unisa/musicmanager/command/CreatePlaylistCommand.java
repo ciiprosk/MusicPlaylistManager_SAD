@@ -17,11 +17,12 @@ public class CreatePlaylistCommand implements Command{
 
     @Override
     public Optional<String> execute() {
-        created = service.createPlaylistReturning(name);
-        if (created == null) {
-            return Optional.of("A playlist with this name already exists!");
+        try {
+            created = service.createPlaylistReturning(name);
+            return Optional.empty();
+        } catch (it.diem.unisa.musicmanager.exception.PlaylistInfoException e) {
+            return Optional.of(e.getMessage());
         }
-        return Optional.empty();
     }
 
     @Override

@@ -234,11 +234,10 @@ public class PlayerService implements TrackObserver {
         if (!queueService.hasNext()) {
             stopCurrent();
             loadedTrack = null;
+            queueService.clearQueue();
             currentTrack.set(null);
             isPlaying.set(false);
             progress.set(0.0);
-
-            queueService.clearQueue();
 
             return;
         }
@@ -253,20 +252,18 @@ public class PlayerService implements TrackObserver {
             } else {
                 stopCurrent();
                 loadedTrack = null;
+                queueService.clearQueue();
                 currentTrack.set(null);
                 isPlaying.set(false);
                 progress.set(0.0);
-
-                queueService.clearQueue();
             }
         } else {
             stopCurrent();
             loadedTrack = null;
+            queueService.clearQueue();
             currentTrack.set(null);
             isPlaying.set(false);
             progress.set(0.0);
-
-            queueService.clearQueue();
         }
     }
 
@@ -283,10 +280,10 @@ public class PlayerService implements TrackObserver {
         if (!queueService.hasNext()) {
             stopCurrent();
             loadedTrack = null;
+            queueService.clearQueue();
             currentTrack.set(null);
             isPlaying.set(false);
             progress.set(0.0);
-            queueService.clearQueue();
             return;
         }
 
@@ -301,27 +298,27 @@ public class PlayerService implements TrackObserver {
                 } else {
                     stopCurrent();
                     loadedTrack = null;
+                    queueService.clearQueue();
                     currentTrack.set(null);
                     isPlaying.set(false);
                     progress.set(0.0);
-                    queueService.clearQueue();
                 }
             } else {
                 stopCurrent();
                 loadedTrack = null;
+                queueService.clearQueue();
                 currentTrack.set(null);
                 isPlaying.set(false);
                 progress.set(0.0);
-                queueService.clearQueue();
             }
 
         } catch (QueueException e) {
             stopCurrent();
             loadedTrack = null;
+            queueService.clearQueue();
             currentTrack.set(null);
             isPlaying.set(false);
             progress.set(0.0);
-            queueService.clearQueue();
         }
     }
 

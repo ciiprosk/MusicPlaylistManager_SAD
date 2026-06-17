@@ -68,9 +68,13 @@ public class PlayerController {
 
         this.queueService = queueService;
 
-        queueService.getQueueList().addListener((ListChangeListener<QueueItem>) c -> updateNextButton());
+        queueService.getQueueList().addListener((ListChangeListener<QueueItem>) c -> {
+            updateNextButton();
+            updateSkipPlaylistButton();
+        });
 
         updateNextButton();
+        updateSkipPlaylistButton();
     }
 
     public void setPlaylistService(it.diem.unisa.musicmanager.service.PlaylistService playlistService) {
@@ -224,7 +228,8 @@ public class PlayerController {
     }
 
     private void updateNextButton() {
-        buttonNext.setDisable(!queueService.hasNext());
+        // Disattiva il pulsante Next solo se il player è completamente fermo (nessuna traccia caricata)
+        buttonNext.setDisable(playerService.currentTrackProperty().get() == null);
     }
 
 }

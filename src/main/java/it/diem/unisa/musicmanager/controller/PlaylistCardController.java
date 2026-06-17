@@ -121,7 +121,11 @@ public class PlaylistCardController {
     @FXML
     private void handlePlay() {
         // Controllo di sicurezza per evitare crash se i dati non sono pronti
-        if (playlist == null || playlist.getTracksList().isEmpty() || playerService == null) {
+        if (playlist == null || playerService == null) {
+            return;
+        }
+        if (playlist.getTracksList().isEmpty()) {
+            it.diem.unisa.musicmanager.util.AlertUtil.showInfo("Playlist Vuota", "Per riprodurre questa playlist, devi prima inserire una traccia.");
             return;
         }
 
