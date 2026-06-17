@@ -1,6 +1,8 @@
 package it.diem.unisa.musicmanager.command;
 
 import it.diem.unisa.musicmanager.exception.PlaylistInfoException;
+import it.diem.unisa.musicmanager.model.Playlist;
+import it.diem.unisa.musicmanager.model.Track;
 import it.diem.unisa.musicmanager.service.PlaylistService;
 
 import java.util.Optional;
@@ -36,6 +38,9 @@ public class RemoveTrackFromPlaylistCommand implements Command{
     private final String trackTitle;
     private final String playlistName;
 
+    private int originalPosition = -1;
+    private Track trackCopy = null;
+
 
     /**
      * Costruisce un comando per rimuovere una traccia da una playlist.
@@ -62,11 +67,22 @@ public class RemoveTrackFromPlaylistCommand implements Command{
     public Optional<String> execute() {
         try {
             // recupera playlist e verifica se contiene la traccia
-            boolean present = service.getPlaylistById(playlistId)
-                    .map(p -> p.containsTrack(trackId)) //true se presente
+            Optional<Playlist> optionalPlaylist = service.getPlaylistById(playlistId);
+            boolean present = optionalPlaylist
+                    .map(p -> p.containsTrack(trackId))
                     .orElseThrow(() -> new PlaylistInfoException("Playlist not found")); //errore altrimenti
             //se la traccia è presente la rimuovo
             if (present) {
+
+                Playlist playlist = optionalPlaylist.get(); //abbiamo già gestito il caso in cui Optional sia null
+
+                //prima di rimuovere, salviamo posizione e copia della traccia
+                this.originalPosition = playlist.getTracks().indexOf(trackId);
+                trackCopy = playlist.getTracksList().stream()
+                        .filter(t -> t.getId().equals(trackId))
+                        .findFirst()
+                        .orElse(null);
+
                 service.removeTrackFromPlaylist(playlistId, trackId);
                 applied = true; //segno che l'azione è stata eseguita
             }
@@ -83,9 +99,9 @@ public class RemoveTrackFromPlaylistCommand implements Command{
      */
     @Override
     public void undo() {
-        // undo solo se la remove è avvenuta davvero
-        if (applied) {
-            service.addTrackToPlaylist(playlistId, trackId); // ripristino
+        // undo solo se la remove è avvenuta davvero. ripristina nella posizione originale
+        if (applied && trackCopy != null && originalPosition >= 0) {
+            service.addTrackToPlaylistAtPosition(playlistId, trackCopy, originalPosition); // ripristino
         }
     }
 

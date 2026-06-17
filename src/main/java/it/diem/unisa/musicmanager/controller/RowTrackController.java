@@ -33,6 +33,7 @@ public class RowTrackController {
     private PlayerService playerService;
     private QueueService queueService;
     private it.diem.unisa.musicmanager.service.PlaylistService playlistService;
+    private CommandManager commandManager;
     private it.diem.unisa.musicmanager.model.Playlist parentPlaylist;
 
     @FXML private Label lblTitle;
@@ -276,11 +277,6 @@ public class RowTrackController {
 
     public Track getTrack() {
         return track;
-    }
-
-    public void setOnDeleteAction(Runnable onDeleteAction) {
-        //AlertUtil.showConfirmation("Confirm Delete", "Are you sure you want to delete this track?");
-        this.onDeleteAction = onDeleteAction;
     }
 
     private void updateCurrentTrackStyle() {

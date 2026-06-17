@@ -40,9 +40,14 @@ public class AddTrackCommand implements Command {
     public Optional<String> execute() {
         Optional<String> error = service.addTrack(title, author, genre, songPath, songLength, year, tags);
         if (error.isEmpty()) {
+
+            //l'autore va gestito
+            String normalizedAuthor = (author == null || author.trim().isEmpty())
+                    ? "Unknown" : author.trim();
+
             // cerca la traccia appena creata per recuperarne l'id
             createdId = service.getAllTracks().stream()
-                    .filter(t -> t.getTitle().equals(title.trim()) && t.getAuthor().equals(author.trim()))
+                    .filter(t -> t.getTitle().equals(title.trim()) && t.getAuthor().equals(normalizedAuthor))
                     .findFirst()
                     .map(Track::getId)
                     .orElse(null);

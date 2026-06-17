@@ -98,10 +98,20 @@ public class DetailedPlaylistController {
         this.queueService = queueService;
     }
 
-    public void setPlaylistService(PlaylistService playlistService){
+    public void setPlaylistService(PlaylistService playlistService) {
         this.playlistService = playlistService;
 
+        // listener si aggiorna quando una playlist viene modificata
+        playlistService.getPlaylists().addListener((InvalidationListener) obs -> {
+            if (playlist != null) {
+                javafx.application.Platform.runLater(() -> {
+                    updateTrackCount();
+                    loadTracks();
+                });
+            }
+        });
     }
+
     public void setTrackService(TrackService trackService){
         this.trackService = trackService;
         createTrackListener();
