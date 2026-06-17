@@ -42,11 +42,17 @@ public class HomeController {
     private  PlaylistService playlistService;
     private QueueService queueService;
     private CommandManager commandManager;
-
+    private boolean isPlaylistListenerAttached = false;
     @FXML
     public void initialize() {
     }
 
+    /**
+     * Metodo che viene chiamato quando il controller viene inizializzato.
+     * Crea un listenere sulle tracce per aggiornare la visualizzazione.
+     * COntrolla che il servizio sia pronto prima di caricare le tracce, per evitare errori.
+     * @param trackService Il servizio delle tracce.
+     */
     public void setTrackService(TrackService trackService) {
         this.trackService = trackService;
         createTrackListener();
@@ -60,6 +66,11 @@ public class HomeController {
         }
     }
 
+    /**
+     * Metodo che viene chiamato quando il controller viene inizializzato.
+     * Controlla che il servizio sia pronto prima di caricare le playlist, per evitare errori.
+     * @param playerService Il servizio del player.
+     */
     public void setPlayerService(it.diem.unisa.musicmanager.service.PlayerService playerService) {
         this.playerService = playerService;
 
@@ -72,22 +83,41 @@ public class HomeController {
         }
     }
 
+    /**
+     * Metodo che viene chiamato quando il controller viene inizializzato.
+     * Crea un listener sulle playlist per aggiornare la visualizzazione.
+     * @param playlistService il servizio delle playlist.
+     */
     public void setPlaylistService(it.diem.unisa.musicmanager.service.PlaylistService playlistService) {
         this.playlistService = playlistService;
         createPlaylistListener();
         loadTopPlaylists();
     }
 
+    /**
+     * Metodo che viene chiamato quando il controller viene inizializzato.
+     * @param queueService
+     */
     public void setQueueService(QueueService queueService) {
         this.queueService = queueService;
     }
 
+    /**
+     * Metodo che viene chiamato quando il controller viene inizializzato.
+     * @param commandManager il CommandManager che gestisce i comandi.
+     */
     public void setCommandManager(CommandManager commandManager) {
         this.commandManager = commandManager;
         loadTopTracks();
         loadTopPlaylists();
     }
 
+    /**
+     * Crea un listener sulle tracce per aggiornare la visualizzazione.
+     * Controlla che il servizio sia stato inizializzato prima di creare il listener e controlla se c'è un listenr per evotare
+     * code di listener, tramite una variabile booleana isListenerAttached.
+     *
+     */
     private void createTrackListener() {
         if (!isListenerAttached && trackService != null) {
             trackService.getAllTracks().addListener(new InvalidationListener() {
@@ -101,8 +131,13 @@ public class HomeController {
         }
     }
 
-    private boolean isPlaylistListenerAttached = false;
 
+    /**
+     *
+     * Crea un listener sulle playlist per aggiornare la visualizzazione.
+     * Controlla che il servizio delle playlist non sia nullo e che il listener non sia già stato
+     * registrato, per evitare code di listener, grazie alla variabile isPlaylistListenerAttached.
+     */
     private void createPlaylistListener() {
         if (!isPlaylistListenerAttached && playlistService != null) {
             playlistService.getPlaylists().addListener(new InvalidationListener() {
@@ -116,6 +151,9 @@ public class HomeController {
         }
     }
 
+    /**
+     * Metodo che controlla che i service non siano nulli prima di caricare le tracce all'interno della vista.
+     */
     public void loadTopTracks() {
         if (trackService == null || playerService == null || topTracksContainer == null) {
             return;
@@ -152,6 +190,9 @@ public class HomeController {
         }
     }
 
+    /**
+     * Apre la finestra per la generazione di una nuova playlist.
+     */
     @FXML
     private void goToGeneratePlaylist() {
         try {
@@ -173,6 +214,9 @@ public class HomeController {
     }
 
 
+    /**
+     * Metodo che carica le playlist più ascoltate all'interno della vista.
+     */
     public void loadTopPlaylists() {
         if (playlistService == null
                 || trackService == null
@@ -221,33 +265,4 @@ public class HomeController {
         }
     }
 
-    // è semplicissimo caricare sia le card che la row dei brani, metto il codice di esempio:
-    /*
-    // Dentro TracksController.java, dove avete una VBox o una griglia per ospitare le tracce
-@FXML
-private VBox tracksContainer;
-
-
-public void loadTracks(ObservableList<Track> allTracks) {
-    tracksContainer.getChildren().clear(); // Pulisce la lista visiva
-
-    for (Track track : allTracks) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/it/diem/unisa/musicmanager/components/trackRow.fxml"));
-            Node row = loader.load();
-
-            // Prendiamo il controller specifico di QUESTA singola riga appena creata
-            RowTrackController controller = loader.getController();
-            // Gli passiamo i dati del brano e lo SharedState
-            controller.setTrack(track);
-
-            // Aggiungiamo la riga grafica al contenitore della pagina
-            tracksContainer.getChildren().add(row);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-}
-     */
 }
