@@ -1,0 +1,145 @@
+@startuml Architectural Class Diagram
+title Architectural Class Diagram - Music Playlist Manager
+
+skinparam linetype ortho
+skinparam packageStyle rectangle
+skinparam ClassBackgroundColor #F9F9F9
+skinparam ClassBorderColor #333333
+skinparam ClassHeaderBackgroundColor #E0E0E0
+
+package "it.diem.unisa.musicmanager" {
+
+    package "model" {
+        interface Playable
+        class Track
+        class Playlist
+        enum Genre
+    }
+
+    package "state" {
+        class SharedState
+    }
+
+    package "dao" {
+        interface DAO<T>
+        abstract class JSONAbstractDAO
+        class JSONTrackDAO
+        class JSONPlaylistDAO
+    }
+
+    package "service" {
+        class TrackService
+        class PlaylistService
+        class PlayerService
+        class QueueService
+        interface TrackObserver
+    }
+
+    package "command" {
+        class CommandManager
+        interface Command
+        class GeneratePlaylistCommand
+    }
+
+    package "playmode" {
+        interface PlayMode
+    }
+
+    package "specification" {
+        interface Specification<T>
+    }
+
+    package "controller" {
+        class MainController
+        class PlayerController
+        class QueueViewController
+        class GeneratePlaylistController
+        class PlaylistCardController
+        class DetailedPlaylistController
+        class RowTrackController
+    }
+
+    package "util" {
+        class WindowUtil
+        class AlertUtil
+        class PopUpUtil
+    }
+}
+
+' --- Relations ---
+
+' Composite model
+Playable <|.. Track
+Playable <|.. Playlist
+Playlist "0..*" o-- "1" Track
+
+' State
+SharedState "1" o-- "*" Track
+SharedState "1" o-- "*" Playlist
+
+' DAO Layer
+DAO <|.. JSONTrackDAO
+DAO <|.. JSONPlaylistDAO
+JSONAbstractDAO <|-- JSONTrackDAO
+JSONAbstractDAO <|-- JSONPlaylistDAO
+JSONTrackDAO ..> Track
+JSONPlaylistDAO ..> Playlist
+
+' Service Layer dependencies
+TrackService --> DAO : "uses JSONTrackDAO"
+TrackService --> SharedState
+PlaylistService --> DAO : "uses JSONPlaylistDAO"
+PlaylistService --> SharedState
+PlaylistService ..|> TrackObserver
+PlayerService --> TrackService
+PlayerService --> QueueService
+PlayerService ..|> TrackObserver
+QueueService --> SharedState
+QueueService ..|> TrackObserver
+QueueService --> PlayMode : "delegates behavior to"
+
+' Controller Layer dependencies
+MainController --> TrackService
+MainController --> PlaylistService
+MainController --> PlayerService
+MainController --> QueueService
+MainController --> CommandManager
+
+PlayerController --> PlayerService
+
+QueueViewController --> QueueService
+QueueViewController --> PlayerService
+QueueViewController --> PlaylistService
+
+GeneratePlaylistController --> PlaylistService
+GeneratePlaylistController --> TrackService
+GeneratePlaylistController --> CommandManager
+
+PlaylistCardController --> PlaylistService
+PlaylistCardController --> PlayerService
+PlaylistCardController --> TrackService
+PlaylistCardController --> QueueService
+
+DetailedPlaylistController --> PlaylistService
+DetailedPlaylistController --> PlayerService
+DetailedPlaylistController --> TrackService
+DetailedPlaylistController --> QueueService
+DetailedPlaylistController --> CommandManager
+
+RowTrackController --> TrackService
+RowTrackController --> PlayerService
+RowTrackController --> QueueService
+
+' Command Layer
+CommandManager "1" o-- "*" Command : "manages undo stack"
+GeneratePlaylistCommand ..|> Command
+GeneratePlaylistCommand --> PlaylistService
+GeneratePlaylistCommand --> TrackService
+GeneratePlaylistCommand --> Specification : "filters tracks using"
+
+' Specification Layer
+Specification <|.. GenreSpecification
+Specification <|.. TagSpecification
+Specification <|.. YearSpecification
+
+@enduml

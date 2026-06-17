@@ -1,0 +1,198 @@
+@startuml Design Patterns Class Diagram
+title Design Patterns Applied in Music Playlist Manager
+
+skinparam linetype ortho
+skinparam packageStyle rectangle
+skinparam ClassBackgroundColor #FFFFFF
+skinparam ClassBorderColor #222222
+skinparam ClassHeaderBackgroundColor #E2E2E2
+skinparam NoteBackgroundColor #FFFFE0
+skinparam NoteBorderColor #B2B200
+
+' ========================================================
+' 1. COMPOSITE PATTERN
+' ========================================================
+package "Composite Pattern (Structural)" {
+    interface Playable <<Component>> {
+        + getTracksToPlay(): List<Track>
+        + getType(): QueueItemType
+        + getId(): UUID
+    }
+
+    class Track <<Leaf>> {
+        - id: UUID
+        - title: String
+        + getTracksToPlay(): List<Track>
+    }
+
+    class Playlist <<Composite>> {
+        - id: UUID
+        - name: String
+        - tracks: List<UUID>
+        + getTracksToPlay(): List<Track>
+    }
+
+    Playable <|.. Track
+    Playable <|.. Playlist
+    Playlist "1" o--> "0..*" Track : "contains (by UUID)"
+    note bottom of Playable
+        Permette di trattare Track (singoli brani) 
+        e Playlist (raccolte) uniformemente come 
+        oggetti riproducibili nella coda.
+    end note
+}
+
+' ========================================================
+' 2. COMMAND PATTERN WITH UNDO
+' ========================================================
+package "Command Pattern (Behavioral)" {
+    interface Command <<Command>> {
+        + execute(): void
+        + undo(): void
+        + getDescription(): String
+    }
+
+    class CommandManager <<Invoker>> {
+        - undoStack: Stack<Command>
+        + executeCommand(cmd: Command): void
+        + undo(): void
+    }
+
+    class CreatePlaylistCommand <<ConcreteCommand>>
+    class DeletePlaylistCommand <<ConcreteCommand>>
+    class AddTrackToPlaylistCommand <<ConcreteCommand>>
+    class RemoveTrackFromPlaylistCommand <<ConcreteCommand>>
+    class GeneratePlaylistCommand <<ConcreteCommand>>
+
+    class PlaylistService <<Receiver>>
+
+    Command <|.. CreatePlaylistCommand
+    Command <|.. DeletePlaylistCommand
+    Command <|.. AddTrackToPlaylistCommand
+    Command <|.. RemoveTrackFromPlaylistCommand
+    Command <|.. GeneratePlaylistCommand
+
+    CommandManager "1" o-- "*" Command : "stores history"
+    CreatePlaylistCommand --> PlaylistService : "modifies state on"
+    DeletePlaylistCommand --> PlaylistService
+    AddTrackToPlaylistCommand --> PlaylistService
+    RemoveTrackFromPlaylistCommand --> PlaylistService
+    GeneratePlaylistCommand --> PlaylistService
+
+    note right of CommandManager
+        Gestisce la storia delle operazioni eseguite
+        dall'utente (creazione, cancellazione,
+        generazione) consentendo l'operazione di Undo.
+    end note
+}
+
+' ========================================================
+' 3. OBSERVER PATTERN
+' ========================================================
+package "Observer Pattern (Behavioral)" {
+    interface TrackObserver <<Observer>> {
+        + onTrackDeleted(trackId: UUID): void
+    }
+
+    class TrackService <<Subject>> {
+        - observers: List<TrackObserver>
+        + addObserver(obs: TrackObserver): void
+        + deleteTrack(trackId: UUID): void
+    }
+
+    class PlaylistService <<ConcreteObserver>>
+    class QueueService <<ConcreteObserver>>
+    class PlayerService <<ConcreteObserver>>
+
+    TrackObserver <|.. PlaylistService
+    TrackObserver <|.. QueueService
+    TrackObserver <|.. PlayerService
+    TrackService "1" o-- "*" TrackObserver : "notifies"
+
+    note top of TrackObserver
+        Utilizzato per disaccoppiare la cancellazione fisica 
+        di una traccia nel TrackService dall'aggiornamento 
+        delle Playlist, della Coda attiva e del Player audio.
+    end note
+
+    ' JavaFX Property Observer Note
+    class PlayerServiceFX <<Subject (JavaFX Properties)>> {
+        + currentTrackProperty(): ReadOnlyObjectProperty<Track>
+        + isPlayingProperty(): ReadOnlyBooleanProperty
+    }
+    class PlayerControllerFX <<Observer (JavaFX Listeners)>>
+    class QueueViewControllerFX <<Observer (JavaFX Listeners)>>
+
+    PlayerServiceFX ..> PlayerControllerFX : "binds / listens to"
+    PlayerServiceFX ..> QueueViewControllerFX : "binds / listens to"
+    note bottom of PlayerServiceFX
+        In aggiunta, l'applicazione usa il pattern Observer 
+        tramite le JavaFX Properties per sincronizzare 
+        lo stato del player con i controller grafici (UI).
+    end note
+}
+
+' ========================================================
+' 4. STRATEGY PATTERN
+' ========================================================
+package "Strategy Pattern (Behavioral)" {
+    interface PlayMode <<Strategy>> {
+        + nextItem(queue: List<QueueItem>, current: QueueItem): Optional<QueueItem>
+        + hasNext(queue: List<QueueItem>, current: QueueItem): boolean
+    }
+
+    class SequentialMode <<ConcreteStrategy>>
+    class ShuffleMode <<ConcreteStrategy>>
+    class LoopMode <<ConcreteStrategy>>
+
+    class QueueServiceContext <<Context>> {
+        - playMode: PlayMode
+        + nextItem(): QueueItem
+        + setCurrentPlayMode(mode: PlayMode): void
+    }
+
+    PlayMode <|.. SequentialMode
+    PlayMode <|.. ShuffleMode
+    PlayMode <|.. LoopMode
+    QueueServiceContext "1" o--> "1" PlayMode : "delegates algorithm"
+
+    note right of PlayMode
+        Consente di cambiare algoritmicamente e dinamicamente 
+        la modalità di riproduzione della coda (sequenziale, 
+        loop dello stesso brano, riproduzione casuale).
+    end note
+}
+
+' ========================================================
+' 5. SPECIFICATION PATTERN
+' ========================================================
+package "Specification Pattern (Behavioral)" {
+    interface Specification<T> <<Specification>> {
+        + isSatisfiedBy(item: T): boolean
+    }
+
+    class GenreSpecification <<ConcreteSpecification>> {
+        - genre: Genre
+    }
+    class TagSpecification <<ConcreteSpecification>> {
+        - tag: String
+    }
+    class YearSpecification <<ConcreteSpecification>> {
+        - year: String
+    }
+
+    class GeneratePlaylistCommandClient <<Client>>
+
+    Specification <|.. GenreSpecification
+    Specification <|.. TagSpecification
+    Specification <|.. YearSpecification
+    GeneratePlaylistCommandClient "1" o--> "*" Specification : "filters with"
+
+    note bottom of Specification
+        Definisce criteri di filtraggio riutilizzabili, 
+        combinabili ed estensibili per selezionare le tracce 
+        che soddisfano i requisiti di generazione playlist.
+    end note
+}
+
+@enduml

@@ -1,0 +1,407 @@
+@startuml Detailed Package and Class Diagram
+title Detailed Package & Class Diagram - Music Playlist Manager
+
+skinparam linetype ortho
+skinparam packageStyle frame
+skinparam ClassBackgroundColor #FFFFFF
+skinparam ClassBorderColor #555555
+skinparam ClassHeaderBackgroundColor #F0F0F0
+
+package "it.diem.unisa.musicmanager.model" {
+    interface Playable {
+        + getTracksToPlay(): List<Track>
+        + getType(): QueueItemType
+        + getId(): UUID
+    }
+
+    class Track {
+        - id: UUID
+        - title: String
+        - author: String
+        - genre: Genre
+        - songLength: int
+        - songPath: String
+        - year: String
+        + Track(title, author, genre, songPath, songLength, year)
+        + Track(id, title, author, genre, songPath, songLength, year)
+        + getId(): UUID
+        + getTitle(): String
+        + getAuthor(): String
+        + getGenre(): Genre
+        + getSongLength(): int
+        + getSongPath(): String
+        + getYear(): String
+        + isDuplicate(Track): boolean
+    }
+
+    class Playlist {
+        - id: UUID
+        - name: String
+        - tracks: List<UUID>
+        + Playlist(name)
+        + Playlist(id, name, tracks)
+        + getId(): UUID
+        + getName(): String
+        + setName(name: String): void
+        + addTrack(trackId: UUID): void
+        + removeTrack(trackId: UUID): void
+        + getTracks(): List<UUID>
+        + numberOfTracks(): int
+        + containsTrack(trackId: UUID): boolean
+    }
+
+    class QueueItem {
+        - playable: Playable
+        - belongsToPlaylist: UUID
+        - playlistProgressive: UUID
+        + QueueItem(playable, belongsToPlaylist, playlistProgressive)
+        + getPlayable(): Playable
+        + getBelongsToPlaylist(): UUID
+        + getPlaylistProgressive(): UUID
+    }
+
+    enum Genre {
+        POP, ROCK, HIPHOP, EDM, JAZZ, CLASSICAL, REGGAE, DISCO, METAL, FUNK, INDIE, COUNTRY, RAP, PUNK, UNKNOWN
+    }
+
+    enum QueueItemType {
+        TRACK, PLAYLIST
+    }
+
+    class Tag {
+        - id: UUID
+        - name: String
+        + Tag(name)
+        + getName(): String
+    }
+}
+
+package "it.diem.unisa.musicmanager.dao" {
+    interface DAO<T> {
+        + selectAll(): List<T>
+        + insert(item: T): void
+        + update(item: T): void
+        + delete(id: UUID): void
+        + searchById(id: UUID): Optional<T>
+        + isDuplicated(item: T): boolean
+    }
+
+    abstract class JSONAbstractDAO {
+        # createFileJSON(filePath: String, folderPath: String): void
+    }
+
+    class JSONTrackDAO {
+        - filePath: String
+        - json: Gson
+        + JSONTrackDAO(filePath, folderPath)
+        + selectAll(): List<Track>
+        + insert(track: Track): void
+        + update(track: Track): void
+        + delete(id: UUID): void
+        + searchById(id: UUID): Optional<Track>
+        + isDuplicated(track: Track): boolean
+    }
+
+    class JSONPlaylistDAO {
+        - filePath: String
+        - json: Gson
+        + JSONPlaylistDAO(filePath, folderPath)
+        + selectAll(): List<Playlist>
+        + insert(playlist: Playlist): void
+        + update(playlist: Playlist): void
+        + delete(id: UUID): void
+        + searchById(id: UUID): Optional<Playlist>
+        + isDuplicated(playlist: Playlist): boolean
+    }
+}
+
+package "it.diem.unisa.musicmanager.service" {
+    interface TrackObserver {
+        + onTrackDeleted(trackId: UUID): void
+    }
+
+    class TrackService {
+        - trackDAO: DAO<Track>
+        - sharedState: SharedState
+        - observers: List<TrackObserver>
+        + TrackService(trackDAO, sharedState)
+        + getAllTracks(): ObservableList<Track>
+        + searchTrackById(id: UUID): Optional<Track>
+        + addTrack(title, author, genre, year, length, path): Optional<String>
+        + updateTrack(id, title, author, genre, year): Optional<String>
+        + deleteTrack(id: UUID): void
+        + addObserver(observer: TrackObserver): void
+    }
+
+    class PlaylistService {
+        - playlistDAO: DAO<Playlist>
+        - sharedState: SharedState
+        + PlaylistService(playlistDAO, sharedState)
+        + getPlaylists(): ObservableList<Playlist>
+        + createPlaylist(name: String): Optional<String>
+        + deletePlaylist(id: UUID): void
+        + renamePlaylist(id: UUID, name: String): Optional<String>
+        + addTrackToPlaylist(playlistId: UUID, trackId: UUID): void
+        + removeTrackFromPlaylist(playlistId: UUID, trackId: UUID): void
+        + getPlaylistById(id: UUID): Optional<Playlist>
+    }
+
+    class PlayerService {
+        - trackService: TrackService
+        - queueService: QueueService
+        - currentTrack: ObjectProperty<Track>
+        - isPlaying: BooleanProperty
+        - progress: DoubleProperty
+        - mediaPlayer: MediaPlayer
+        - loadedTrack: Track
+        + play(track, clearQueueItem, forceRestart): void
+        + pause(): void
+        + resume(): void
+        + seek(fraction: double): void
+        + togglePlay(track: Track): void
+        + next(): void
+        + skipPlaylist(): void
+        + currentTrackProperty(): ReadOnlyObjectProperty<Track>
+        + isPlayingProperty(): ReadOnlyBooleanProperty
+        + progressProperty(): ReadOnlyDoubleProperty
+    }
+
+    class QueueService {
+        - sharedState: SharedState
+        - currentItem: ObjectProperty<QueueItem>
+        - playMode: PlayMode
+        + QueueService(sharedState)
+        + addToQueue(playable: Playable): List<QueueItem>
+        + clearQueue(): void
+        + nextItem(): QueueItem
+        + skipCurrentPlaylist(): QueueItem
+        + queuePlaylistFromTrack(playable, track): QueueItem
+        + synchronizePlaylistOrder(playlist: Playlist): void
+        + moveQueueItem(item: QueueItem, newIndex: int): void
+        + moveQueueItem(dragged: QueueItem, target: QueueItem): void
+        + getQueueList(): ObservableList<QueueItem>
+        + currentItemProperty(): ReadOnlyObjectProperty<QueueItem>
+        + hasNext(): boolean
+    }
+
+    class PersistenceService {
+        - trackDAO: DAO<Track>
+        - playlistDAO: DAO<Playlist>
+        - sharedState: SharedState
+        + PersistenceService(trackDAO, playlistDAO, sharedState)
+        + load(): void
+    }
+}
+
+package "it.diem.unisa.musicmanager.state" {
+    class SharedState {
+        - allTracks: ObservableList<Track>
+        - allPlaylists: ObservableList<Playlist>
+        - queue: ObservableList<QueueItem>
+        - currentTrack: ObjectProperty<Track>
+        - isPlaying: BooleanProperty
+        - progress: DoubleProperty
+        + getALlTracks(): ObservableList<Track>
+        + getALlPlaylists(): ObservableList<Playlist>
+        + getQueue(): ObservableList<QueueItem>
+        + getCurrentTrack(): ObjectProperty<Track>
+        + getIsPlaying(): BooleanProperty
+        + getProgress(): DoubleProperty
+    }
+}
+
+package "it.diem.unisa.musicmanager.command" {
+    interface Command {
+        + execute(): void
+        + undo(): void
+        + getDescription(): String
+    }
+
+    class CommandManager {
+        - undoStack: Stack<Command>
+        + executeCommand(command: Command): void
+        + undo(): void
+        + canUndo(): boolean
+        + peekUndoDescription(): Optional<String>
+    }
+
+    class CreatePlaylistCommand {
+        - playlistService: PlaylistService
+        - playlistName: String
+        - createdPlaylistId: UUID
+        + CreatePlaylistCommand(playlistService, name)
+    }
+
+    class DeletePlaylistCommand {
+        - playlistService: PlaylistService
+        - playlistId: UUID
+        - deletedPlaylist: Playlist
+        + DeletePlaylistCommand(playlistService, id)
+    }
+
+    class AddTrackToPlaylistCommand {
+        - playlistService: PlaylistService
+        - playlistId: UUID
+        - trackId: UUID
+        + AddTrackToPlaylistCommand(playlistService, playlistId, trackId)
+    }
+
+    class RemoveTrackFromPlaylistCommand {
+        - playlistService: PlaylistService
+        - playlistId: UUID
+        - trackId: UUID
+        - trackIndex: int
+        + RemoveTrackFromPlaylistCommand(playlistService, playlistId, trackId)
+    }
+
+    class GeneratePlaylistCommand {
+        - playlistService: PlaylistService
+        - trackService: TrackService
+        - playlistName: String
+        - specs: List<Specification<Track>>
+        - createdPlaylistId: UUID
+        - previousTracks: List<UUID>
+        - isOverwrite: boolean
+        + GeneratePlaylistCommand(playlistService, trackService, name, specs)
+    }
+}
+
+package "it.diem.unisa.musicmanager.specification" {
+    interface Specification<T> {
+        + isSatisfiedBy(item: T): boolean
+    }
+
+    class GenreSpecification {
+        - genre: Genre
+        + GenreSpecification(genre)
+    }
+
+    class TagSpecification {
+        - tag: String
+        + TagSpecification(tag)
+    }
+
+    class YearSpecification {
+        - year: String
+        + YearSpecification(year)
+    }
+}
+
+package "it.diem.unisa.musicmanager.playmode" {
+    interface PlayMode {
+        + nextItem(queue: List<QueueItem>, current: QueueItem): Optional<QueueItem>
+        + hasNext(queue: List<QueueItem>, current: QueueItem): boolean
+    }
+
+    class SequentialMode {
+        + nextItem(queue, current): Optional<QueueItem>
+        + hasNext(queue, current): boolean
+    }
+
+    class ShuffleMode {
+        - playedItems: Set<UUID>
+        + nextItem(queue, current): Optional<QueueItem>
+        + hasNext(queue, current): boolean
+    }
+
+    class LoopMode {
+        + nextItem(queue, current): Optional<QueueItem>
+        + hasNext(queue, current): boolean
+    }
+}
+
+package "it.diem.unisa.musicmanager.controller" {
+    class MainController {
+        - playlistsPageController: PlaylistController
+        - tracksPageController: TracksController
+        - playerController: PlayerController
+        - homePageController: HomeController
+        - queueService: QueueService
+        - playlistService: PlaylistService
+        - playerService: PlayerService
+        - commandManager: CommandManager
+        + initialize(): void
+        - openHome(): void
+        - openTracks(): void
+        - openPlaylists(): void
+        - openQueue(): void
+        - onUndo(): void
+    }
+
+    class QueueViewController {
+        - queueListView: ListView<QueueItem>
+        - labelCurrentTrack: Label
+        - queueService: QueueService
+        - playlistService: PlaylistService
+        - playerService: PlayerService
+        - filteredQueue: FilteredList<QueueItem>
+        + initialize(): void
+        + setQueueService(queueService): void
+        + setPlayerService(playerService): void
+        + setPlaylistService(playlistService): void
+        - refreshQueueFilter(): void
+    }
+
+    class GeneratePlaylistController {
+        - playlistService: PlaylistService
+        - trackService: TrackService
+        - commandManager: CommandManager
+        - fieldName: TextField
+        - comboGenre: ComboBox<Genre>
+        - fieldTag: TextField
+        - fieldYear: TextField
+        + onGenerate(event): void
+    }
+
+    class PlaylistCardController {
+        - playlistService: PlaylistService
+        - playerService: PlayerService
+        - trackService: TrackService
+        - queueService: QueueService
+        - playlist: Playlist
+        + setPlaylist(playlist): void
+        - handlePlay(): void
+        - handleMenu(): void
+    }
+
+    class DetailedPlaylistController {
+        - playlistService: PlaylistService
+        - playerService: PlayerService
+        - trackService: TrackService
+        - queueService: QueueService
+        - commandManager: CommandManager
+        - playlist: Playlist
+        + onAddToQueue(event): void
+        + onSequential(event): void
+        + onLoop(event): void
+        + onShuffle(event): void
+    }
+}
+
+' --- Realizations ---
+Playable <|.. Track
+Playable <|.. Playlist
+DAO <|.. JSONTrackDAO
+DAO <|.. JSONPlaylistDAO
+JSONAbstractDAO <|-- JSONTrackDAO
+JSONAbstractDAO <|-- JSONPlaylistDAO
+
+TrackObserver <|.. PlaylistService
+TrackObserver <|.. PlayerService
+TrackObserver <|.. QueueService
+
+Command <|.. CreatePlaylistCommand
+Command <|.. DeletePlaylistCommand
+Command <|.. AddTrackToPlaylistCommand
+Command <|.. RemoveTrackFromPlaylistCommand
+Command <|.. GeneratePlaylistCommand
+
+Specification <|.. GenreSpecification
+Specification <|.. TagSpecification
+Specification <|.. YearSpecification
+
+PlayMode <|.. SequentialMode
+PlayMode <|.. ShuffleMode
+PlayMode <|.. LoopMode
+
+@enduml

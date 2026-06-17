@@ -1,0 +1,126 @@
+@startuml
+enum Tag {
++  FAVOURITE
++  EXPLICIT
++  NEWRELEASE
+}
+
+enum QueueItemType {
++  TRACK
++  PLAYLIST
+}
+
+enum Genre {
++  POP
++  ROCK
++  HIPHOP
++  EDM
++  JAZZ
++  CLASSICAL
++  REGGAE
++  DISCO
++  METAL
++  FUNK
++  INDIE
++  COUNTRY
++  RAP
++  PUNK
++  UNKNOWN
+}
+
+' --- COMPOSITE PATTERN: Component ---
+interface Playable {
+~ List<Track> getTracksToPlay()
+~ QueueItemType getType()
+~ UUID getId()
+}
+
+' --- COMPOSITE PATTERN: Composite ---
+class Playlist {
+- String name
+- UUID id
+- List<UUID> trackIDs
+- List<Track> tracksList
+- int playCount
++ List<Track> getTracksToPlay()
++ QueueItemType getType()
++ UUID getId()
++ String getName()
++ void setName(String)
++ void addTrack(UUID)
++ void removeTrack(UUID)
++ List<UUID> getTracks()
++ boolean containsTrack(UUID)
++ int numberOfTracks()
+- boolean checkRulesName(String)
++ void addTrack(Track)
++ void addTrackAtPosition(Track, int)
++ void removeTrack(Track)
++ void moveTrack(int, int)
++ List<Track> getTracksList()
++ void resolveTracks(List<Track>)
++ void replaceTracks(List<Track>)
++ boolean equals(Object)
++ int hashCode()
++ int getPlayCount()
++ void incrementPlayCount()
+}
+
+' --- COMPOSITE PATTERN: Leaf ---
+class Track {
+- UUID id
+- String title
+- String author
+- Genre genre
+- int songLength
+- String songPath
+- String year
+- int playCount
+- Set<Tag> tags
++ List<Track> getTracksToPlay()
++ QueueItemType getType()
++ UUID getId()
++ int getSongLength()
++ String getTitle()
++ Genre getGenre()
++ String getYear()
++ String getAuthor()
++ String getSongPath()
++ Set<Tag> getTags()
++ void addTag(Tag)
++ void removeTag(Tag)
++ boolean hasTag(Tag)
++ void setTags(Set<Tag>)
++ void setTitle(String)
++ void setAuthor(String)
++ void setGenre(Genre)
++ void setYear(String)
++ boolean isDuplicate(Track)
+- String validateTitle(String)
+- String validateAuthor(String)
+- int validateSongLength(int)
+- String validateYear(String)
++ int getPlayCount()
++ void incrementPlayCount()
++ boolean equals(Object)
++ int hashCode()
+}
+
+class QueueItem {
+- Playable playable
+- UUID belongsToPlaylist
+- UUID playlistProgressive
++ Playable getPlayable()
++ UUID getBelongsToPlaylist()
++ UUID getPlaylistProgressive()
++ boolean isPlaylist()
++ boolean isTrack()
+}
+
+' --- Relazioni UML ---
+Playable <|.. Playlist
+Playable <|.. Track
+
+' Nel codice Playlist aggrega liste di Track
+Playlist o--> "0..*" Track : contains
+@enduml
