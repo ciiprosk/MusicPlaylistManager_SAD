@@ -105,6 +105,10 @@ public class RemoveTrackFromPlaylistCommand implements Command{
         }
     }
 
+    /**
+     * Restituisce una descrizione del comando.
+     * @return stringa che descrive l'operazione eseguita dal comando
+     */
     @Override
     public String getDescription() {
         return "Remove \"" + trackTitle + "\" from \"" + playlistName + "\"";

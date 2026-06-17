@@ -9,6 +9,10 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+/**
+ * Classe che implementa l'interfaccia Command per la creazione di una traccia.
+ * Implementa il Command Pattern per supportare l'undo di operazioni di creazione.
+ */
 public class AddTrackCommand implements Command {
 
     //ci servono come attributi il service di Track (per le operazioni CRUD)
@@ -23,6 +27,17 @@ public class AddTrackCommand implements Command {
     private final Set<Tag> tags;
     private UUID createdId;   // catturato dopo execute(), serve all'undo
 
+    /**
+     * Costruisce un comando per creare una traccia.
+     * @param service Il servizio che gestisce le tracce (receiver).
+     * @param title Il titolo della traccia.
+     * @param author Il nome dell'autore.
+     * @param year La data di pubblicazione.
+     * @param songPath Il percorso del file audio.
+     * @param genre Il genere della traccia.
+     * @param songLength La durata della traccia in secondi.
+     * @param tags i Tag della traccia.
+     */
     public AddTrackCommand(TrackService service, String title, String author, String year, String songPath, Genre genre, int songLength, Set<Tag> tags) {
 
         this.service = service;
@@ -36,6 +51,11 @@ public class AddTrackCommand implements Command {
 
     }
 
+    /**
+     * Esegue il comando di creazione della traccia.
+     *
+     * @return Optional#empty() se l'operazione ha successo, altrimenti un Optional contenente un messaggio di errore.
+     */
     @Override
     public Optional<String> execute() {
         Optional<String> error = service.addTrack(title, author, genre, songPath, songLength, year, tags);
@@ -55,6 +75,10 @@ public class AddTrackCommand implements Command {
         return error;
     }
 
+    /**
+     * Annulla l'operazione di creazione della traccia.
+     *
+     */
     @Override
     public void undo() {
         if (createdId != null) {
@@ -62,6 +86,10 @@ public class AddTrackCommand implements Command {
         }
     }
 
+    /**
+     * Restituisce una descrizione del comando.
+     * @return una stringa che descrive l'operazione eseguita dal comando
+     */
     @Override
     public String getDescription() {
         return "Add track \"" + title + "\"";
