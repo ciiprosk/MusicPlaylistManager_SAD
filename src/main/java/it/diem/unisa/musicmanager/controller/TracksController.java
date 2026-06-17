@@ -1,8 +1,7 @@
 package it.diem.unisa.musicmanager.controller;
 
-import it.diem.unisa.musicmanager.command.AddTrackCommand;
+
 import it.diem.unisa.musicmanager.command.CommandManager;
-import it.diem.unisa.musicmanager.model.Playlist;
 import it.diem.unisa.musicmanager.model.Track;
 import it.diem.unisa.musicmanager.service.PlayerService;
 import it.diem.unisa.musicmanager.service.PlaylistService;
@@ -15,19 +14,22 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
-import javafx.stage.Stage;
 import javafx.scene.control.Label;
-
 import java.io.IOException;
-import java.util.Optional;
 
+/**
+ * Controller per la schermata principale dell'archivio tracce.
+ * Gestisce la visualizzazione dinamica dell'elenco dei brani musicali,
+ * fornendo funzionalità di ricerca in tempo reale (filtro testuale) e l'accesso
+ * alle interfacce per l'aggiunta di nuovi brani o la visualizzazione dei dettagli.
+ * Sfrutta il pattern Observer per ricaricare automaticamente la UI ogni volta
+ * che la lista delle tracce nel Model subisce una modifica.
+ */
 public class TracksController {
 
 
@@ -47,21 +49,59 @@ public class TracksController {
 
     @FXML private VBox trackList;
 
+    /**
+     * Inietta il service responsabile della gestione delle tracce (Model).
+     * All'iniezione, aggancia automaticamente un listener reattivo alla lista
+     * delle tracce per mantenere la View costantemente sincronizzata.
+     * * @param trackService l'istanza del service delle tracce.
+     */
     public void setTrackService(TrackService trackService) {
 
         this.trackService = trackService;
         createTrackListener();
     }
 
+    /**
+     * Inietta il service responsabile della gestione delle tracce (Model).
+     * All'iniezione, aggancia automaticamente un listener reattivo alla lista
+     * delle tracce per mantenere la View costantemente sincronizzata.
+     * * @param trackService l'istanza del service delle tracce.
+     */
     public void setPlaylistService(PlaylistService playlistService) {
         this.playlistService = playlistService;
     }
 
+    /**
+     * Inietta il service responsabile della gestione della coda di ascolto.
+     * * @param queueService l'istanza del service della coda.
+     */
+    public void setQueueService(QueueService queueService) {
+        this.queueService = queueService;
+    }
+
+    /**
+     * Inietta il service responsabile della riproduzione audio.
+     * * @param playerService l'istanza del service di riproduzione.
+     */
+    public void setPlayerService(PlayerService playerService) {
+        this.playerService = playerService;
+    }
+
+    /**
+     * Inietta il gestore dei comandi (Command Pattern) per supportare operazioni
+     * annullabili/ripetibili (Undo/Redo).
+     * * @param commandManager l'istanza del gestore dei comandi.
+     */
     public void setCommandManager(CommandManager commandManager) {
         this.commandManager = commandManager;
     }
 
-
+    /**
+     * Gestisce l'evento di click sul pulsante per l'aggiunta di una nuova traccia.
+     * Apre la finestra modale dedicata all'inserimento dei dati del nuovo brano.
+     * * @param actionEvent l'evento generato dal click sul bottone.
+     * @throws IOException se il caricamento del file FXML fallisce.
+     */
     public void handleAdd(ActionEvent actionEvent) throws IOException {
         FXMLLoader loader = WindowUtil.openWindow("/it/diem/unisa/musicmanager/pages/addSong.fxml", "Add Track",Modality.WINDOW_MODAL);
         if (loader == null) {
@@ -73,7 +113,11 @@ public class TracksController {
     }
 
 
-
+    /**
+     * Inizializzazione standard di JavaFX, chiamata automaticamente dopo il caricamento dell'FXML.
+     * Configura il listener sulla barra di ricerca per eseguire il filtraggio testuale in tempo reale
+     * e gestisce la visibilità del pulsante per svuotare la ricerca.
+     */
     @FXML
     public void initialize() {
         if (searchBar != null) {
@@ -93,6 +137,13 @@ public class TracksController {
         }
     }
 
+    /**
+     * Carica e renderizza la lista delle tracce all'interno del contenitore VBox (trackList).
+     * Applica eventuali filtri testuali provenienti dalla barra di ricerca.
+     * Gestisce la User Experience in caso di lista vuota, mostrando messaggi contestuali
+     * (archivio completamente vuoto vs. nessun risultato trovato per la ricerca corrente).
+     * * @throws IOException se il caricamento dei componenti grafici delle singole righe fallisce.
+     */
     public void loadTracks() throws IOException {
         trackList.getChildren().clear();
 
@@ -115,6 +166,15 @@ public class TracksController {
             trackList.getChildren().add(emptyLabel);
         }
     }
+
+    /**
+     * Genera dinamicamente il componente grafico (Node) per una singola riga della lista tracce.
+     * Inietta tutte le dipendenze necessarie nel controller della singola riga per permettere
+     * l'interazione (Play, aggiunta alla coda, eliminazione, ecc.).
+     * * @param track la traccia da visualizzare nella riga.
+     * @return il nodo grafico JavaFX configurato.
+     * @throws IOException se il file FXML `trackRow.fxml` non viene trovato o è corrotto.
+     */
     private Node createTrackRow(Track track) throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/it/diem/unisa/musicmanager/components/trackRow.fxml"));
 
@@ -130,7 +190,11 @@ public class TracksController {
         return card;
     }
 
-
+    /**
+     * Registra un InvalidationListener sulla lista osservabile del TrackService.
+     * Questo garantisce che ogni volta che una traccia viene aggiunta, rimossa o modificata
+     * altrove nell'applicazione, la UI si aggiorni automaticamente ricaricando i componenti grafici.
+     */
     private void createTrackListener() {
         if (!isListenerAttached) {
             trackService.getAllTracks().addListener(new InvalidationListener() {
@@ -147,36 +211,7 @@ public class TracksController {
         }
     }
 
-    public void setPlayerService(PlayerService playerService) {
-        this.playerService = playerService;
-    }
 
-    private void openTrackDetails(Track track) {
-        if (track == null) {
-            return;
-        }
 
-        try {
-            FXMLLoader loader = WindowUtil.openWindow(
-                    "/it/diem/unisa/musicmanager/pages/detailSong.fxml",
-                    "Track Details",
-                    Modality.WINDOW_MODAL
-            );
-            if (loader == null) {
-                return;
-            }
 
-            DetailSongController controller = loader.getController();
-            controller.setTrackService(trackService);
-            controller.setTrack(track);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    public void setQueueService(QueueService queueService) {
-        this.queueService = queueService;
-    }
 }

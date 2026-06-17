@@ -40,6 +40,13 @@ public class PlaylistController {
     private boolean isListenerAttached = false;
     private CommandManager commandManager;
 
+    /**
+     * Metodo di inizializzazione chiamato automaticamente da JavaFX al termine del caricamento dell'FXML.
+     * Configura il listener reattivo sulla barra di ricerca: ogni volta che l'utente digita un carattere,
+     * l'elenco delle playlist viene filtrato in tempo reale. Gestisce inoltre la visibilità
+     * del pulsante per svuotare rapidamente il campo di ricerca.
+     * * @throws IOException se si verifica un errore durante il primo caricamento delle card.
+     */
     @FXML
     public void initialize() throws IOException {
         if (searchBar != null) {
@@ -83,7 +90,13 @@ public class PlaylistController {
     }
 
 
-    // metodi setere da chiamare per passare i service
+    /**
+     * Inietta il service responsabile della gestione logica e persistenza delle playlist.
+     * Al momento dell'iniezione, aggancia un `InvalidationListener` alla lista osservabile del Model
+     * per garantire che la griglia venga ridisegnata automaticamente in caso di modifiche esterne.
+     * L'uso del flag `isListenerAttached` previene memory leak dovuti a registrazioni multiple.
+     * * @param playlistService l'istanza del service delle playlist.
+     */
     public void setPlaylistService(PlaylistService playlistService) {
 
         this.playlistService = playlistService;
@@ -104,16 +117,33 @@ public class PlaylistController {
         }
         checkReadyAndLoad();
     }
+
+    /**
+     * Inietta il service responsabile della riproduzione audio.
+     * @param playerService l'istanza del service di riproduzione.
+     */
     public void setPlayerService(PlayerService playerService) {
         this.playerService = playerService;
         checkReadyAndLoad();
     }
 
-
+    /**
+     * Inietta il service responsabile della gestione delle tracce.
+     * @param trackService l'istanza del service delle tracce.
+     */
     public void setTrackService(TrackService trackService) {
         this.trackService = trackService;
         checkReadyAndLoad();
     }
+
+    /**
+     * Inietta il service responsabile della coda di riproduzione.
+     * @param queueService l'istanza del service della coda.
+     */
+    public void setQueueService(QueueService queueService) {
+        this.queueService = queueService;
+    }
+
 
     public void setCommandManager(CommandManager commandManager) {
         this.commandManager = commandManager;
@@ -171,6 +201,11 @@ public class PlaylistController {
         return card;
     }
 
+    /**
+     * Metodo di utilità per garantire che la griglia venga renderizzata solo quando
+     * tutte le dipendenze essenziali sono state correttamente iniettate dall'applicazione principale.
+     * Evita fastidiosi NullPointerException durante la fase di caricamento.
+     */
     private void checkReadyAndLoad() {
         if (playlistService != null && trackService != null && playerService != null) {
             try {
@@ -180,9 +215,7 @@ public class PlaylistController {
             }
         }
     }
-    public void setQueueService(QueueService queueService) {
-        this.queueService = queueService;
-    }
+
 
 
 

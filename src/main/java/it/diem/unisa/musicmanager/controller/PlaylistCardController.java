@@ -82,14 +82,30 @@ public class PlaylistCardController {
         updatePlayingStyle();
     }
 
+    /**
+     * Inietta il service responsabile della gestione logica e persistenza delle playlist.
+     * @param playlistService l'istanza del service delle playlist.
+     */
     public void setPlaylistService(PlaylistService playlistService) {
         this.playlistService = playlistService;
     }
 
+    /**
+     * Inietta il service responsabile della gestione delle tracce (necessario per le viste di dettaglio).
+     * @param trackService l'istanza del service delle tracce.
+     */
     public void setTrackService(TrackService trackService) {
         this.trackService = trackService;
     }
 
+    /**
+     * Inietta il service responsabile della riproduzione audio.
+     * Configura inoltre dei listener deboli (WeakChangeListener) sulle proprietà del player
+     * per aggiornare lo stile grafico della card quando la playlist inizia o smette di suonare,
+     * prevenendo memory leak nel caso in cui la card venga distrutta.
+     *
+     * @param playerService l'istanza del service di riproduzione.
+     */
     public void setPlayerService(PlayerService playerService) {
         this.playerService = playerService;
         if (!isListenerAttached && playerService != null) {
@@ -100,11 +116,20 @@ public class PlaylistCardController {
         updatePlayingStyle();
     }
 
+    /**
+     * Inietta il service responsabile della coda di ascolto.
+     * @param queueService l'istanza del service della coda.
+     */
     public void setQueueService(QueueService queueService) {
         this.queueService = queueService;
         updatePlayingStyle();
     }
 
+    /**
+     * Inietta il gestore dei comandi per supportare le operazioni annullabili (Undo/Redo),
+     * come l'eliminazione della playlist.
+     * @param commandManager l'istanza del gestore dei comandi.
+     */
     public void setCommandManager(CommandManager commandManager) {
         this.commandManager = commandManager;
     }
@@ -219,6 +244,9 @@ public class PlaylistCardController {
 
     }
 
+    /**
+     * Apre la finestra per la modifica del nome della playlist.
+     */
     private void openEditPlaylist() {
         if (playlistService == null) return;
         try {
@@ -236,6 +264,10 @@ public class PlaylistCardController {
         }
     }
 
+    /**
+     * Apre la vista dettagliata della playlist, iniettando tutte le dipendenze necessarie
+     * nel relativo controller per consentire la gestione completa (aggiunta/rimozione tracce).
+     */
     private void openDetail() {
         try {
             FXMLLoader loader = WindowUtil.openWindow(
@@ -260,6 +292,11 @@ public class PlaylistCardController {
         }
     }
 
+    /**
+     * Gestisce la logica di eliminazione della playlist.
+     * Chiede conferma all'utente tramite una finestra di dialogo (Alert) e, in caso positivo,
+     * esegue l'operazione incapsulandola in un {@link DeletePlaylistCommand} per permettere l'annullamento.
+     */
     private void deletePlaylist() {
         if (playlistService == null || playlist == null) return;
 
@@ -281,10 +318,12 @@ public class PlaylistCardController {
         });
     }
 
-    private void openAddTrackToPlaylist() {
-        //DA FAREE
-    }
-
+    /**
+     * Aggiorna dinamicamente lo stile CSS della card e l'icona del pulsante Play.
+     * Verifica se il brano attualmente in esecuzione nel player appartiene alla playlist
+     * associata a questa card. In caso affermativo, applica una classe CSS di evidenziazione
+     * ("playlist-card-playing") e modifica l'icona del pulsante in "Pausa".
+     */
     private void updatePlayingStyle() {
         if (rootCard == null) return;
         rootCard.getStyleClass().remove("playlist-card-playing");

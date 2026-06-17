@@ -53,6 +53,14 @@ public class RowTrackController {
 
     private boolean isListenerAttached = false;
 
+    /**
+     * Alterna la visualizzazione della riga tra modalità standard e modalità selezione.
+     * In modalità selezione nasconde i pulsanti di azione (Play, Modifica, Menu)
+     * e mostra una CheckBox per la selezione multipla.
+     *
+     * @param isSelectionMode true per attivare la modalità selezione, false per la standard.
+     * @param isAlreadyInPlaylist true se il brano è già presente nella playlist di destinazione (spunta la CheckBox).
+     */
     public void setSelectionMode(boolean isSelectionMode, boolean isAlreadyInPlaylist) {
         checkkSelect.setVisible(isSelectionMode);
         checkkSelect.setManaged(isSelectionMode);
@@ -72,14 +80,27 @@ public class RowTrackController {
         }
     }
 
+    /**
+     * Inietta il gestore dei comandi per supportare operazioni annullabili (Undo/Redo).
+     * @param commandManager l'istanza del CommandManager.
+     */
     public void setCommandManager(CommandManager commandManager) {
         this.commandManager = commandManager;
     }
 
+    /**
+     * Verifica se la riga è attualmente spuntata nella modalità di selezione.
+     * @return true se la CheckBox è selezionata, false altrimenti.
+     */
     public boolean isSelected() {
         return checkkSelect.isSelected();
     }
 
+    /**
+     * Associa un brano a questa riga, popolando tutti gli elementi grafici
+     * (titolo, autore, durata, ascolti e tag) con i dati forniti dal Model.
+     * @param track l'istanza del brano da visualizzare.
+     */
     public void setTrack(Track track) {
         this.track = track;
 
@@ -97,8 +118,10 @@ public class RowTrackController {
         renderTags();
     }
 
-
-
+    /**
+     * Inietta il service responsabile della gestione delle tracce.
+     * @param trackService l'istanza del service delle tracce.
+     */
     public void setTrackService(TrackService trackService) {
         this.trackService = trackService;
     }
@@ -113,6 +136,13 @@ public class RowTrackController {
         updateButtonState();
     };
 
+    /**
+     * Inietta il service di riproduzione audio e aggancia dei WeakChangeListener
+     * allo stato del player. L'uso di listener deboli garantisce che questa card
+     * possa essere rimossa in sicurezza dalla memoria senza causare memory leak
+     * quando la lista viene aggiornata.
+     * @param playerService l'istanza del service di riproduzione.
+     */
     public void setPlayerService(PlayerService playerService) {
         this.playerService = playerService;
 
@@ -127,16 +157,38 @@ public class RowTrackController {
         updateButtonState();
     }
 
+    /**
+     * Inietta il service responsabile della coda di ascolto.
+     * @param queueService l'istanza del service della coda.
+     */
     public void setQueueService(QueueService queueService) {
         this.queueService = queueService;
     }
 
+    /**
+     * Inietta il service responsabile della gestione delle playlist.
+     * @param playlistService l'istanza del service delle playlist.
+     */
     public void setPlaylistService(it.diem.unisa.musicmanager.service.PlaylistService playlistService) {
         this.playlistService = playlistService;
     }
 
+    /**
+     * Imposta la playlist genitore se questa riga viene visualizzata all'interno
+     * della schermata di dettaglio di una playlist. Questo cambia contestualmente
+     * il comportamento del pulsante "Elimina" (rimozione dalla playlist vs rimozione dall'archivio).
+     * @param parentPlaylist la playlist contenitrice, o null se in archivio globale.
+     */
     public void setParentPlaylist(it.diem.unisa.musicmanager.model.Playlist parentPlaylist) {
         this.parentPlaylist = parentPlaylist;
+    }
+
+    /**
+     * Restituisce l'istanza del brano associato a questa riga.
+     * @return la traccia associata.
+     */
+    public Track getTrack() {
+        return track;
     }
 
     /**
@@ -180,11 +232,22 @@ public class RowTrackController {
         }
     }
 
+    /**
+     * Apre la schermata modale per la modifica dei metadati della traccia.
+     * @param actionEvent l'evento generato dal click.
+     */
     @FXML
     public void handleModify(ActionEvent actionEvent) {
         openEditTrack();
     }
 
+    /**
+     * Gestisce l'eliminazione della traccia.
+     * Riconosce dinamicamente il contesto: se la riga si trova dentro una playlist,
+     * il comando rimuoverà il brano solo dalla playlist (RemoveTrackFromPlaylistCommand).
+     * Se si trova nell'archivio globale, eliminerà fisicamente la traccia (DeleteTrackCommand).
+     * @param actionEvent l'evento generato dal click.
+     */
     @FXML
     public void handleDelete(ActionEvent actionEvent) {
         if (track == null) return;
@@ -207,6 +270,11 @@ public class RowTrackController {
 
     }
 
+    /**
+     * Apre il menu contestuale della riga (tre puntini), offrendo azioni secondarie
+     * come il dettaglio, la modifica, l'eliminazione e l'aggiunta alla coda.
+     * @param actionEvent l'evento generato dal click.
+     */
     @FXML
     public void handleMenu(ActionEvent actionEvent) {
         if (track == null) return;
@@ -231,7 +299,9 @@ public class RowTrackController {
         menu.show(buttonMenu, Side.BOTTOM, 0, 0);
     }
 
-
+    /**
+     * Helper per l'apertura modale dei dettagli della traccia.
+     */
     private void openDetail() {
         try {
             FXMLLoader loader = WindowUtil.openWindow(
@@ -254,6 +324,9 @@ public class RowTrackController {
         }
     }
 
+    /**
+     * Helper per l'apertura modale della modifica della traccia.
+     */
     private void openEditTrack() {
         try {
             FXMLLoader loader = WindowUtil.openWindow("/it/diem/unisa/musicmanager/pages/editSong.fxml", "Modify Track", Modality.WINDOW_MODAL);
@@ -269,16 +342,11 @@ public class RowTrackController {
         }
     }
 
-    private void deleteTrackAction() {
-        if (trackService != null && track != null) {
-            trackService.deleteTrack(track.getId());
-        }
-    }
-
-    public Track getTrack() {
-        return track;
-    }
-
+    /**
+     * Aggiorna lo stile CSS dell'intero contenitore della riga.
+     * Se questo specifico brano è in riproduzione, applica la classe "brano-row-playing"
+     * per evidenziarlo visivamente.
+     */
     private void updateCurrentTrackStyle() {
         rootContainer.getStyleClass().remove("brano-row-playing");
 
@@ -296,7 +364,10 @@ public class RowTrackController {
         }
     }
 
-
+    /**
+     * Svuota e renderizza dinamicamente all'interno dell'HBox i badge grafici
+     * relativi ai Tag associati al brano (es. EXPLICIT, FAVOURITE, NEWRELEASE).
+     */
     private void renderTags() {
         if (tagsContainer == null) return;
 
@@ -307,7 +378,11 @@ public class RowTrackController {
         }
     }
 
-    //Creazione dinamica delle label associate ai tag
+    /**
+     * Crea un componente visivo (Label stilizzata) per un singolo tag.
+     * @param tag l'enumerativo del tag da graficare.
+     * @return il nodo Label formattato con classe CSS appropriata.
+     */
     private Label createTag(Tag tag) {
         Label label = new Label();
         label.getStyleClass().add("tag");
@@ -329,6 +404,13 @@ public class RowTrackController {
 
         return label;
     }
+
+    /**
+     * Aggiunge la traccia alla coda di ascolto.
+     * Se la coda è attualmente vuota e non vi è alcuna riproduzione attiva, forza
+     * l'avvio immediato del brano appena accodato. Altrimenti notifica l'aggiunta.
+     * @param actionEvent l'evento generato dal click sull'opzione.
+     */
     private void onAddQueue(ActionEvent actionEvent) {
         if(queueService !=null && track != null) {
             //vedio se la coda d ascolto è vuota

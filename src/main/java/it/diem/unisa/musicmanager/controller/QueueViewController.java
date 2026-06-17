@@ -16,6 +16,15 @@ import javafx.scene.input.TransferMode;
 
 public class QueueViewController {
 
+    /**
+     * Controller per la schermata della Coda di Riproduzione (queueView.fxml).
+     * Gestisce la visualizzazione del brano attualmente in esecuzione e della lista dei brani successivi.
+     * Implementa una logica avanzata tramite {@link FilteredList} per mostrare all'utente solo
+     * gli elementi futuri (nascondendo quelli già riprodotti).
+     * Fornisce inoltra la funzionalità di Drag and Drop per permettere all'utente di riordinare
+     * manualmente i brani in coda.
+     */
+
     @FXML
     private ListView<QueueItem> queueListView;
     @FXML
@@ -27,6 +36,15 @@ public class QueueViewController {
     private FilteredList<QueueItem> filteredQueue;
     private QueueItem draggedQueueItem;
 
+
+
+    /**
+     * Metodo di inizializzazione chiamato automaticamente da JavaFX.
+     * Configura la CellFactory per la ListView, personalizzando la visualizzazione testuale
+     * degli elementi in coda (Titolo, Autore, eventuale Playlist di provenienza).
+     * Implementa inoltre tutti i gestori di eventi per il Drag & Drop nativo,
+     * consentendo il riordino grafico e logico degli elementi.
+     */
     @FXML
     public void initialize() {
 
@@ -148,6 +166,12 @@ public class QueueViewController {
         });
     }
 
+    /**
+     * Inietta il service responsabile delle playlist.
+     * Necessario per recuperare i nomi delle playlist originarie dei brani in coda.
+     * Al momento dell'iniezione, forza un refresh grafico della lista per aggiornare le etichette.
+     * @param playlistService l'istanza del service delle playlist.
+     */
     public void setPlaylistService(PlaylistService playlistService) {
         this.playlistService = playlistService;
         if (queueListView != null) {
@@ -155,6 +179,13 @@ public class QueueViewController {
         }
     }
 
+    /**
+     * Inietta il service responsabile della gestione logica della coda.
+     * Inizializza la {@link FilteredList} agganciata alla lista originale del Service e
+     * predispone i listener per intercettare aggiunte, rimozioni e cambi di brano corrente,
+     * assicurando che la visualizzazione rimanga coerente.
+     * @param queueService l'istanza del service della coda.
+     */
     public void setQueueService(QueueService queueService) {
         this.queueService = queueService;
 
@@ -184,6 +215,12 @@ public class QueueViewController {
         }
     }
 
+    /**
+     * Inietta il service responsabile della riproduzione audio.
+     * Imposta un listener sul brano in esecuzione per aggiornare l'etichetta superiore
+     * ("Now Playing") e richiedere un aggiornamento del filtro della coda.
+     * @param playerService l'istanza del service di riproduzione.
+     */
     public void setPlayerService(it.diem.unisa.musicmanager.service.PlayerService playerService) {
         this.playerService = playerService;
         if (this.playerService != null && labelCurrentTrack != null) {
@@ -197,6 +234,10 @@ public class QueueViewController {
         }
     }
 
+    /**
+     * Aggiorna il testo dell'etichetta che mostra il brano attualmente in esecuzione.
+     * @param track la traccia corrente, oppure null se la riproduzione è ferma.
+     */
     private void updateCurrentTrackLabel(Track track) {
         if (track == null) {
             labelCurrentTrack.setText("No Track Playing");
@@ -205,6 +246,12 @@ public class QueueViewController {
         }
     }
 
+    /**
+     * Ricalcola il predicato (condizione logica) della FilteredList.
+     * Filtra la lista originale mostrata all'utente in modo da includere ESCLUSIVAMENTE
+     * i brani che si trovano dopo l'indice dell'elemento attualmente in riproduzione.
+     * I brani passati vengono mantenuti in memoria dal QueueService, ma nascosti dalla View.
+     */
     private void refreshQueueFilter() {
         if (filteredQueue == null) return;
         javafx.collections.ObservableList<QueueItem> source = queueService.getQueueList();
