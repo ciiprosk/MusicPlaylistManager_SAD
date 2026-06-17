@@ -9,6 +9,7 @@ public class LoopMode implements PlayMode {
 
     @Override
     public Optional<QueueItem> nextItem(List<QueueItem> queue, QueueItem currentItem) {
+
         if (queue.isEmpty()) return Optional.empty();
 
         int currentIndex = queue.indexOf(currentItem);
@@ -16,7 +17,7 @@ public class LoopMode implements PlayMode {
             QueueItem consumed = queue.remove(currentIndex);
             queue.add(consumed);   // lo rimetto in fondo: il loop continua a girare
         }
-        return Optional.of(queue.get(0));   // il prossimo è sempre in testa
+        return Optional.of(queue.getFirst());   // il prossimo è sempre in testa
     }
 
     @Override

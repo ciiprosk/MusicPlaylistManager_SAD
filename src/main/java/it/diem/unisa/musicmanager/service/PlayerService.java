@@ -205,7 +205,6 @@ public class PlayerService implements TrackObserver {
     public void togglePlay(Track track) {
         if (track == null) return;
 
-        // Se il brano passato è quello corrente e sta già suonando -> Pausa
         Track current = currentTrack.get();
 
         if (current != null
@@ -213,11 +212,20 @@ public class PlayerService implements TrackObserver {
                 && isPlaying.get()) {
             pause();
         } else {
-            // Nuova traccia fuori coda: svuota la coda (clearQueueItem=true) e riproduci (forceRestart = false)
             if (queueService != null) {
                 queueService.clearQueue();
+
+                //Aggiunge la traccia alla coda come QueueItem
+                List<QueueItem> items = queueService.addToQueue(track);
+
+                // Imposta il currentItem così LoopMode sa cosa sta suonando
+                if (items != null && !items.isEmpty()) {
+                    queueService.setCurrentItem(items.get(0));
+                }
             }
-            play(track, true, false);
+
+            // false: non azzerare il currentItem che abbiamo appena impostato
+            play(track, false, false);
         }
     }
 
