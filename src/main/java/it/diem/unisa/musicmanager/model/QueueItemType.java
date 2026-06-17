@@ -1,9 +1,11 @@
 package it.diem.unisa.musicmanager.model;
 
 /**
- * Enumerazione che rappresenta il tipo di elemento della coda.
- * Può essere una traccia o una playlist.
+ * Rappresenta i possibili tipi di elementi inseribili nella coda di riproduzione.
  */
 public enum QueueItemType {
-    TRACK, PLAYLIST
+    /** Indica che l'elemento è una singola traccia. */
+    TRACK, 
+    /** Indica che l'elemento è una playlist. */
+    PLAYLIST
 }
