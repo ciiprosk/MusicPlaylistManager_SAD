@@ -171,6 +171,22 @@ public class PlaylistService implements TrackObserver{
     }
 
     /**
+     * Metodo che aggiunge una traccia a una playlist, in una certa posizione.
+     * @param playlistId è l'identificatore univoco della playlist a cui aggiungere la traccia.
+     * @param track è l'identificatore univoco della traccia da aggiungere.
+     */
+    public void addTrackToPlaylistAtPosition(UUID playlistId, Track track, int position) {
+        Playlist playlist = sharedState.getALlPlaylists().stream()
+                .filter(p -> p.getId().equals(playlistId))
+                .findFirst()
+                .orElse(null);
+        if (playlist == null || playlist.containsTrack(track.getId())) return;
+        playlist.addTrackAtPosition(track, position);
+        playlistDAO.update(playlist);
+        updateInState(playlist);
+    }
+
+    /**
      * Metodo che rimuove una traccia da una playlist.
      * @param playlistID è l'identificatore univoco della playlist da cui rimuovere la traccia.
      * @param trackID è l'identificatore univoco della traccia da rimuovere.

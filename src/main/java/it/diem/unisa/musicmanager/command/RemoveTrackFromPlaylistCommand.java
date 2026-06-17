@@ -91,6 +91,6 @@ public class RemoveTrackFromPlaylistCommand implements Command{
 
     @Override
     public String getDescription() {
-        return "Remove \"" + trackTitle + "\" to \"" + playlistName + "\"";
+        return "Remove \"" + trackTitle + "\" from \"" + playlistName + "\"";
     }
 }

@@ -204,6 +204,23 @@ public class Playlist implements Playable{
     }
 
     /**
+     * Aggiunge una traccia alla playlist in una certa posizione, aggiornando sia la lista in memoria che la lista per il salvataggio JSON.
+     * @param track l'oggetto Track da aggiungere, la posizione in cui aggiungere la Track.
+     */
+    public void addTrackAtPosition(Track track, int position) {
+
+        if (track == null || trackIDs.contains(track.getId()))
+            return;
+
+        int idx = Math.min(position, trackIDs.size());
+
+        trackIDs.add(idx, track.getId());
+
+        tracksList.add(idx, track);
+
+    }
+
+    /**
      * Rimuove una traccia dalla playlist, aggiornando sia la lista in memoria che la lista per il salvataggio JSON.
      * @param track l'oggetto Track da rimuovere.
      */

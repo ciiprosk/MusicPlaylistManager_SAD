@@ -82,6 +82,8 @@ public class MusicPlaylistManager extends Application {
         controller.getTracksPageController().setQueueService(queueService);
         controller.getTracksPageController().setTrackService(trackService);
         controller.getTracksPageController().setPlayerService(playerService);
+        controller.getTracksPageController().setCommandManager(commandManager);
+        controller.getTracksPageController().setPlaylistService(playlistService);
         controller.getTracksPageController().loadTracks();
 
         //passo service al player

@@ -84,6 +84,7 @@ public class HomeController {
 
     public void setCommandManager(CommandManager commandManager) {
         this.commandManager = commandManager;
+        loadTopTracks();
         loadTopPlaylists();
     }
 
@@ -141,10 +142,8 @@ public class HomeController {
                 controller.setTrackService(trackService);
                 controller.setPlayerService(playerService);
                 controller.setQueueService(queueService);
-                controller.setOnDeleteAction(() -> {
-                    trackService.deleteTrack(track.getId());
-                    loadTopTracks();
-                });
+                controller.setPlaylistService(playlistService);
+                controller.setCommandManager(commandManager);
 
                 topTracksContainer.getChildren().add(row);
             } catch (java.io.IOException e) {

@@ -146,6 +146,13 @@ public class TrackService {
         sharedState.getALlTracks().removeIf(t -> t.getId().equals(trackId));
     }
 
+    //metodo per recuperare la traccia eliminata (Undo di eliminazione della traccia dall'archivio)
+    public void restoreTrack(Track track) {
+        if (track == null) return;
+        trackDAO.insert(track);
+        sharedState.getALlTracks().add(track);
+    }
+
     //si occupa dell'update della traccia nell'interfaccia grafica
     private void updateInState(Track track) {
 

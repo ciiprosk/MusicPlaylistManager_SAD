@@ -1,5 +1,7 @@
 package it.diem.unisa.musicmanager.controller;
 
+import it.diem.unisa.musicmanager.command.AddTrackCommand;
+import it.diem.unisa.musicmanager.command.CommandManager;
 import it.diem.unisa.musicmanager.exception.TrackInfoException;
 import it.diem.unisa.musicmanager.model.Genre;
 import it.diem.unisa.musicmanager.model.Track;
@@ -59,6 +61,9 @@ public class AddSongController {
     // Durata del brano in secondi, dedotta automaticamente dal file audio.
     private int songLengthSeconds;
 
+    //per fare Command (add, delete e i rispettivi Undo)
+    private CommandManager commandManager;
+
     /**
      * Imposta il service da usare per salvare i brani.
      * Va chiamato da TracksController subito dopo aver caricato il popup,
@@ -75,6 +80,13 @@ public class AddSongController {
      * Metodo chiamato automaticamente da JavaFX appena la finestra e' pronta.
      * Lo usiamo per riempire la tendina dei generi.
      */
+
+    public void setCommandManager(CommandManager commandManager) {
+
+        this.commandManager = commandManager;
+
+    }
+
     @FXML
     private void initialize() {
         // Mettiamo nella tendina tutti i generi tranne UNKNOWN:
@@ -208,16 +220,13 @@ public class AddSongController {
         try {
 
             // Validazione lasciata al costruttore
-            Optional<String> result = trackService.addTrack(
-                    titolo,
-                    autore,
-                    genre,
-                    audioPath,
-                    songLengthSeconds,
-                    anno,
-                    TagUtils.fromToggles(btnExplicit, btnFavorite, btnNewRelease)
+            Optional<String> result = commandManager.executeCommand(  // ← passa per il CommandManager
+                    new AddTrackCommand(
+                            trackService, titolo, autore, anno, audioPath,
+                            genre, songLengthSeconds,
+                            TagUtils.fromToggles(btnExplicit, btnFavorite, btnNewRelease)
+                    )
             );
-
             if (result.isPresent()) {
                 lblError.setText(result.get());
                 return;

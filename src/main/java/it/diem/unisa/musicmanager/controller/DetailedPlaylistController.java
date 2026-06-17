@@ -121,8 +121,10 @@ public class DetailedPlaylistController {
 
     public void setCommandManager(CommandManager commandManager) {
         this.commandManager = commandManager;
+        if (playlist != null && trackService != null && playerService != null) {
+            loadTracks();
+        }
     }
-
     private void updateTrackCount() {
         if (playlist == null) return;
         int n = playlist.getTracksList().size();
@@ -223,17 +225,8 @@ public class DetailedPlaylistController {
                 controller.setQueueService(queueService);
                 controller.setPlaylistService(playlistService);
                 controller.setParentPlaylist(playlist);
+                controller.setCommandManager(commandManager);
 
-                //se premo il tasto elimina, rimuovo la traccia dalla playlist
-                controller.setOnDeleteAction(() -> {
-                    if (playlistService != null) {
-                        playlistService.removeTrackFromPlaylist(playlist.getId(), track.getId());
-                        javafx.application.Platform.runLater(() -> {
-                            updateTrackCount();
-                            loadTracks();
-                        });
-                    }
-                });
 
                 trackList.getChildren().add(row);
 

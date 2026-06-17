@@ -1,5 +1,8 @@
 package it.diem.unisa.musicmanager.controller;
 
+import it.diem.unisa.musicmanager.command.CommandManager;
+import it.diem.unisa.musicmanager.command.DeleteTrackCommand;
+import it.diem.unisa.musicmanager.command.RemoveTrackFromPlaylistCommand;
 import it.diem.unisa.musicmanager.model.Tag;
 import it.diem.unisa.musicmanager.model.Track;
 import it.diem.unisa.musicmanager.service.PlayerService;
@@ -31,6 +34,7 @@ public class RowTrackController {
     private QueueService queueService;
     private it.diem.unisa.musicmanager.service.PlaylistService playlistService;
     private it.diem.unisa.musicmanager.model.Playlist parentPlaylist;
+    private CommandManager commandManager;
 
     @FXML private Label lblTitle;
     @FXML private Label lblAuthor;
@@ -48,7 +52,6 @@ public class RowTrackController {
     private HBox tagsContainer;
 
     private boolean isListenerAttached = false;
-    private Runnable onDeleteAction;
 
     public void setSelectionMode(boolean isSelectionMode, boolean isAlreadyInPlaylist) {
         checkkSelect.setVisible(isSelectionMode);
@@ -67,6 +70,10 @@ public class RowTrackController {
             buttonMenu.setVisible(!isSelectionMode);
             buttonMenu.setManaged(!isSelectionMode);
         }
+    }
+
+    public void setCommandManager(CommandManager commandManager) {
+        this.commandManager = commandManager;
     }
 
     public boolean isSelected() {
@@ -180,15 +187,23 @@ public class RowTrackController {
 
     @FXML
     public void handleDelete(ActionEvent actionEvent) {
-        if (trackService != null && track != null) {
-
-            boolean isConfirmed = AlertUtil.showConfirmation("Confirm Delete", "Are you sure you want to delete this track?");
-
-            if (isConfirmed && onDeleteAction != null) {
-                onDeleteAction.run();
-            }
+        if (track == null) return;
+        boolean isConfirmed = AlertUtil.showConfirmation("Confirm Delete", "Are you sure you want to delete this track?");
+        if (!isConfirmed) return;
+        if (parentPlaylist != null) {
+            // contesto playlist --> rimuove dalla playlist
+            commandManager.executeCommand(
+                    new RemoveTrackFromPlaylistCommand(
+                            playlistService, parentPlaylist.getId(), track.getId(),
+                            track.getTitle(), parentPlaylist.getName()
+                    )
+            );
+        } else {
+            // contesto archivio --> elimina dall'archivio
+            commandManager.executeCommand(
+                    new DeleteTrackCommand(trackService, playlistService, track.getId())
+            );
         }
-
     }
 
     @FXML
@@ -261,10 +276,7 @@ public class RowTrackController {
         return track;
     }
 
-    public void setOnDeleteAction(Runnable onDeleteAction) {
-        //AlertUtil.showConfirmation("Confirm Delete", "Are you sure you want to delete this track?");
-        this.onDeleteAction = onDeleteAction;
-    }
+
 
     private void updateCurrentTrackStyle() {
         rootContainer.getStyleClass().remove("brano-row-playing");

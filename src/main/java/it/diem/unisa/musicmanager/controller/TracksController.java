@@ -1,8 +1,11 @@
 package it.diem.unisa.musicmanager.controller;
 
+import it.diem.unisa.musicmanager.command.AddTrackCommand;
+import it.diem.unisa.musicmanager.command.CommandManager;
 import it.diem.unisa.musicmanager.model.Playlist;
 import it.diem.unisa.musicmanager.model.Track;
 import it.diem.unisa.musicmanager.service.PlayerService;
+import it.diem.unisa.musicmanager.service.PlaylistService;
 import it.diem.unisa.musicmanager.service.QueueService;
 import it.diem.unisa.musicmanager.service.TrackService;
 import it.diem.unisa.musicmanager.util.WindowUtil;
@@ -37,8 +40,10 @@ public class TracksController {
 
     private TrackService trackService;
     private PlayerService playerService;
+    private PlaylistService playlistService;
     private QueueService queueService;
     private boolean isListenerAttached = false;
+    private CommandManager commandManager;
 
     @FXML private VBox trackList;
 
@@ -47,18 +52,21 @@ public class TracksController {
         this.trackService = trackService;
         createTrackListener();
     }
-/*
-    public void setPlayerService(PlayerService playerService) {
-        this.playerService = playerService;
+
+    public void setPlaylistService(PlaylistService playlistService) {
+        this.playlistService = playlistService;
     }
 
- */
+    public void setCommandManager(CommandManager commandManager) {
+        this.commandManager = commandManager;
+    }
 
 
     public void handleAdd(ActionEvent actionEvent) throws IOException {
         FXMLLoader loader = WindowUtil.openWindow("/it/diem/unisa/musicmanager/pages/addSong.fxml", "Add Track",Modality.WINDOW_MODAL);
         AddSongController controller = loader.getController();
         controller.setTrackService(trackService);
+        controller.setCommandManager(commandManager);
     }
 
 
@@ -110,10 +118,11 @@ public class TracksController {
         Node card = loader.load();
         RowTrackController controller = loader.getController();
         controller.setTrack(track); //gli passo la track ddi cui creare la row
-        controller.setOnDeleteAction(() -> trackService.deleteTrack(track.getId()));    //elimina dall'archivio la traccia
         controller.setTrackService(trackService); //i serviceeeee
         controller.setPlayerService(playerService);
         controller.setQueueService(queueService);
+        controller.setCommandManager(commandManager);
+        controller.setPlaylistService(playlistService);
         return card;
     }
 
