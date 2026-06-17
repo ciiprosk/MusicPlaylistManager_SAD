@@ -1,17 +1,15 @@
 package it.diem.unisa.musicmanager.controller;
 
+import it.diem.unisa.musicmanager.command.Command;
+import it.diem.unisa.musicmanager.command.CommandManager;
+import it.diem.unisa.musicmanager.command.CreatePlaylistCommand;
 import it.diem.unisa.musicmanager.service.PlaylistService;
+import it.diem.unisa.musicmanager.util.WindowUtil;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.stage.Stage;
-import it.diem.unisa.musicmanager.command.CommandManager;
-import it.diem.unisa.musicmanager.command.Command;
-import it.diem.unisa.musicmanager.command.CreatePlaylistCommand;
-import it.diem.unisa.musicmanager.util.WindowUtil;
-
 
 import java.util.Optional;
 
@@ -24,8 +22,10 @@ import java.util.Optional;
 public class AddPlaylistController {
 
     // --- Campi dell'interfaccia, collegati agli fx:id in addPlaylist.fxml ---
-    @FXML private TextField fieldName;
-    @FXML private Label lblError;
+    @FXML
+    private TextField fieldName;
+    @FXML
+    private Label lblError;
 
 
     // Service per la gestione delle playlist (passato da chi apre il popup).
@@ -41,6 +41,11 @@ public class AddPlaylistController {
         this.playlistService = playlistService;
     }
 
+    /**
+     * Imposta il CommandManager per gestire i comandi.
+     *
+     * @param commandManager il CommandManager condiviso da tutti i controller.
+     */
     public void setCommandManager(CommandManager commandManager) {
         this.commandManager = commandManager;
     }

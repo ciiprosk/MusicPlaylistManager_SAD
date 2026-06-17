@@ -16,6 +16,7 @@ import it.diem.unisa.musicmanager.service.QueueService;
 import it.diem.unisa.musicmanager.service.TrackService;
 import it.diem.unisa.musicmanager.util.AlertUtil;
 import it.diem.unisa.musicmanager.util.WindowUtil;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -84,20 +85,24 @@ public class DetailedPlaylistController {
         if (trackService != null && playerService != null) {
             loadTracks();
         }
-        // Quando il TrackService sara' disponibile, qui risolveremo gli UUID
-        // della playlist nei rispettivi Track e riempiremo la lista:
-        //
-        // List<Track> tracce = playlist.getTracks().stream()
-        //         .map(id -> trackService.findById(id))   // metodo da aggiungere al service
-        //         .filter(Objects::nonNull)
-        //         .toList();
-        // tracksList.getItems().setAll(tracce);
+
     }
 
+    /**
+     * Imposta il servizio della coda di riproduzione.
+     *
+     * @param queueService il {@link QueueService} da associare.
+     */
     public void setQueueService(QueueService queueService){
         this.queueService = queueService;
     }
 
+    /**
+     * Imposta il servizio per la gestione delle playlist e registra un listener
+     * per aggiornare l'interfaccia in caso di modifiche.
+     *
+     * @param playlistService il {@link PlaylistService} da associare.
+     */
     public void setPlaylistService(PlaylistService playlistService) {
         this.playlistService = playlistService;
 
@@ -112,6 +117,12 @@ public class DetailedPlaylistController {
         });
     }
 
+    /**
+     * Imposta il servizio delle tracce e avvia l'ascolto per le modifiche alle tracce.
+     * Se i servizi dipendenti sono pronti, carica le tracce della playlist.
+     *
+     * @param trackService il {@link TrackService} da associare.
+     */
     public void setTrackService(TrackService trackService){
         this.trackService = trackService;
         createTrackListener();
@@ -121,6 +132,12 @@ public class DetailedPlaylistController {
     }
 
 
+    /**
+     * Imposta il servizio di riproduzione.
+     * Se i servizi dipendenti sono pronti, carica le tracce della playlist.
+     *
+     * @param playerService il {@link PlayerService} da associare.
+     */
     public void setPlayerService(PlayerService playerService) {
         this.playerService = playerService;
         if (this.playlist != null && this.trackService != null) {
@@ -129,25 +146,38 @@ public class DetailedPlaylistController {
     }
 
 
+    /**
+     * Imposta il gestore dei comandi (Undo/Redo).
+     * Se i servizi dipendenti sono pronti, carica le tracce della playlist.
+     *
+     * @param commandManager il {@link CommandManager} da associare.
+     */
     public void setCommandManager(CommandManager commandManager) {
         this.commandManager = commandManager;
         if (playlist != null && trackService != null && playerService != null) {
             loadTracks();
         }
     }
+    /**
+     * Aggiorna l'etichetta dell'interfaccia che mostra il numero di tracce presenti nella playlist.
+     */
     private void updateTrackCount() {
         if (playlist == null) return;
         int n = playlist.getTracksList().size();
         lblTrackCount.setText(n + (n == 1 ? " track" : " tracks"));
     }
 
+    /**
+     * Crea e registra un listener per il {@link TrackService} in modo da ricaricare la lista
+     * delle tracce qualora avvengano modifiche (es. aggiunta/rimozione) nel catalogo globale.
+     */
     private void createTrackListener() {
         if (!isTrackListenerAttached && trackService != null) {
             trackService.getAllTracks().addListener(new InvalidationListener() {
                 @Override
                 public void invalidated(Observable observable) {
                     if (playlist != null) {
-                        javafx.application.Platform.runLater(() -> loadTracks());
+                       Platform.runLater(() -> loadTracks());
                     }
                 }
             });
@@ -156,6 +186,10 @@ public class DetailedPlaylistController {
         }
     }
 
+    /**
+     * Carica e mostra graficamente le tracce della playlist.
+     * Associa ad ogni riga la logica di drag & drop per il riordinamento delle tracce.
+     */
     private void loadTracks(){
         trackList.getChildren().clear();
 
@@ -246,6 +280,11 @@ public class DetailedPlaylistController {
         }
     }
 
+    /**
+     * Apre la finestra modale per modificare i dettagli (es. nome) della playlist corrente.
+     *
+     * @param actionEvent L'evento scatenato dal click sul pulsante "Modifica".
+     */
     public void onModify(ActionEvent actionEvent) {
         try {
             FXMLLoader loader = WindowUtil.openWindow(
@@ -263,15 +302,17 @@ public class DetailedPlaylistController {
             controller.setPlaylistService(playlistService);
             controller.setPlaylist(playlist);
 
-            // NOTA: Ho rimosso WindowUtil.close(...) da qui!
-            // In questo modo la schermata di dettaglio resta aperta sotto
-            // mentre modifichi il nome sopra.
 
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    /**
+     * Avvia la riproduzione della playlist.
+     *
+     * @param actionEvent L'evento scatenato dal click sul pulsante di riproduzione.
+     */
     public void onPlay(ActionEvent actionEvent) {
         if (playlist == null) return;
         if (playlist.getTracksList().isEmpty()) {
@@ -282,14 +323,6 @@ public class DetailedPlaylistController {
         if (playlistService != null) {
             playlistService.incrementPlayCount(playlist.getId());
         }
-
-//        if (queueService != null && playerService != null) {
-//            queueService.clearQueue();
-//            queueService.addToQueue(playlist);
-//            playerService.next();
-//        } else if (playerService != null) {
-//            playerService.play(playlist.getTracksList().get(0), false, true);
-//        }
 
         if (playerService != null) {
             playerService.playPlayable(playlist);
@@ -332,6 +365,11 @@ public class DetailedPlaylistController {
         }
     }
 
+    /**
+     * Avvia la procedura di eliminazione della playlist corrente, previa conferma dell'utente.
+     *
+     * @param actionEvent L'evento scatenato dal click sul pulsante "Elimina".
+     */
     public void onDelete(ActionEvent actionEvent) {
         //uso il service per eliminare la playlist
         deletePlaylist();
@@ -340,6 +378,11 @@ public class DetailedPlaylistController {
 
     }
 
+    /**
+     * Avvia la riproduzione della playlist in modalità sequenziale.
+     *
+     * @param actionEvent L'evento scatenato dal click sul pulsante "Sequential".
+     */
     public void onSequential(ActionEvent actionEvent) {
         if (playlist == null) return;
         if (playlist.getTracksList().isEmpty()) {
@@ -354,6 +397,11 @@ public class DetailedPlaylistController {
         }
     }
 
+    /**
+     * Avvia la riproduzione della playlist in modalità a ciclo continuo (loop).
+     *
+     * @param actionEvent L'evento scatenato dal click sul pulsante "Loop".
+     */
     public void onLoop(ActionEvent actionEvent) {
         if (playlist == null) return;
         if (playlist.getTracksList().isEmpty()) {
@@ -368,6 +416,11 @@ public class DetailedPlaylistController {
         }
     }
 
+    /**
+     * Avvia la riproduzione della playlist in modalità casuale (shuffle).
+     *
+     * @param actionEvent L'evento scatenato dal click sul pulsante "Shuffle".
+     */
     public void onShuffle(ActionEvent actionEvent) {
 
         if (playlist == null) return;
@@ -378,15 +431,6 @@ public class DetailedPlaylistController {
         if (playlistService != null)
             playlistService.incrementPlayCount(playlist.getId());
 
-//        if (queueService != null && playerService != null) {
-//
-//            queueService.clearQueue();
-//            queueService.setCurrentPlayMode(new ShuffleMode());
-//            queueService.addToQueue(playlist);
-//            playerService.next();
-//            updateModeButtons(buttonShuffle);
-//
-//        }
         if (queueService != null && playerService != null) {
             queueService.setCurrentPlayMode(new ShuffleMode()); // o LoopMode/SequentialMode
             playerService.playPlayable(playlist);
@@ -394,14 +438,13 @@ public class DetailedPlaylistController {
         }
     }
 
-    /*
-    private void close(ActionEvent e) {
-        Stage stage = (Stage) ((Node) e.getSource()).getScene().getWindow();
-        stage.close();
-    }
 
+    /**
+     * Aggiorna lo stile dei pulsanti delle modalità di riproduzione,
+     * evidenziando quello attualmente attivo.
+     *
+     * @param active Il bottone corrispondente alla modalità di riproduzione attivata.
      */
-
     private void updateModeButtons(Button active) { //metodo per CSS + gestione delle modalità ascolto playlist
         // Reset tutti
         buttonSequential.setDisable(false);
@@ -415,6 +458,10 @@ public class DetailedPlaylistController {
         active.getStyleClass().add("btn-mode-active");
     }
 
+    /**
+     * Mostra un alert di conferma e, in caso positivo, esegue il comando di
+     * eliminazione della playlist corrente tramite il {@link CommandManager}.
+     */
     private void deletePlaylist() {
         if (playlistService == null || playlist == null) return;
 
@@ -435,6 +482,13 @@ public class DetailedPlaylistController {
         });
     }
 
+    /**
+     * Aggiunge tutte le tracce della playlist in coda di riproduzione.
+     * Se la coda era vuota e nessuna traccia è in esecuzione, avvia automaticamente
+     * il player.
+     *
+     * @param actionEvent L'evento scatenato dal click sul pulsante "Aggiungi alla coda".
+     */
     @FXML
     public void onAddToQueue(ActionEvent actionEvent) {
         if(queueService !=null && playlist != null) {

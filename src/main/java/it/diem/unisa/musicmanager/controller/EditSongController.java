@@ -139,6 +139,10 @@ public class EditSongController {
     }
 
 
+    /**
+     * Imposta il callback da eseguire dopo un salvataggio riuscito.
+     * @param onSaved Il callback {@link Runnable} da eseguire.
+     */
     public void setOnSaved(Runnable onSaved) {
         this.onSaved = onSaved;
     }

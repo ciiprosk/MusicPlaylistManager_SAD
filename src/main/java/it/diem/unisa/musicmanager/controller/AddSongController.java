@@ -4,8 +4,9 @@ import it.diem.unisa.musicmanager.command.AddTrackCommand;
 import it.diem.unisa.musicmanager.command.CommandManager;
 import it.diem.unisa.musicmanager.exception.TrackInfoException;
 import it.diem.unisa.musicmanager.model.Genre;
-import it.diem.unisa.musicmanager.model.Track;
 import it.diem.unisa.musicmanager.service.TrackService;
+import it.diem.unisa.musicmanager.util.TagUtils;
+import it.diem.unisa.musicmanager.util.WindowUtil;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -15,17 +16,10 @@ import javafx.scene.media.MediaPlayer;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import it.diem.unisa.musicmanager.model.Tag;
-import it.diem.unisa.musicmanager.util.TagUtils;
-import it.diem.unisa.musicmanager.util.WindowUtil;
-
 
 import java.io.File;
-import java.time.Year;
 import java.util.Arrays;
-import java.util.EnumSet;
 import java.util.Optional;
-import java.util.Set;
 
 /**
  * Controller della finestra modale "Crea Brano" (addSong.fxml).
@@ -41,18 +35,30 @@ public class AddSongController {
 
 
     // --- Campi dell'interfaccia, collegati agli fx:id presenti in addSong.fxml ---
-    @FXML private TextField fieldTitolo;
-    @FXML private TextField fieldAutore;
-    @FXML private TextField fieldAnno;
-    @FXML private TextField fieldDurata;
-    @FXML private ComboBox<Genre> comboGenere;
-    @FXML private Button btnCarica;
-    @FXML private Label lblFilePath;
-    @FXML private Label lblError;
-    @FXML private Button btnCrea;
-    @FXML private ToggleButton btnExplicit;
-    @FXML private ToggleButton btnFavorite;
-    @FXML private ToggleButton btnNewRelease;
+    @FXML
+    private TextField fieldTitolo;
+    @FXML
+    private TextField fieldAutore;
+    @FXML
+    private TextField fieldAnno;
+    @FXML
+    private TextField fieldDurata;
+    @FXML
+    private ComboBox<Genre> comboGenere;
+    @FXML
+    private Button btnCarica;
+    @FXML
+    private Label lblFilePath;
+    @FXML
+    private Label lblError;
+    @FXML
+    private Button btnCrea;
+    @FXML
+    private ToggleButton btnExplicit;
+    @FXML
+    private ToggleButton btnFavorite;
+    @FXML
+    private ToggleButton btnNewRelease;
 
     // Service per la gestione dei brani. Viene passato da chi apre il popup (TracksController).
     private TrackService trackService;
@@ -72,7 +78,8 @@ public class AddSongController {
      * prima che la finestra venga mostrata.
      *
      * @param trackService il service condiviso per la gestione dei brani
-     *                     */
+     *
+     */
 
     public void setTrackService(TrackService trackService) {
         this.trackService = trackService;
@@ -179,19 +186,6 @@ public class AddSongController {
         int secondi = totSecondi % 60;
         return String.format("%d:%02d", minuti, secondi);
     }
-
-    /**
-     * Restituisce il genere scelto dall'utente.
-     *
-     * @return il genere selezionato, oppure UNKNOWN se non e' stato scelto nulla
-     */
-    private Genre getSelectedGenre() {
-        Genre selezionato = comboGenere.getValue();
-        return (selezionato != null) ? selezionato : Genre.UNKNOWN;
-    }
-
-
-
     /**
      * Gestisce il click su "Crea": controlla i campi, crea il brano e lo passa
      * al service per il salvataggio, poi chiude la finestra.
@@ -206,7 +200,7 @@ public class AddSongController {
 
         String titolo = fieldTitolo.getText() == null ? "" : fieldTitolo.getText().trim();
         String autore = fieldAutore.getText() == null ? "" : fieldAutore.getText().trim();
-        String anno   = fieldAnno.getText() == null ? "" : fieldAnno.getText().trim();
+        String anno = fieldAnno.getText() == null ? "" : fieldAnno.getText().trim();
 
         // UI check minimali
         if (audioPath == null || songLengthSeconds <= 0) {

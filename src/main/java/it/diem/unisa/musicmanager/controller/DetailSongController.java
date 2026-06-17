@@ -122,6 +122,11 @@ public class DetailSongController {
     }
 
 
+    /**
+     * Formatta i tag in una stringa separata da virgola.
+     * @param track la traccia da formattare
+     * @return una stringa con i tag separati da virgola, o "No tags" se non ci sono tag
+     */
 
     private String formatTags(Track track) {
         return track.getTags()
